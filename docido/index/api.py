@@ -4,35 +4,33 @@ __all__ = ['IndexAPI', 'IndexAPIProcessor']
 class IndexAPI:
     """Read/write access to Docido index.
 
-    An `IndexAPI` object can manipulate 3 kind of data:
+    :An IndexAPI object can manipulate 3 kind of data:
+        :cards:
+          a searchable item in Docido index.
+        :thumbnails:
+          a binary item in Docido index, for thumbnails of 
+          card's attachments. Used to improve user-experience by providing 
+          fast preview of binary files attached to cards. 
+        :a key value store:
+          provides crawlers a way to persist their synchronization state.
 
-    :cards:
-      a searchable item in Docido index.
-    :thumbnails:
-      a binary item in Docido index, for thumbnails of 
-      card's attachments. Used to improve user-experience by providing 
-      fast preview of binary files attached to cards. 
-    :a key value store:
-      provides crawlers a way to persist their synchronization state.
+    :Error Handling:
+        Every bulk operation that modifies Docido index returns the list of 
+        operations that failed. Every item is a `dict` providing the following key:
 
+        :status:
+          http error code
+        :error:
+          reason in string format
+        :id:
+          error identifier
+        :card:
+          original card
 
-    Every bulk operation that modifies Docido index returns the list of 
-    operations that failed. Every item is a `dict` providing the following key:
-
-    :status:
-      http error code
-    :error:
-      reason in string format
-    :id:
-      error identifier
-    :card:
-      original card
-
-    Filtering
-    ----------
-    Index enumeration and deletion operations allow you to restrict 
-    the target scope by providing a `query` in parameter.
-    The `query` parameters follows the Elasticsearch Query DSL.
+    :Filtering:
+        Index enumeration and deletion operations allow you to restrict 
+        the target scope by providing a `query` in parameter.
+        The `query` parameters follows the Elasticsearch Query DSL.
     """
     def push_cards(self, cards):
         """Send a synchronous bulk indexing request
