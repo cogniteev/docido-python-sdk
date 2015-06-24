@@ -7,12 +7,14 @@ exec(open('docido/version.py').read())
 
 setup(
     name=module_name,
-    version=version,
+    version=__version__,
     description='Docido software development kit for Python',
     author='Cogniteev',
     author_email='tech@cogniteev.com',
     url=root_url,
-    download_url=root_url + '/tarball/v' + version,
+    download_url=root_url + '/tarball/v' + __version__,
+    license='Apache license version 2.0',
+    keywords='cogniteev docido',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
