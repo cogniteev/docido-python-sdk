@@ -6,5 +6,5 @@ pypi_upload:
 pypi_register:
 	$(PYTHON) setup.py sdist register -r pypi
 
-html:
+clean html:
 	cd docs && $(MAKE) $@
