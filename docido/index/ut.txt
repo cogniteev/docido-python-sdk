@@ -1,0 +1,237 @@
+
+# all
+{
+            'took': 1,
+            'timed_out': False,
+            '_shards': {
+                'total': 1,
+                'successful': 1,
+                'failed': 0,
+            },
+            'hits': {
+                'total': len(result),
+                'max_score': 1.0,
+                'hits': [{
+                    '_index': 'docido',
+                    '_type': 'item',
+                    '_id': r['id'],
+                    '_score': 1.0,
+                    '_source': r
+                } for r in result
+                ],
+            }
+        }
+
+
+
+{
+    "fields": []
+}
+=>
+{
+  "took" : 2,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 6,
+    "successful" : 6,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 3,
+    "max_score" : 1.0,
+    "hits" : [ {
+      "_index" : "docido_v1",
+      "_type" : "item",
+      "_id" : "42",
+      "_score" : 1.0
+    }, {
+      "_index" : "docido_v1",
+      "_type" : "item",
+      "_id" : "44",
+      "_score" : 1.0
+    }, {
+      "_index" : "docido_v1",
+      "_type" : "item",
+      "_id" : "45",
+      "_score" : 1.0
+    } ]
+  }
+}
+
+
+{
+    "fields": ["user"]
+}
+=>
+{
+  "took" : 2,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 6,
+    "successful" : 6,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 3,
+    "max_score" : 1.0,
+    "hits" : [ {
+      "_index" : "docido_v1",
+      "_type" : "item",
+      "_id" : "42",
+      "_score" : 1.0,
+      "fields" : {
+        "user" : [ "kimchy" ]
+      }
+    }, {
+      "_index" : "docido_v1",
+      "_type" : "item",
+      "_id" : "44",
+      "_score" : 1.0,
+      "fields" : {
+        "user" : [ "tristan" ]
+      }
+    }, {
+      "_index" : "docido_v1",
+      "_type" : "item",
+      "_id" : "45",
+      "_score" : 1.0,
+      "fields" : {
+        "user" : [ "tristan" ]
+      }
+    } ]
+  }
+}
+
+
+
+
+{
+    "facets": {
+        "users": {
+            "terms": {
+                "field": "user",
+                "size": 100
+            }
+        }
+    }
+}
+=>
+{
+  "took" : 2,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 6,
+    "successful" : 6,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 3,
+    "max_score" : 1.0,
+    "hits" : [ {
+      "_index" : "docido_v1",
+      "_type" : "item",
+      "_id" : "42",
+      "_score" : 1.0,
+      "_source":{
+    "user" : "kimchy",
+    "id": 42,
+    "date" : "2009-11-15T14:12:12",
+    "description" : "trying out Elasticsearch"
+}
+    }, {
+      "_index" : "docido_v1",
+      "_type" : "item",
+      "_id" : "44",
+      "_score" : 1.0,
+      "_source":{
+    "user" : "tristan",
+    "id": 44,
+    "date" : "2012-11-15T14:12:12",
+    "description" : "trying out Elasticsearch"
+}
+    }, {
+      "_index" : "docido_v1",
+      "_type" : "item",
+      "_id" : "45",
+      "_score" : 1.0,
+      "_source":{
+    "user" : "tristan",
+    "id": 45,
+    "date" : "2013-11-15T14:12:12",
+    "description" : "trying out Elasticsearch"
+}
+    } ]
+  },
+  "facets" : {
+    "users" : {
+      "_type" : "terms",
+      "missing" : 0,
+      "total" : 3,
+      "other" : 0,
+      "terms" : [ {
+        "term" : "tristan",
+        "count" : 2
+      }, {
+        "term" : "kimchy",
+        "count" : 1
+      } ]
+    }
+  }
+}
+
+
+{
+    "fields": [],
+    "facets": {
+        "users": {
+            "terms": {
+                "field": "user",
+                "size": 1
+            }
+        }
+    }
+}
+=>
+{
+  "took" : 2,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 6,
+    "successful" : 6,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 3,
+    "max_score" : 1.0,
+    "hits" : [ {
+      "_index" : "docido_v1",
+      "_type" : "item",
+      "_id" : "42",
+      "_score" : 1.0
+    }, {
+      "_index" : "docido_v1",
+      "_type" : "item",
+      "_id" : "44",
+      "_score" : 1.0
+    }, {
+      "_index" : "docido_v1",
+      "_type" : "item",
+      "_id" : "45",
+      "_score" : 1.0
+    } ]
+  },
+  "facets" : {
+    "users" : {
+      "_type" : "terms",
+      "missing" : 0,
+      "total" : 3,
+      "other" : 1,
+      "terms" : [ {
+        "term" : "tristan",
+        "count" : 2
+      } ]
+    }
+  }
+}
+
+
