@@ -1,23 +1,35 @@
 
+__all__ = ['IndexAPI', 'IndexAPIProcessor']
+
 class IndexAPI:
-    """Read/write access to Docido index. A `IndexAPI` can manipulate 3 kind of data:
+    """Read/write access to Docido index.
 
-    - cards: a searchable item in Docido index.
-    - thumbnails: a binary item in Docido index, for thumbnails of 
-    card's attachments. Used to improve user-experience by providing fast preview
-    of binary files attached to cards. 
-    - a key value store: provides crawlers a way to persist their synchronization
-    state.
+    An `IndexAPI` object can manipulate 3 kind of data:
 
-    Error handling:
-    every bulk operation that modifies Docido index returns the list of 
+    :cards:
+      a searchable item in Docido index.
+    :thumbnails:
+      a binary item in Docido index, for thumbnails of 
+      card's attachments. Used to improve user-experience by providing 
+      fast preview of binary files attached to cards. 
+    :a key value store:
+      provides crawlers a way to persist their synchronization state.
+
+
+    Every bulk operation that modifies Docido index returns the list of 
     operations that failed. Every item is a `dict` providing the following key:
-      - status: http error code
-      - error: reason in string format
-      - id: error identifier
-      - card: original card
 
-    Filtering:
+    :status:
+      http error code
+    :error:
+      reason in string format
+    :id:
+      error identifier
+    :card:
+      original card
+
+    Filtering
+    ----------
     Index enumeration and deletion operations allow you to restrict 
     the target scope by providing a `query` in parameter.
     The `query` parameters follows the Elasticsearch Query DSL.
@@ -25,65 +37,93 @@ class IndexAPI:
     def push_cards(self, cards):
         """Send a synchronous bulk indexing request
 
-        :arg cards: collections of cards to index.
-        :return collection of items whose insertion failed.
+        :param list cards: collections of cards to index.
+
+        :return: collection of items whose insertion failed.
         """
         pass
 
     def delete_cards(self, query=None):
-        """Send a synchronous bulk deletion request
+        """Send a synchronous bulk deletion request.
 
-        :arg query: a search definition using the Elasticsearch Query DSL
-        to restrict the scope of cards to delete.
-        :return collection of items whose deletion failed.
+        :param list query: a search definition using the Elasticsearch Query DSL
+                      to restrict the scope of cards to delete.
+
+        :return: collection of items whose deletion failed.
         """
         pass
 
     def search_cards(self, query=None):
         """Enumerate cards in Docido index.
 
-        :arg query: a search definition using the Elasticsearch Query DSL
-        :return FIXME
+        :param list query: a search definition using the Elasticsearch Query DSL
+
+        :return: FIXME
         """
         pass
 
     def push_thumbnails(self, thumbnails):
         """Add or update thumbnails in dedicated Docido index.
 
-        :arg thumbnails: Collection of tuples
-        `(identifier, encoded_bytes, mime_type)`
-        :return collection of items whose insertion failed.
+        :param list thumbnails: Collection of tuples
+                                `(identifier, encoded_bytes, mime_type)`
+
+        :return: collection of items whose insertion failed.
         """
         pass
 
     def delete_thumbnails(self, query=None):
         """Delete thumbnails from dedicated Docido index.
 
-        :arg query: a search definition using the Elasticsearch Query DSL to 
-        restrict the scope of thumbnails to delete.
-        :return collection of items whose deletion failed.
+        :param query: a search definition using the Elasticsearch Query DSL to 
+                    restrict the scope of thumbnails to delete.
+
+        :return: collection of items whose deletion failed.
         """
         pass
 
-    def get_key(self, key):
+    def get_kv(self, key):
+        """Retrieve value from persistence layer
+
+        :param string key: input key
+
+        :return: the value is present, `None` otherwise.
+        :rtype: string
+        """
         pass
 
-    def set_key(self, key, value):
+    def set_kv(self, key, value):
+        """Insert or update existing key in persistence layer.
+
+        :param string key: input key
+        :param string value: value to store
+        """
         pass
 
-    def delete_key(self, key):
+    def delete_kv(self, key):
         """Remove key from persistent storage.
 
-        :arg key: the key to remove
+        :param key: the key to remove
         """
 
-    def delete_keys(self):
+    def delete_kvs(self):
+        """Remove all crawler persisted data.
+        """
         pass
 
     def get_kvs(self):
+        """Retrieve all crawler persisted data.
+
+        :return: collection of tuple `(key, value)`
+        :rtype: list
+        """
         pass
 
     def ping(self):
+        """Test availability of Docido index
+
+        :raises SystemError: if Docido index is unreachable
+        """
         pass
 
 
