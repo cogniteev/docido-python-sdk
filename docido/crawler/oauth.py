@@ -6,6 +6,7 @@ __all__ = [
     'OAuthSecretToken'
 ]
 
+
 class OAuthToken(object):
     """OAuth credentials base-class. Several implementations are available:
 
@@ -41,6 +42,7 @@ class OAuthToken(object):
         '''
     )
 
+
 class OAuthExpiresToken(OAuthToken):
     def __init__(self, access_token, expires_in):
         """
@@ -59,6 +61,7 @@ class OAuthExpiresToken(OAuthToken):
         '''
     )
 
+
 class OAuthRefreshToken(OAuthToken):
     def __init__(self, access_token, refresh_token):
         """
@@ -76,6 +79,7 @@ class OAuthRefreshToken(OAuthToken):
         :rtype: string
         '''
     )
+
 
 class OAuthSecretToken(OAuthToken):
     def __init__(self, access_token, token_secret):

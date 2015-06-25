@@ -25,6 +25,8 @@ Introspection
    :inherited-members:
 .. autoclass:: docido.crawler.api.CrawlConfiguration
    :inherited-members:
+.. autoclass:: docido.crawler.api.ICrawlerManager
+   :inherited-members:
 
 Oauth
 ~~~~~
