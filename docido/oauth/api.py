@@ -1,10 +1,22 @@
 
+from docido.core import Interface
+
 __all__ = [
+    'IOAuthProvider',
     'OAuthToken',
     'OAuthExpiresToken',
     'OAuthRefreshToken',
-    'OAuthSecretToken'
+    'OAuthSecretToken',
 ]
+
+class IOAuthProvider(Interface):
+    def refresh_token():
+        """Refresh the OAuth token
+
+        :return: the new OAuth token
+        :rtype: string
+        """
+        pass
 
 
 class OAuthToken(object):
@@ -13,14 +25,14 @@ class OAuthToken(object):
     this class:
       for simple authentication using only *access token*
 
-    :py:class:`docido.crawler.oauth.OAuthExpiresToken` :
+    :py:class:`docido.oauth.api.OAuthExpiresToken` :
       when *access token* expires after some time
 
-    :py:class:`docido.crawler.oauth.OAuthRefreshToken` :
+    :py:class:`docido.oauth.api.OAuthRefreshToken` :
       when *access token* is short-lived and a *refresh token* is provided
       to re-create it.
 
-    :py:class:`docido.crawler.oauth.OAuthSecretToken` :
+    :py:class:`docido.oauth.api.OAuthSecretToken` :
       when authentication does not use consumer keys but thru a pair
       of keys given during OAuth negotiation.
     """
@@ -85,7 +97,7 @@ class OAuthSecretToken(OAuthToken):
     def __init__(self, access_token, token_secret):
         """
         :param string token_secret:
-            secret used by Docido to establish ownership 
+            secret used by Docido to establish ownership
             of a given access token.
         """
         super(OAuthSecretToken, self).__init__(access_token)
@@ -94,7 +106,7 @@ class OAuthSecretToken(OAuthToken):
     token_secret = property(
         fget=lambda slf: slf.__token_secret,
         doc='''Read-only property accessor over the
-        secret used by Docido to establish ownership of 
+        secret used by Docido to establish ownership of
         a given access token.
 
         :rtype: string

@@ -3,6 +3,12 @@ from collections import namedtuple
 
 from docido.core import Interface
 
+__all__ = [
+    'CrawlConfiguration',
+    'ICrawler',
+    'ICrawlerManager',
+]
+
 class ICrawlerManager(Interface):
     """Extension point interface for components willing to
     provide crawl configurations.
@@ -50,11 +56,11 @@ class ICrawler(Interface):
         """
 
     def get_account_login(oauth_token):
-        """Provides most *human-readable* representation of the 
+        """Provides most *human-readable* representation of the
         user account. The returned value is used to identify
         the account among others.
 
-        :param docido.crawler.oauth.OAuthToken oauth_token:
+        :param docido.oauth.OAuthToken oauth_token:
           OAuth credentials
 
         :return: user account identifier
@@ -67,4 +73,29 @@ class ICrawler(Interface):
 
         :param flask_oauthlib.client.OAuth oauth: OAuth transaction
         :rtype: docido.crawler.oauth.OAuthToken
+        """
+
+    def iter_crawl_tasks(papi, oauth_token, full=False):
+        """Split the crawl in smaller independant actions,
+        and returns them instead of executing them.
+
+        :param docido.push.api.PushAPI
+
+        :param docido.crawler.oauth.OAuthToken oauth_token:
+          OAuth credentials
+
+        :param bool full:
+          whether the entire account must be pushed or only
+          changes that occured since previous crawl.
+
+        :return: generator of `py:class:`functools.partial` objects
+                 to execute to perform the crawl.
+        """
+
+    def clear_account(oauth_token):
+        """Remove from Docido index all data previously indexed for
+        this account. Persisted data must also be cleared.
+
+        :param docido.crawler.oauth.OAuthToken oauth_token:
+          OAuth credentials
         """

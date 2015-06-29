@@ -31,11 +31,11 @@ Introspection
 Oauth
 ~~~~~
 
-.. autoclass:: docido.crawler.oauth.OAuthToken
+.. autoclass:: docido.oauth.api.OAuthToken
    :inherited-members:
-.. autoclass:: docido.crawler.oauth.OAuthExpiresToken
+.. autoclass:: docido.oauth.api.OAuthExpiresToken
    :inherited-members:
-.. autoclass:: docido.crawler.oauth.OAuthRefreshToken
+.. autoclass:: docido.oauth.api.OAuthRefreshToken
    :inherited-members:
-.. autoclass:: docido.crawler.oauth.OAuthSecretToken
+.. autoclass:: docido.oauth.api.OAuthSecretToken
    :inherited-members:
