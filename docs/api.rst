@@ -10,9 +10,9 @@ This part of the documentation covers all the interfaces of Docido Python SDK.
 Index API
 ----------
 
-.. autoclass:: docido.index.IndexAPI
+.. autoclass:: docido_sdk.index.IndexAPI
    :inherited-members:
-.. autoclass:: docido.index.IndexAPIProcessor
+.. autoclass:: docido_sdk.index.IndexAPIProcessor
    :inherited-members:
 
 Crawler API
@@ -21,21 +21,17 @@ Crawler API
 Introspection
 ~~~~~~~~~~~~~~
 
-.. autoclass:: docido.crawler.api.ICrawler
-   :inherited-members:
-.. autoclass:: docido.crawler.api.CrawlConfiguration
-   :inherited-members:
-.. autoclass:: docido.crawler.api.ICrawlerManager
+.. autoclass:: docido_sdk.crawler.api.ICrawler
    :inherited-members:
 
 Oauth
 ~~~~~
 
-.. autoclass:: docido.oauth.api.OAuthToken
+.. autoclass:: docido_sdk.oauth.api.OAuthToken
    :inherited-members:
-.. autoclass:: docido.oauth.api.OAuthExpiresToken
+.. autoclass:: docido_sdk.oauth.api.OAuthExpiresToken
    :inherited-members:
-.. autoclass:: docido.oauth.api.OAuthRefreshToken
+.. autoclass:: docido_sdk.oauth.api.OAuthRefreshToken
    :inherited-members:
-.. autoclass:: docido.oauth.api.OAuthSecretToken
+.. autoclass:: docido_sdk.oauth.api.OAuthSecretToken
    :inherited-members:

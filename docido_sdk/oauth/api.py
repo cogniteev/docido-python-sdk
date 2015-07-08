@@ -1,5 +1,5 @@
 
-from docido.core import Interface
+from docido_sdk.core import Interface
 
 __all__ = [
     'IOAuthProvider',

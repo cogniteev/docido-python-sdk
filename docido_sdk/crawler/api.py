@@ -1,7 +1,7 @@
 
 from collections import namedtuple
 
-from docido.core import Interface
+from docido_sdk.core import Interface
 
 __all__ = [
     'ICrawler',
@@ -22,7 +22,7 @@ class ICrawler(Interface):
         user account. The returned value is used to identify
         the account among others.
 
-        :param docido.oauth.OAuthToken oauth_token:
+        :param docido_sdk.oauth.OAuthToken oauth_token:
           OAuth credentials
 
         :return: user account identifier
@@ -50,16 +50,17 @@ class ICrawler(Interface):
           whether the entire account must be pushed or only
           changes that occured since previous crawl.
 
-        :return: generator of `py:class:`functools.partial` objects
-                 to execute to perform the crawl.
-                 a tuple can also be returns for crawlers that needs
-                 to perform a final operation when partial objects
-                 have been executed:
-                 `tuple(generator of partial, partial)`
-                 Partial instances may accept 2 arguments:
-                   - push_api - docido.push.api.PushAPI
-                   - token - basestring
+        :return: generator of :py:func:`functools.partial` tasks
+          to execute to perform the account synchronization.
+          Partial instances may accept 2 arguments:
 
+          - push_api (:py:class:`docido_sdk.push.PushAPI`)
+          - token (:py:class:`docido_sdk.oauth.OAuthToken`)
+
+          A tuple of 2 elements can also be returned for crawlers
+          willing to perform a final operation when all sub-tasks
+          have been executed. The tuple may be like:
+          `tuple(generator of partial, partial)`
         """
 
 
