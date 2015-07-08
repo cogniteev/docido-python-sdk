@@ -8,14 +8,14 @@ class IndexAPI:
         :cards:
           a searchable item in Docido index.
         :thumbnails:
-          a binary item in Docido index, for thumbnails of 
-          card's attachments. Used to improve user-experience by providing 
-          fast preview of binary files attached to cards. 
+          a binary item in Docido index, for thumbnails of
+          card's attachments. Used to improve user-experience by providing
+          fast preview of binary files attached to cards.
         :a key value store:
           provides crawlers a way to persist their synchronization state.
 
     :Error Handling:
-        Every bulk operation that modifies Docido index returns the list of 
+        Every bulk operation that modifies Docido index returns the list of
         operations that failed. Every item is a `dict` providing the following key:
 
         :status:
@@ -28,7 +28,7 @@ class IndexAPI:
           original card
 
     :Filtering:
-        Index enumeration and deletion operations allow you to restrict 
+        Index enumeration and deletion operations allow you to restrict
         the target scope by providing a `query` in parameter.
         The `query` parameters follows the Elasticsearch Query DSL.
     """
@@ -73,7 +73,7 @@ class IndexAPI:
     def delete_thumbnails(self, query=None):
         """Delete thumbnails from dedicated Docido index.
 
-        :param query: a search definition using the Elasticsearch Query DSL to 
+        :param query: a search definition using the Elasticsearch Query DSL to
                     restrict the scope of thumbnails to delete.
 
         :return: collection of items whose deletion failed.
@@ -124,6 +124,14 @@ class IndexAPI:
         """
         pass
 
+    def refresh_oauth_access_token(self):
+        """Refresh OAuth access token.
+        This method may be used when the crawled source
+        invalidates the OAuth access token.
+
+        :return: new access token
+        :rtype: basestring
+        """
 
 class IndexAPIProcessor(IndexAPI):
     def __init__(self, parent):
