@@ -37,11 +37,12 @@ class ICrawler(Interface):
 #        :rtype: docido.crawler.oauth.OAuthToken
 #        """
 
-    def iter_crawl_tasks(papi, oauth_token, full=False):
+    def iter_crawl_tasks(index, oauth_token, full=False):
         """Split the crawl in smaller independant actions,
         and returns them instead of executing them.
 
-        :param docido.push.api.PushAPI
+        :param docido.push.api.IndexAPI: index
+          To manipulate Docido index
 
         :param basestring oauth_token:
           OAuth credentials
@@ -54,7 +55,7 @@ class ICrawler(Interface):
           to execute to perform the account synchronization.
           Partial instances may accept 2 arguments:
 
-          - push_api (:py:class:`docido_sdk.push.PushAPI`)
+          - push_api (:py:class:`docido_sdk.push.IndexAPI`)
           - token (:py:class:`docido_sdk.oauth.OAuthToken`)
 
           A tuple of 2 elements can also be returned for crawlers
@@ -63,12 +64,13 @@ class ICrawler(Interface):
           `tuple(generator of partial, partial)`
         """
 
-
-
-    def clear_account(oauth_token):
+    def clear_account(index, oauth_token):
         """Remove from Docido index all data previously indexed for
         this account. Persisted data must also be cleared.
 
-        :param docido.crawler.oauth.OAuthToken oauth_token:
+        :param docido.push.IndexAPI index:
+          To manipulate Docido index
+
+        :param docido.oauth.OAuthToken oauth_token:
           OAuth credentials
         """
