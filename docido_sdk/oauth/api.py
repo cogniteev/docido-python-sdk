@@ -2,22 +2,11 @@
 from docido_sdk.core import Interface
 
 __all__ = [
-    'IOAuthProvider',
     'OAuthToken',
     'OAuthExpiresToken',
     'OAuthRefreshToken',
     'OAuthSecretToken',
 ]
-
-class IOAuthProvider(Interface):
-    def refresh_token():
-        """Refresh the OAuth token
-
-        :return: the new OAuth token
-        :rtype: string
-        """
-        pass
-
 
 class OAuthToken(object):
     """OAuth credentials base-class. Several implementations are available:
