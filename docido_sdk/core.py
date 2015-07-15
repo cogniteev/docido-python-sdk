@@ -177,6 +177,7 @@ class ComponentManager(object):
         """Can be overridden by sub-classes so that special
         initialization for components can be provided.
         """
+        return True
 
     def is_component_enabled(self, cls):
         """Can be overridden by sub-classes to veto the activation of
