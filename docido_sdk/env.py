@@ -21,3 +21,5 @@ class Environment(Component, ComponentManager):
     def setup(self):
         from docido_sdk.loader import load_components
         load_components(self)
+
+env = Environment()
