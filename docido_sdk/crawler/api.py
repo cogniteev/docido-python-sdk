@@ -34,14 +34,14 @@ class ICrawler(Interface):
 #        and extract meaningful fields from response.
 #
 #        :param flask_oauthlib.client.OAuth oauth: OAuth transaction
-#        :rtype: docido.crawler.oauth.OAuthToken
+#        :rtype: docido_sdk.crawler.oauth.OAuthToken
 #        """
 
     def iter_crawl_tasks(index, oauth_token, full=False):
         """Split the crawl in smaller independant actions,
         and returns them instead of executing them.
 
-        :param docido.push.api.IndexAPI: index
+        :param docido_sdk.push.api.IndexAPI: index
           To manipulate Docido index
 
         :param basestring oauth_token:
@@ -56,7 +56,7 @@ class ICrawler(Interface):
           Partial instances may accept 2 arguments:
 
           - push_api (:py:class:`docido_sdk.push.IndexAPI`)
-          - token (:py:class:`docido_sdk.oauth.OAuthToken`)
+          - oauth_token (:py:class:`docido_sdk.oauth.OAuthToken`)
 
           A tuple of 2 elements can also be returned for crawlers
           willing to perform a final operation when all sub-tasks
@@ -68,9 +68,9 @@ class ICrawler(Interface):
         """Remove from Docido index all data previously indexed for
         this account. Persisted data must also be cleared.
 
-        :param docido.push.IndexAPI index:
+        :param docido_sdk.push.IndexAPI index:
           To manipulate Docido index
 
-        :param docido.oauth.OAuthToken oauth_token:
+        :param docido_sdk.oauth.OAuthToken oauth_token:
           OAuth credentials
         """

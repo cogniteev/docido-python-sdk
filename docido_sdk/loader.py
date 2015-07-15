@@ -7,7 +7,7 @@ from pkg_resources import (
     UnknownExtra,
 )
 
-from docido.toolbox.text import exception_to_unicode
+from docido_sdk.toolbox.text import exception_to_unicode
 
 def _enable_plugin(env, module):
     """Enable the given plugin module if it wasn't disabled explicitly."""

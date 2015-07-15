@@ -9,7 +9,7 @@ def exception_to_unicode(e, traceback=False):
     """
     message = '%s: %s' % (e.__class__.__name__, to_unicode(e))
     if traceback:
-        from docido.toolbox import get_last_traceback
+        from docido_sdk.toolbox import get_last_traceback
         traceback_only = get_last_traceback().split('\n')[:-2]
         message = '\n%s\n%s' % (to_unicode('\n'.join(traceback_only)), message)
     return message

@@ -5,7 +5,7 @@ import json
 import os.path as osp
 import shutil
 
-from docido.toolbox.threading import RWLock
+from docido_sdk.toolbox.threading import RWLock
 from .api import IndexAPIProcessor
 
 class LocalKV(IndexAPIProcessor):

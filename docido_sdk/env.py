@@ -1,7 +1,7 @@
 
 import logging
 
-from docido.core import *
+from docido_sdk.core import *
 
 class Environment(Component, ComponentManager):
     """Docido SDK environment manager."""
@@ -19,5 +19,5 @@ class Environment(Component, ComponentManager):
         component.env = self
 
     def setup(self):
-        from docido.loader import load_components
+        from docido_sdk.loader import load_components
         load_components(self)

@@ -14,14 +14,14 @@ class OAuthToken(object):
     this class:
       for simple authentication using only *access token*
 
-    :py:class:`docido.oauth.api.OAuthExpiresToken` :
+    :py:class:`docido_sdk.oauth.api.OAuthExpiresToken` :
       when *access token* expires after some time
 
-    :py:class:`docido.oauth.api.OAuthRefreshToken` :
+    :py:class:`docido_sdk.oauth.api.OAuthRefreshToken` :
       when *access token* is short-lived and a *refresh token* is provided
       to re-create it.
 
-    :py:class:`docido.oauth.api.OAuthSecretToken` :
+    :py:class:`docido_sdk.oauth.api.OAuthSecretToken` :
       when authentication does not use consumer keys but thru a pair
       of keys given during OAuth negotiation.
     """
