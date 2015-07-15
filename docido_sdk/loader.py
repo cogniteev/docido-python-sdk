@@ -16,7 +16,7 @@ def _enable_plugin(env, module):
 
 def load_eggs(entry_point_name):
     """Loader that loads any eggs in `sys.path`."""
-    def _load_eggs(env, auto_enable=None):
+    def _load_eggs(env):
         distributions, errors = working_set.find_plugins(
             pkg_resources.Environment()
         )
@@ -49,11 +49,10 @@ def load_eggs(entry_point_name):
             except Exception as e:
                 _log_error(entry, e)
             else:
-                if os.path.dirname(entry.dist.location) == auto_enable:
-                    _enable_plugin(env, entry.module_name)
+                _enable_plugin(env, entry.module_name)
     return _load_eggs
 
 def load_components(env, loaders=(load_eggs('docido.plugins'),)):
     """Load all plugin components found in `sys.path`."""
     for loadfunc in loaders:
-        loadfunc(env, auto_enable=plugins_dir)
+        loadfunc(env)
