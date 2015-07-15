@@ -53,7 +53,7 @@ def load_eggs(entry_point_name):
                     _enable_plugin(env, entry.module_name)
     return _load_eggs
 
-def load_components(env, loaders=(load_eggs('docido.plugins'))):
+def load_components(env, loaders=(load_eggs('docido.plugins'),)):
     """Load all plugin components found in `sys.path`."""
     for loadfunc in loaders:
         loadfunc(env, auto_enable=plugins_dir)
