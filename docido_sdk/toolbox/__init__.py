@@ -1,4 +1,6 @@
 
+from . text import to_unicode
+
 def get_last_traceback():
     """Retrieve the last traceback as an `unicode` string."""
     import traceback
