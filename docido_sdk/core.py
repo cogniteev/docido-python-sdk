@@ -1,4 +1,8 @@
 
+
+class DocidoError(Exception):
+    pass
+
 class Interface(object):
     """Marker base class for extension point interfaces."""
 
