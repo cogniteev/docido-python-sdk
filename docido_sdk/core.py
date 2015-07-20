@@ -10,12 +10,18 @@ class Interface(object):
 class ExtensionPoint(property):
     """Marker class for extension points in components."""
 
-    def __init__(self, interface):
+    def __init__(self, interface, unique=False):
         """Create the extension point.
-        :param interface: the `Interface` subclass that defines the
-                          protocol for the extension point
+
+        :param interface:
+          the `Interface` subclass that defines the
+          protocol for the extension point.
+        :param bool unique:
+          If True, then there must be exactly one `Component` implemented
+          the specified `Interface` and the property value is the `Component`
+          instead of the components list implementing the `Interface`.
         """
-        property.__init__(self, self.extensions)
+        property.__init__(self, self.extension if unique else self.extensions)
         self.interface = interface
         self.__doc__ = ("List of components that implement `~%s.%s`" %
                         (self.interface.__module__, self.interface.__name__))
@@ -27,6 +33,13 @@ class ExtensionPoint(property):
         classes = ComponentMeta._registry.get(self.interface, ())
         components = [component.compmgr[cls] for cls in classes]
         return [c for c in components if c]
+
+    def extension(self, component):
+        components = self.extensions(component)
+        if len(components) != 1:
+            raise Exception("Expected one component, but found {}".format(len(components)))
+        else:
+            return components[0]
 
     def __repr__(self):
         """Return a textual representation of the extension point."""
