@@ -3,7 +3,6 @@ from docido_sdk.core import Interface
 
 __all__ = [
     'OAuthToken',
-    'OAuthExpiresToken',
     'OAuthRefreshToken',
     'OAuthSecretToken',
 ]
@@ -40,25 +39,6 @@ class OAuthToken(object):
         OAuth granted access token
 
         :rtype: string
-        '''
-    )
-
-
-class OAuthExpiresToken(OAuthToken):
-    def __init__(self, access_token, expires_in):
-        """
-        :param int expires_in:
-            Number of days the token will be valid for.
-        """
-        super(OAuthExpiresToken, self).__init__(access_token)
-        self.__expires_in = expires_in
-
-    expires_in = property(
-        fget=lambda slf: slf.__expires_in,
-        doc='''Read-only property accessor over the
-        number of days the token will be valid for.
-
-        :rtype: int
         '''
     )
 
