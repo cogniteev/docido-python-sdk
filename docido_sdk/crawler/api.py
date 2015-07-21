@@ -39,7 +39,7 @@ class ICrawler(Interface):
 
     def iter_crawl_tasks(index, oauth_token, full=False):
         """Split the crawl in smaller independant actions,
-        and returns them instead of executing them.
+        and returns them for delayed execution.
 
         :param docido_sdk.push.api.IndexAPI: index
           To manipulate Docido index
@@ -53,7 +53,7 @@ class ICrawler(Interface):
 
         :return: generator of :py:func:`functools.partial` tasks
           to execute to perform the account synchronization.
-          Partial instances may accept 2 arguments:
+          partial objects may accept 2 arguments:
 
           - push_api (:py:class:`docido_sdk.push.IndexAPI`)
           - oauth_token (:py:class:`docido_sdk.oauth.OAuthToken`)
@@ -62,6 +62,11 @@ class ICrawler(Interface):
           willing to perform a final operation when all sub-tasks
           have been executed. The tuple may be like:
           `tuple(generator of partial, partial)`
+
+          A task cannot be instance, class, or static method
+          of a :py:func:`docido_sdk.core.Component` object.
+          Therefore you may provide functions defined outside
+          your crawler class definition.
         """
 
     def clear_account(index, oauth_token):
