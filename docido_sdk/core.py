@@ -3,6 +3,7 @@
 class DocidoError(Exception):
     pass
 
+
 class Interface(object):
     """Marker base class for extension point interfaces."""
 
@@ -37,7 +38,9 @@ class ExtensionPoint(property):
     def extension(self, component):
         components = self.extensions(component)
         if len(components) != 1:
-            raise Exception("Expected one component, but found {}".format(len(components)))
+            raise Exception(
+                "Expected one component, but found {}".format(len(components))
+            )
         else:
             return components[0]
 
@@ -88,8 +91,8 @@ class ComponentMeta(type):
             return self
 
         # The normal case where the component is not also the component manager
-        assert len(args) >= 1 and isinstance(args[0], ComponentManager), \
-               "First argument must be a ComponentManager instance"
+        msg = "First argument must be a ComponentManager instance"
+        assert len(args) >= 1 and isinstance(args[0], ComponentManager), msg
         compmgr = args[0]
         self = compmgr.components.get(cls)
         # Note that this check is racy, we intentionally don't use a
@@ -125,8 +128,8 @@ class Component(object):
         locals_ = frame.f_locals
 
         # Some sanity checks
-        assert locals_ is not frame.f_globals and '__module__' in locals_, \
-               'implements() can only be used in a class definition'
+        msg = 'implements() can only be used in a class definition'
+        assert locals_ is not frame.f_globals and '__module__' in locals_, msg
 
         locals_.setdefault('_implements', []).extend(interfaces)
 
@@ -162,12 +165,15 @@ class ComponentManager(object):
         component = self.components.get(cls)
         if not component and not issubclass(cls, ComponentManager):
             if cls not in ComponentMeta._components:
-                raise DocidoError('Component "%s" not registered' % cls.__name__)
+                raise DocidoError(
+                    'Component "%s" not registered' % cls.__name__
+                )
             try:
                 component = cls(self)
             except TypeError as e:
-                raise DocidoError('Unable to instantiate component %r (%s)' %
-                                (cls, e))
+                raise DocidoError(
+                    'Unable to instantiate component %r (%s)' % (cls, e)
+                )
         return component
 
     def is_enabled(self, cls):

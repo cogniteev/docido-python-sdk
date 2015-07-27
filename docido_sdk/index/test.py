@@ -8,6 +8,7 @@ import shutil
 from docido_sdk.toolbox.threading import RWLock
 from .api import IndexAPIProcessor
 
+
 class LocalKV(IndexAPIProcessor):
     """Local thread-safe, `IndexAPIProcessor` persistent storage
     implementation backed by a json file on the local filesystem.
@@ -29,7 +30,7 @@ class LocalKV(IndexAPIProcessor):
 
     def get_key(self, key):
         with self.__lock.read():
-            return __store.get(key)
+            return self.__store.get(key)
 
     def get_kvs(self):
         with self.__lock_read():
@@ -59,7 +60,7 @@ class LocalKV(IndexAPIProcessor):
 class LocalDumbIndex(IndexAPIProcessor):
     """Dumb, but yet reentrant, index implementation, persisting indices
     in local-filesystem.
-    
+
     Some methods does not provide all functionalities the real Docido index
     provides. More information available in documentation of the following
     member methods: `delete_cards`, `search_cards`, and `delete_thumbnails`.
@@ -68,12 +69,14 @@ class LocalDumbIndex(IndexAPIProcessor):
     __cards = dict()
     __thumbnails = dict()
 
-    def __init__(self, parent, cards_path, thumbnails_path, failure_probability=0):
+    def __init__(self,
+                 parent, cards_path,
+                 thumbnails_path, failure_probability=0):
         super(LocalDumbIndex, self).__init__(parent)
         self.__cards_path = cards_path
         self.__thumbnails_path = thumbnails_path
-        self.__cards = LocalIndex.load_index(cards_path)
-        self.__thumbnails = LocalIndex.load_index(thumbnails_path)
+        self.__cards = LocalDumbIndex.load_index(cards_path)
+        self.__thumbnails = LocalDumbIndex.load_index(thumbnails_path)
 
     @contextmanager
     def __update(self, cards=False, thumbnails=False):
@@ -81,23 +84,27 @@ class LocalDumbIndex(IndexAPIProcessor):
         try:
             yield
             if cards:
-                LocalIndex.persist_index(self.__cards, self.__cards_path)
+                LocalDumbIndex.persist_index(self.__cards, self.__cards_path)
             if thumbnails:
-                LocalIndex.persist_index(self.__thumbnails, self.__thumbnails_path)
+                LocalDumbIndex.persist_index(
+                    self.__thumbnails,
+                    self.__thumbnails_path
+                )
         finally:
+            self.__lock.writer_release()
 
     def push_cards(self, cards):
         # FIXME: returns expected value
-        with self.__update(cards=True)
+        with self.__update(cards=True):
             for card in cards:
                 self.__cards[card['id']] = card
 
     def delete_cards(self, query=None):
         # FIXME: returns expected value
-        with self.__update(cards=True)
-        if query:
-            raise NotImplementedError()
-        self.__cards.clear()
+        with self.__update(cards=True):
+            if query:
+                raise NotImplementedError()
+            self.__cards.clear()
 
     def search_cards(self, query=None):
         with self.__lock.read():

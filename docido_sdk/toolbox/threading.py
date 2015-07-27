@@ -2,6 +2,7 @@
 from contextlib import contextmanager
 import threading
 
+
 class RWLock:
     """Synchronization object used in a solution of so-called second
     readers-writers problem. In this problem, many readers can simultaneously

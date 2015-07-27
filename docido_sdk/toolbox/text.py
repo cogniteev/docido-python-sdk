@@ -1,6 +1,7 @@
 
 import os
 
+
 def to_unicode(text, charset=None):
     """Convert input to an `unicode` object.
 
@@ -34,6 +35,7 @@ def to_unicode(text, charset=None):
             # unicode arguments given to the exception (e.g. parse_date)
             return ' '.join([to_unicode(arg) for arg in text.args])
     return unicode(text)
+
 
 def exception_to_unicode(e, traceback=False):
     """Convert an `Exception` to an `unicode` object.

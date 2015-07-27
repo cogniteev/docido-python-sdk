@@ -1,6 +1,7 @@
 
 __all__ = ['IndexAPI', 'IndexAPIProcessor']
 
+
 class IndexAPI:
     """Read/write access to Docido index.
 
@@ -16,7 +17,8 @@ class IndexAPI:
 
     :Error Handling:
         Every bulk operation that modifies Docido index returns the list of
-        operations that failed. Every item is a `dict` providing the following key:
+        operations that failed. Every item is a `dict` providing
+        the following key:
 
         :status:
           http error code
@@ -44,8 +46,8 @@ class IndexAPI:
     def delete_cards(self, query=None):
         """Send a synchronous bulk deletion request.
 
-        :param list query: a search definition using the Elasticsearch Query DSL
-                      to restrict the scope of cards to delete.
+        :param list query: a search definition using the Elasticsearch
+            Query DSL to restrict the scope of cards to delete.
 
         :return: collection of items whose deletion failed.
         """
@@ -54,7 +56,8 @@ class IndexAPI:
     def search_cards(self, query=None):
         """Enumerate cards in Docido index.
 
-        :param list query: a search definition using the Elasticsearch Query DSL
+        :param list query: a search definition using the
+            Elasticsearch Query DSL
 
         :return: FIXME
         """
@@ -132,6 +135,7 @@ class IndexAPI:
         :return: new access token
         :rtype: basestring
         """
+
 
 class IndexAPIProcessor(IndexAPI):
     def __init__(self, parent):

@@ -9,10 +9,12 @@ from pkg_resources import (
 
 from docido_sdk.toolbox.text import exception_to_unicode
 
+
 def _enable_plugin(env, module):
     """Enable the given plugin module if it wasn't disabled explicitly."""
     if env.is_component_enabled(module) is None:
         env.enable_component(module)
+
 
 def load_eggs(entry_point_name):
     """Loader that loads any eggs in `sys.path`."""
@@ -43,7 +45,11 @@ def load_eggs(entry_point_name):
 
         for entry in sorted(working_set.iter_entry_points(entry_point_name),
                             key=lambda entry: entry.name):
-            env.log.debug('Loading %s from %s', entry.name, entry.dist.location)
+            env.log.debug(
+                'Loading %s from %s',
+                entry.name,
+                entry.dist.location
+            )
             try:
                 entry.load(require=True)
             except Exception as e:
@@ -51,6 +57,7 @@ def load_eggs(entry_point_name):
             else:
                 _enable_plugin(env, entry.module_name)
     return _load_eggs
+
 
 def load_components(env, loaders=(load_eggs('docido.plugins'),)):
     """Load all plugin components found in `sys.path`."""

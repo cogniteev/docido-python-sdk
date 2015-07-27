@@ -3,6 +3,7 @@ from setuptools import setup, find_packages
 module_name = 'docido-python-sdk'
 root_url = 'https://github.com/cogniteev/' + module_name
 
+__version__ = None
 exec(open('docido_sdk/__init__.py').read())
 
 setup(

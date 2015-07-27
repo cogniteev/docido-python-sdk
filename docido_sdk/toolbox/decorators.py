@@ -2,6 +2,7 @@
 import functools
 import inspect
 
+
 class lazy(object):
     """A lazily-evaluated attribute.
 
@@ -26,6 +27,7 @@ class lazy(object):
 
     def __delete__(self, instance):
         del instance.__dict__[self.fn.__name__]
+
 
 def decorate_instance_methods(obj, decorator, includes=None, excludes=None):
     """Decorator instance methods of an object.

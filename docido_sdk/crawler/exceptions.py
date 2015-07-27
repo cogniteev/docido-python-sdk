@@ -22,7 +22,7 @@ class OAuthTokenExpiredError(CrawlerError):
         super(OAuthTokenExpiredError, self).__init__(message)
 
 
-class OAuthTokenPermanentError(OAuthTokenExpired):
+class OAuthTokenPermanentError(CrawlerError):
     """Exception class used to notify crawler manager when
     the OAuth token of an account has been revoked.
     """

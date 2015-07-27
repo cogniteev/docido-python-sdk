@@ -1,11 +1,9 @@
-
-from docido_sdk.core import Interface
-
 __all__ = [
     'OAuthToken',
     'OAuthRefreshToken',
     'OAuthSecretToken',
 ]
+
 
 class OAuthToken(object):
     """OAuth credentials base-class. Several implementations are available:

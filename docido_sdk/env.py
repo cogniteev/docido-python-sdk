@@ -3,6 +3,7 @@ import logging
 
 from docido_sdk.core import *
 
+
 class Environment(Component, ComponentManager):
     """Docido SDK environment manager."""
 

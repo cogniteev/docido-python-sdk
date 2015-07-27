@@ -1,11 +1,10 @@
 
-from collections import namedtuple
-
 from docido_sdk.core import Interface
 
 __all__ = [
     'ICrawler',
 ]
+
 
 class ICrawler(Interface):
     """Extension point interface for components willing to

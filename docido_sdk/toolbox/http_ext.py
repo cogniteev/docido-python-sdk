@@ -3,6 +3,7 @@ __all__ = [
     'activate_pyopenssl_for_urllib3',
 ]
 
+
 def activate_pyopenssl_for_urllib3():
     """
     Workaround issue described here:
