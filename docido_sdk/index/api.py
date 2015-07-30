@@ -1,8 +1,9 @@
 
-__all__ = ['IndexAPI', 'IndexAPIProcessor']
+__all__ = ['IndexAPI']
+from docido_sdk.core import Interface
 
 
-class IndexAPI:
+class IndexAPI(Interface):
     """Read/write access to Docido index.
 
     :An IndexAPI object can manipulate 3 kind of data:
@@ -34,16 +35,15 @@ class IndexAPI:
         the target scope by providing a `query` in parameter.
         The `query` parameters follows the Elasticsearch Query DSL.
     """
-    def push_cards(self, cards):
+    def push_cards(cards):
         """Send a synchronous bulk indexing request
 
         :param list cards: collections of cards to index.
 
         :return: collection of items whose insertion failed.
         """
-        pass
 
-    def delete_cards(self, query=None):
+    def delete_cards(query=None):
         """Send a synchronous bulk deletion request.
 
         :param list query: a search definition using the Elasticsearch
@@ -51,9 +51,8 @@ class IndexAPI:
 
         :return: collection of items whose deletion failed.
         """
-        pass
 
-    def search_cards(self, query=None):
+    def search_cards(query=None):
         """Enumerate cards in Docido index.
 
         :param list query: a search definition using the
@@ -61,9 +60,8 @@ class IndexAPI:
 
         :return: FIXME
         """
-        pass
 
-    def push_thumbnails(self, thumbnails):
+    def push_thumbnails(thumbnails):
         """Add or update thumbnails in dedicated Docido index.
 
         :param list thumbnails: Collection of tuples
@@ -71,9 +69,8 @@ class IndexAPI:
 
         :return: collection of items whose insertion failed.
         """
-        pass
 
-    def delete_thumbnails(self, query=None):
+    def delete_thumbnails(query=None):
         """Delete thumbnails from dedicated Docido index.
 
         :param query: a search definition using the Elasticsearch Query DSL to
@@ -81,9 +78,8 @@ class IndexAPI:
 
         :return: collection of items whose deletion failed.
         """
-        pass
 
-    def get_kv(self, key):
+    def get_kv(key):
         """Retrieve value from persistence layer
 
         :param string key: input key
@@ -91,43 +87,38 @@ class IndexAPI:
         :return: the value is present, `None` otherwise.
         :rtype: string
         """
-        pass
 
-    def set_kv(self, key, value):
+    def set_kv(key, value):
         """Insert or update existing key in persistence layer.
 
         :param string key: input key
         :param string value: value to store
         """
-        pass
 
-    def delete_kv(self, key):
+    def delete_kv(key):
         """Remove key from persistent storage.
 
         :param key: the key to remove
         """
 
-    def delete_kvs(self):
+    def delete_kvs():
         """Remove all crawler persisted data.
         """
-        pass
 
-    def get_kvs(self):
+    def get_kvs():
         """Retrieve all crawler persisted data.
 
         :return: collection of tuple `(key, value)`
         :rtype: list
         """
-        pass
 
-    def ping(self):
+    def ping():
         """Test availability of Docido index
 
         :raises SystemError: if Docido index is unreachable
         """
-        pass
 
-    def refresh_oauth_access_token(self):
+    def refresh_oauth_access_token():
         """Refresh OAuth access token.
         This method may be used when the crawled source
         invalidates the OAuth access token.
@@ -135,41 +126,3 @@ class IndexAPI:
         :return: new access token
         :rtype: basestring
         """
-
-
-class IndexAPIProcessor(IndexAPI):
-    def __init__(self, parent):
-        self.__parent = parent
-
-    def push_cards(self, cards):
-        return self.__parent.push_cards(cards)
-
-    def delete_cards(self, query=None):
-        return self.__parent.delete_cards(query)
-
-    def search_cards(self, query=None):
-        return self.__parent.search_cards(query)
-
-    def push_thumbnails(self, thumbnails):
-        return self.__parent.push_thumbnails(thumbnails)
-
-    def delete_thumbnails(self, query=None):
-        return self.__parent.delete_thumbnails(query)
-
-    def get_key(self, key):
-        return self.__parent.get_key(key)
-
-    def set_key(self, key, value):
-        return self.__parent.set_key(key, value)
-
-    def delete_key(self, key):
-        return self.__parent.delete_key(key)
-
-    def delete_keys(self):
-        return self.__parent.delete_keys()
-
-    def get_kvs(self):
-        return self.__parent.get_kvs()
-
-    def ping(self):
-        return self.__parent.ping()
