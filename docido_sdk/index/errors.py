@@ -1,0 +1,3 @@
+
+class IndexApiError(Exception):
+    pass
