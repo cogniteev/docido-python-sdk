@@ -1,8 +1,8 @@
-
 """
 Provides a set of Exception classes a crawler may raise when it is
 not possible to consume source API because of OAuth-related issues.
 """
+
 
 class CrawlerError(Exception):
     """Common base exception class for crawl issues"""

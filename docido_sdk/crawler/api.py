@@ -18,8 +18,8 @@ class ICrawler(Interface):
 
     def get_account_login(oauth_token):
         """Provides most *human-readable* representation of the
-        user account. The returned value is used to identify
-        the account among others.
+        user account. The value returned by this methyod is used to
+        identify the account among others in Docido frontend application.
 
         :param docido_sdk.oauth.OAuthToken oauth_token:
           OAuth credentials
@@ -28,14 +28,6 @@ class ICrawler(Interface):
         :rtype: string
         """
 
-#    def handle_oauth_response(oauth):
-#        """Handle the OAuth response with the proper method,
-#        and extract meaningful fields from response.
-#
-#        :param flask_oauthlib.client.OAuth oauth: OAuth transaction
-#        :rtype: docido_sdk.crawler.oauth.OAuthToken
-#        """
-
     def iter_crawl_tasks(index, oauth_token, full=False):
         """Split the crawl in smaller independant actions,
         and returns them for delayed execution.
@@ -43,7 +35,7 @@ class ICrawler(Interface):
         :param docido_sdk.push.api.IndexAPI: index
           To manipulate Docido index
 
-        :param basestring oauth_token:
+        :param docido_sdk.oauth.OAuthToken oauth_token:
           OAuth credentials
 
         :param bool full:

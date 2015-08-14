@@ -1,6 +1,7 @@
 
-__all__ = ['IndexAPI']
 from docido_sdk.core import Interface
+
+__all__ = ['IndexAPI']
 
 
 class IndexAPI(Interface):

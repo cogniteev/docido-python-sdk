@@ -29,9 +29,3 @@ Oauth
 
 .. autoclass:: docido_sdk.oauth.api.OAuthToken
    :inherited-members:
-.. autoclass:: docido_sdk.oauth.api.OAuthExpiresToken
-   :inherited-members:
-.. autoclass:: docido_sdk.oauth.api.OAuthRefreshToken
-   :inherited-members:
-.. autoclass:: docido_sdk.oauth.api.OAuthSecretToken
-   :inherited-members:
