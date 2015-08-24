@@ -16,18 +16,6 @@ class ICrawler(Interface):
         :rtype: string
         """
 
-    def get_account_login(oauth_token):
-        """Provides most *human-readable* representation of the
-        user account. The value returned by this methyod is used to
-        identify the account among others in Docido frontend application.
-
-        :param docido_sdk.oauth.OAuthToken oauth_token:
-          OAuth credentials
-
-        :return: user account identifier
-        :rtype: string
-        """
-
     def iter_crawl_tasks(index, oauth_token, full=False):
         """Split the crawl in smaller independant actions,
         and returns them for delayed execution.
