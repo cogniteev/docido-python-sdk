@@ -16,7 +16,7 @@ class ICrawler(Interface):
         :rtype: string
         """
 
-    def iter_crawl_tasks(index, oauth_token, full=False):
+    def iter_crawl_tasks(index, oauth_token, logger, full=False):
         """Split the crawl in smaller independant actions,
         and returns them for delayed execution.
 
@@ -25,6 +25,9 @@ class ICrawler(Interface):
 
         :param docido_sdk.oauth.OAuthToken oauth_token:
           OAuth credentials
+
+        :param logging.Logger logger:
+          to emit messages
 
         :param bool full:
           whether the entire account must be pushed or only
@@ -48,7 +51,7 @@ class ICrawler(Interface):
           your crawler class definition.
         """
 
-    def clear_account(index, oauth_token):
+    def clear_account(index, oauth_token, logger):
         """Remove from Docido index all data previously indexed for
         this account. Persisted data must also be cleared.
 
@@ -57,4 +60,7 @@ class ICrawler(Interface):
 
         :param docido_sdk.oauth.OAuthToken oauth_token:
           OAuth credentials
+
+        :param logging.Logger logger:
+          to emit messages
         """
