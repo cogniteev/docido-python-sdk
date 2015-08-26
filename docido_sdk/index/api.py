@@ -1,10 +1,30 @@
 
 from docido_sdk.core import Interface
 
-__all__ = ['IndexAPI']
+__all__ = [
+    'IndexAPI',
+    'IndexAPIConfigurationProvider',
+    'IndexAPIProcessor',
+    'IndexAPIProvider',
+    'IndexPipelineConfig',
+]
 
 
-class IndexAPI(Interface):
+class IndexAPIProvider(Interface):
+    """ Provide an implementation of IndexAPI
+    """
+    def get_index_api(**config):
+        """ Create a new instance of :py:class:`docido_sdk.index.IndexAPI`
+
+        :param dict: config:
+          extra configuration given to the object to create
+
+        :return: new instance
+        :rtype: :py:class:`docido_sdk.index.IndexAPI`
+        """
+
+
+class IndexAPI(object):
     """Read/write access to Docido index.
 
     :An IndexAPI object can manipulate 3 kind of data:
@@ -127,3 +147,86 @@ class IndexAPI(Interface):
         :return: new access token
         :rtype: basestring
         """
+
+
+class IndexAPIProcessor(IndexAPI):
+    """ Allows creation of :py:class:`docido_sdk.index.IndexAPI` pipelines
+    """
+    def __init__(self, parent=None, **config):
+        """
+        :param :py:class:`docido_sdk.index.IndexAPI`: parent:
+          next pipeline object
+
+        :param dict: config:
+          extra processor configuration
+        """
+        self._parent = parent
+        self._config = config
+
+    def push_cards(self, cards):
+        return self._parent.push_cards(cards)
+
+    def delete_cards(self, query=None):
+        return self._parent.delete_cards(query)
+
+    def search_cards(self, query=None):
+        return self._parent.search_cards(query)
+
+    def push_thumbnails(self, thumbnails):
+        return self._parent.push_thumbnails(thumbnails)
+
+    def delete_thumbnails(self, query=None):
+        return self._parent.delete_thumbnails(query)
+
+    def get_kv(self, key):
+        return self._parent.get_kv(key)
+
+    def set_kv(self, key, value):
+        return self._parent.set_kv(key, value)
+
+    def delete_kv(self, key):
+        return self._parent.delete_kv(key)
+
+    def delete_kvs(self):
+        return self._parent.delete_kvs()
+
+    def get_kvs(self):
+        return self._parent.get_kvs()
+
+    def ping(self):
+        return self._parent.ping()
+
+
+class IndexAPIConfigurationProvider(Interface):
+    """ An interface to provide a configuration consumed by
+    :py:class:`docido_sdk.index.IndexAPIProcessor`
+    """
+    def get_index_api_conf(service, docido_user_id, account_login):
+        """ Provides a configuration object given to every index processors
+
+        :param basestring: service:
+          account service name (gmail, trello, ...)
+
+        :param basestring: docido_user_id:
+          the Docido user identifier for which the IndexAPI is meant form
+
+        :param basestring: account_login
+          the user account login for which the IndexAPI is meant for
+
+        :return: IndexAPI Configuration
+        :rtype: dict
+        """
+        pass
+
+
+class IndexPipelineConfig(Interface):
+    """ Provides list of :py:class:`docido_sdk.index.IndexAPIProvider`
+    to link together in order to create the indexing pipeline.
+    """
+    def get_pipeline():
+        """
+        :return:
+          description of the index pipeline to create
+        :rtype: :py:class:`docido_sdk.index.IndexAPIProvider`
+        """
+        pass

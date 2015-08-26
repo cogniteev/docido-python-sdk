@@ -1,3 +1,3 @@
 
-class IndexApiError(Exception):
+class IndexAPIError(Exception):
     pass
