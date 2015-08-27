@@ -5,7 +5,7 @@ import json
 import os.path as osp
 import shutil
 
-from docido_sdk.toolbox.threading import RWLock
+from docido_sdk.toolbox.threading_ext import RWLock
 from .api import IndexAPIProcessor
 
 
