@@ -163,27 +163,28 @@ class LocalDumbIndexProcessor(IndexAPIProcessor):
             else:
                 for card in self.__cards.values():
                     result.append(card)
-        return {
-            'took': 1,
-            'timed_out': False,
-            '_shards': {
-                'total': 1,
-                'successful': 1,
-                'failed': 0,
-            },
-            'hits': {
-                'total': len(result),
-                'max_score': 1.0,
-                'hits': [{
-                    '_index': 'docido',
-                    '_type': 'item',
-                    '_id': r['id'],
-                    '_score': 1.0,
-                    '_source': r
-                } for r in result
-                ],
-            }
-        }
+        return result
+        # return {
+        #     'took': 1,
+        #     'timed_out': False,
+        #     '_shards': {
+        #         'total': 1,
+        #         'successful': 1,
+        #         'failed': 0,
+        #     },
+        #     'hits': {
+        #         'total': len(result),
+        #         'max_score': 1.0,
+        #         'hits': [{
+        #             '_index': 'docido',
+        #             '_type': 'item',
+        #             '_id': r['id'],
+        #             '_score': 1.0,
+        #             '_source': r
+        #         } for r in result
+        #         ],
+        #     }
+        # }
 
     def push_thumbnails(self, *thumbnails):
         # FIXME: returns expected value

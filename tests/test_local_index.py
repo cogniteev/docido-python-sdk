@@ -2,6 +2,7 @@ from itertools import repeat
 import tempfile
 import unittest
 
+from docido_sdk.toolbox.decorators import lazy
 from docido_sdk.test import (
     cleanup_component,
     cleanup_components,
@@ -58,7 +59,8 @@ class TestLocalIndex(unittest.TestCase):
     def setUpClass(cls):
         TEST_ENV.temp_dir = tempfile.mkdtemp()
 
-    def _index(self):
+    @lazy
+    def index(self):
         pipeline = TEST_ENV[IndexPipelineProvider]
         return pipeline.get_index_api(None, None, None)
 
@@ -66,7 +68,8 @@ class TestLocalIndex(unittest.TestCase):
         card = {
             'id': 12345
         }
-        self._index().push_cards(repeat(card, 1))
+        self.index.push_cards(repeat(card, 1))
+        self.assertEqual(self.index.search_cards(), [card])
 
     @classmethod
     def tearDownClass(cls):

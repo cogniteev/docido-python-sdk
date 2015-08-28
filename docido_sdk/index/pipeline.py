@@ -49,6 +49,5 @@ class IndexPipelineProvider(Component):
         index_providers = self.pipeline.get_pipeline()
         index_api = None
         for provider in reversed(index_providers):
-            print config
             index_api = provider.get_index_api(parent=index_api, **config)
         return index_api
