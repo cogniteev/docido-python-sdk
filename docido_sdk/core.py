@@ -39,7 +39,10 @@ class ExtensionPoint(property):
         components = self.extensions(component)
         if len(components) != 1:
             raise Exception(
-                "Expected one component, but found {}".format(len(components))
+                "Expected one {} component, but found {}".format(
+                    component.__class__.__name__,
+                    len(components)
+                )
             )
         else:
             return components[0]
