@@ -2,7 +2,7 @@ from itertools import repeat
 import tempfile
 import unittest
 
-from utils import (
+from docido_sdk.test import (
     cleanup_component,
     cleanup_components,
 )

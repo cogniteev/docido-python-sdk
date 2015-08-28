@@ -15,7 +15,7 @@ from docido_sdk.core import (
     Component,
     implements,
 )
-from utils import cleanup_component, cleanup_components
+from docido_sdk.test import cleanup_component, cleanup_components
 
 
 @cleanup_component

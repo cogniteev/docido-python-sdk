@@ -9,7 +9,7 @@ from docido_sdk.index.api import (
     IndexPipelineConfig,
 )
 from docido_sdk.index.pipeline import IndexPipelineProvider
-from utils import cleanup_component, cleanup_components
+from docido_sdk.test import cleanup_component, cleanup_components
 
 
 class Processor1(IndexAPIProcessor):
