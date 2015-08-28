@@ -39,6 +39,7 @@ class ICrawler(Interface):
 
           - push_api (:py:class:`docido_sdk.push.IndexAPI`)
           - oauth_token (:py:class:`docido_sdk.oauth.OAuthToken`)
+          - logger (:py:class:`logging.Logger`)
 
           A tuple of 2 elements can also be returned for crawlers
           willing to perform a final operation when all sub-tasks
