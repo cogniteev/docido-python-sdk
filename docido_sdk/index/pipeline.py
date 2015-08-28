@@ -1,5 +1,6 @@
 from .. core import Component, implements, ExtensionPoint
 from . api import (
+    IndexAPI,
     IndexAPIConfigurationProvider,
     IndexPipelineConfig,
     IndexAPIProvider,
@@ -47,7 +48,7 @@ class IndexPipelineProvider(Component):
             service, docido_user_id, account_login
         )
         index_providers = self.pipeline.get_pipeline()
-        index_api = None
+        index_api = IndexAPI()
         for provider in reversed(index_providers):
             index_api = provider.get_index_api(parent=index_api, **config)
         return index_api
