@@ -47,7 +47,6 @@ def build_env():
     env = Environment()
     env[ForcePipeline]
     env[ForceConfig]
-    env[LocalKV]
     return env
 
 TEST_ENV = build_env()
