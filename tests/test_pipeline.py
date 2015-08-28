@@ -36,6 +36,7 @@ class Processor2Provider(Component):
         return Processor2(parent, **config)
 
 
+@cleanup_component
 class IndexPipelineConfig(Component):
     implements(IndexPipelineConfig)
 
