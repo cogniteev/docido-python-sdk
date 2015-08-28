@@ -117,8 +117,8 @@ class LocalDumbIndexProcessor(IndexAPIProcessor):
 
         self.__cards_path = cards_path
         self.__thumbnails_path = thumbnails_path
-        self.__cards = LocalDumbIndex.load_index(cards_path)
-        self.__thumbnails = LocalDumbIndex.load_index(thumbnails_path)
+        self.__cards = LocalDumbIndexProcessor.load_index(cards_path)
+        self.__thumbnails = LocalDumbIndexProcessor.load_index(thumbnails_path)
         self.__failure_probability = failure_probability
 
     @contextmanager
@@ -127,9 +127,11 @@ class LocalDumbIndexProcessor(IndexAPIProcessor):
         try:
             yield
             if cards:
-                LocalDumbIndex.persist_index(self.__cards, self.__cards_path)
+                LocalDumbIndexProcessor.persist_index(
+                    self.__cards, self.__cards_path
+                )
             if thumbnails:
-                LocalDumbIndex.persist_index(
+                LocalDumbIndexProcessor.persist_index(
                     self.__thumbnails,
                     self.__thumbnails_path
                 )
@@ -151,6 +153,7 @@ class LocalDumbIndexProcessor(IndexAPIProcessor):
 
     def search_cards(self, query=None):
         with self.__lock.read():
+            fetch_fields = None
             if query and 'fields' in query.keys():
                 fetch_fields = query.get('fields', None)
             result = list()
@@ -182,7 +185,7 @@ class LocalDumbIndexProcessor(IndexAPIProcessor):
             }
         }
 
-    def push_thumbnails(self, thumbnails):
+    def push_thumbnails(self, *thumbnails):
         # FIXME: returns expected value
         with self.__update(thumbnails=True):
             for id_, payload, mime in thumbnails:

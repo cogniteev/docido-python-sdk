@@ -3,6 +3,7 @@ import shutil
 import tempfile
 import unittest
 
+from docido_sdk.env import Environment
 from docido_sdk.index import (
     IndexAPIConfigurationProvider,
     IndexAPIError,
@@ -43,7 +44,6 @@ class ForceConfig(Component):
 
 
 def build_env():
-    from docido_sdk.env import Environment
     env = Environment()
     env[ForcePipeline]
     env[ForceConfig]
@@ -53,7 +53,7 @@ TEST_ENV = build_env()
 
 
 class TestLocalKV(unittest.TestCase):
-    def kv(cls):
+    def kv(self):
         pipeline = TEST_ENV[IndexPipelineProvider]
         return pipeline.get_index_api(None, None, None)
 
