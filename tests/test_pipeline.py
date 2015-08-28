@@ -9,12 +9,14 @@ from docido_sdk.index.api import (
     IndexPipelineConfig,
 )
 from docido_sdk.index.pipeline import IndexPipelineProvider
+from utils import cleanup_component, cleanup_components
 
 
 class Processor1(IndexAPIProcessor):
     pass
 
 
+@cleanup_component
 class Processor1Provider(Component):
     implements(IndexAPIProvider)
 
@@ -26,6 +28,7 @@ class Processor2(IndexAPIProcessor):
     pass
 
 
+@cleanup_component
 class Processor2Provider(Component):
     implements(IndexAPIProvider)
 
@@ -43,6 +46,7 @@ class IndexPipelineConfig(Component):
         ]
 
 
+@cleanup_component
 class IndexAPIConfigurationProvider(Component):
     implements(IndexAPIConfigurationProvider)
 
@@ -76,6 +80,10 @@ class TestPipeline(unittest.TestCase):
         self.assertTrue(isinstance(index_api._parent, Processor2))
         self.assertEqual(index_api._parent._config, config)
         self.assertIsNone(index_api._parent._parent)
+
+    @classmethod
+    def tearDownClass(cls):
+        cleanup_components()
 
 
 if __name__ == '__main__':
