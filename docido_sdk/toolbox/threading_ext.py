@@ -54,7 +54,7 @@ class RWLock:
 
     @contextmanager
     def read(self):
-        self.reader_require()
+        self.reader_acquire()
         try:
             yield
         finally:
@@ -62,7 +62,7 @@ class RWLock:
 
     @contextmanager
     def write(self):
-        self.write_acquire()
+        self.writer_acquire()
         try:
             yield
         finally:
