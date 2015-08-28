@@ -139,15 +139,6 @@ class IndexAPI(object):
         :raises SystemError: if Docido index is unreachable
         """
 
-    def refresh_oauth_access_token():
-        """Refresh OAuth access token.
-        This method may be used when the crawled source
-        invalidates the OAuth access token.
-
-        :return: new access token
-        :rtype: basestring
-        """
-
 
 class IndexAPIProcessor(IndexAPI):
     """ Allows creation of :py:class:`docido_sdk.index.IndexAPI` pipelines
