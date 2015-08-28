@@ -39,7 +39,10 @@ class ExtensionPoint(property):
         components = self.extensions(component)
         if len(components) != 1:
             raise Exception(
-                "Expected one component, but found {}".format(len(components))
+                "Expected one {} component, but found {}".format(
+                    component.__class__.__name__,
+                    len(components)
+                )
             )
         else:
             return components[0]
@@ -78,6 +81,18 @@ class ComponentMeta(type):
                     classes.append(new_class)
 
         return new_class
+
+    @classmethod
+    def unregister(cls, component):
+        try:
+            cls._components.remove(component)
+        except:
+            pass
+        for interface, components in cls._registry.iteritems():
+            try:
+                components.remove(component)
+            except:
+                pass
 
     def __call__(cls, *args, **kwargs):
         """Return an existing instance of the component if it has
@@ -132,6 +147,10 @@ class Component(object):
         assert locals_ is not frame.f_globals and '__module__' in locals_, msg
 
         locals_.setdefault('_implements', []).extend(interfaces)
+
+    @classmethod
+    def unregister(cls):
+        cls.__class__.unregister(cls)
 
 
 implements = Component.implements

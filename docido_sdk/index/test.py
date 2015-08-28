@@ -4,12 +4,25 @@ from contextlib import contextmanager
 import json
 import os.path as osp
 import shutil
+import tempfile
 
-from docido_sdk.toolbox.threading import RWLock
-from .api import IndexAPIProcessor
+from docido_sdk.core import (
+    Component,
+    implements,
+)
+from docido_sdk.toolbox.threading_ext import RWLock
+from .api import (
+    IndexAPIProcessor,
+    IndexAPIProvider,
+)
+from .errors import IndexAPIError
+from docido_sdk.toolbox.decorators import reraise
 
 
-class LocalKV(IndexAPIProcessor):
+reraise = reraise(IndexAPIError)
+
+
+class LocalKVProcessor(IndexAPIProcessor):
     """Local thread-safe, `IndexAPIProcessor` persistent storage
     implementation backed by a json file on the local filesystem.
     """
@@ -17,37 +30,52 @@ class LocalKV(IndexAPIProcessor):
     __lock = RWLock()
     __store = dict()
 
-    def __init__(self, parent, path):
+    def __init__(self, **config):
         """
         :param path: Path to a json file where the KVS is written.
         """
-        super(LocalKV, self).__init__(parent)
+        super(LocalKVProcessor, self).__init__(**config)
+        local_storage = config.get('local_storage', {})
+        kv_storage = local_storage.get('kv', {})
+        path = kv_storage.get('path')
+        if path is None:
+            path = tempfile.mkdtemp(prefix='docido-local-storage-kv')
+        path = osp.join(path, 'kv.yaml')
         self.__path = path
-        with self.write():
+        with self.__lock.write():
             if osp.exists(path):
                 with open(path) as istr:
                     self.__store = json.load(istr)
 
+    @reraise
     def get_key(self, key):
+        assert isinstance(key, basestring)
         with self.__lock.read():
             return self.__store.get(key)
 
+    @reraise
     def get_kvs(self):
-        with self.__lock_read():
-            return copy.copy(self.__store.iteritems())
+        with self.__lock.read():
+            return copy.copy(self.__store)
 
+    @reraise
     def set_key(self, key, value):
-        with self.write():
+        assert isinstance(key, basestring)
+        assert isinstance(value, basestring)
+        with self.__lock.write():
             self.__store[key] = value
             self.__persist()
 
+    @reraise
     def delete_key(self, key):
-        with self.write():
+        assert isinstance(key, basestring)
+        with self.__lock.write():
             self.__store.pop(key, None)
             self.__persist()
 
+    @reraise
     def delete_keys(self):
-        with self.write():
+        with self.__lock.write():
             self.__store.clear()
             self.__persist()
 
@@ -57,7 +85,14 @@ class LocalKV(IndexAPIProcessor):
         shutil.move(self.__path + '.new', self.__path)
 
 
-class LocalDumbIndex(IndexAPIProcessor):
+class LocalKV(Component):
+    implements(IndexAPIProvider)
+
+    def get_index_api(self, **config):
+        return LocalKVProcessor(**config)
+
+
+class LocalDumbIndexProcessor(IndexAPIProcessor):
     """Dumb, but yet reentrant, index implementation, persisting indices
     in local-filesystem.
 
@@ -69,14 +104,22 @@ class LocalDumbIndex(IndexAPIProcessor):
     __cards = dict()
     __thumbnails = dict()
 
-    def __init__(self,
-                 parent, cards_path,
-                 thumbnails_path, failure_probability=0):
-        super(LocalDumbIndex, self).__init__(parent)
+    def __init__(self, **config):
+        super(LocalDumbIndexProcessor, self).__init__(**config)
+        local_storage = config.get('local_storage', {})
+        index_storage = local_storage.get('documents', {})
+        path = index_storage.get('path')
+        if path is None:
+            path = tempfile.mkdtemp('docido-local-storage-documents')
+        cards_path = osp.join(path, 'cards.yml')
+        thumbnails_path = osp.join(path, 'thumbnails.yml')
+        failure_probability = index_storage.get('failure_probability', 0)
+
         self.__cards_path = cards_path
         self.__thumbnails_path = thumbnails_path
-        self.__cards = LocalDumbIndex.load_index(cards_path)
-        self.__thumbnails = LocalDumbIndex.load_index(thumbnails_path)
+        self.__cards = LocalDumbIndexProcessor.load_index(cards_path)
+        self.__thumbnails = LocalDumbIndexProcessor.load_index(thumbnails_path)
+        self.__failure_probability = failure_probability
 
     @contextmanager
     def __update(self, cards=False, thumbnails=False):
@@ -84,9 +127,11 @@ class LocalDumbIndex(IndexAPIProcessor):
         try:
             yield
             if cards:
-                LocalDumbIndex.persist_index(self.__cards, self.__cards_path)
+                LocalDumbIndexProcessor.persist_index(
+                    self.__cards, self.__cards_path
+                )
             if thumbnails:
-                LocalDumbIndex.persist_index(
+                LocalDumbIndexProcessor.persist_index(
                     self.__thumbnails,
                     self.__thumbnails_path
                 )
@@ -108,6 +153,7 @@ class LocalDumbIndex(IndexAPIProcessor):
 
     def search_cards(self, query=None):
         with self.__lock.read():
+            fetch_fields = None
             if query and 'fields' in query.keys():
                 fetch_fields = query.get('fields', None)
             result = list()
@@ -139,7 +185,7 @@ class LocalDumbIndex(IndexAPIProcessor):
             }
         }
 
-    def push_thumbnails(self, thumbnails):
+    def push_thumbnails(self, *thumbnails):
         # FIXME: returns expected value
         with self.__update(thumbnails=True):
             for id_, payload, mime in thumbnails:
@@ -165,3 +211,10 @@ class LocalDumbIndex(IndexAPIProcessor):
         with open(path + '.new', 'w') as ostr:
             json.dump(index, ostr, indent=2)
         shutil.move(path + '.new', path)
+
+
+class LocalDumbIndex(Component):
+    implements(IndexAPIProvider)
+
+    def get_index_api(self, **config):
+        return LocalDumbIndexProcessor(**config)

@@ -60,3 +60,23 @@ def decorate_instance_methods(obj, decorator, includes=None, excludes=None):
                 value = decorator(name, value)
             return value
     return InstanceMethodDecorator()
+
+
+def reraise(clazz):
+    """ Decorator catching every exception that might be raised by wrapped
+    function and raise another exception instead.
+    Exception initially raised is passed in first argument of the raised
+    exception.
+
+    :param: Exception class: clazz:
+      Python exception class to raise
+    """
+    def _decorator(f):
+        @functools.wraps(f)
+        def _wrap(*args, **kwargs):
+            try:
+                return f(*args, **kwargs)
+            except Exception as e:
+                raise clazz(e)
+        return _wrap
+    return _decorator
