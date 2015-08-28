@@ -56,7 +56,7 @@ class IndexAPI(object):
         the target scope by providing a `query` in parameter.
         The `query` parameters follows the Elasticsearch Query DSL.
     """
-    def push_cards(cards):
+    def push_cards(self, cards):
         """Send a synchronous bulk indexing request
 
         :param list cards: collections of cards to index.
@@ -64,7 +64,7 @@ class IndexAPI(object):
         :return: collection of items whose insertion failed.
         """
 
-    def delete_cards(query=None):
+    def delete_cards(self, query=None):
         """Send a synchronous bulk deletion request.
 
         :param list query: a search definition using the Elasticsearch
@@ -73,7 +73,7 @@ class IndexAPI(object):
         :return: collection of items whose deletion failed.
         """
 
-    def search_cards(query=None):
+    def search_cards(self, query=None):
         """Enumerate cards in Docido index.
 
         :param list query: a search definition using the
@@ -82,7 +82,7 @@ class IndexAPI(object):
         :return: FIXME
         """
 
-    def push_thumbnails(thumbnails):
+    def push_thumbnails(self, thumbnails):
         """Add or update thumbnails in dedicated Docido index.
 
         :param list thumbnails: Collection of tuples
@@ -91,7 +91,7 @@ class IndexAPI(object):
         :return: collection of items whose insertion failed.
         """
 
-    def delete_thumbnails(query=None):
+    def delete_thumbnails(self, query=None):
         """Delete thumbnails from dedicated Docido index.
 
         :param query: a search definition using the Elasticsearch Query DSL to
@@ -100,7 +100,7 @@ class IndexAPI(object):
         :return: collection of items whose deletion failed.
         """
 
-    def get_kv(key):
+    def get_kv(self, key):
         """Retrieve value from persistence layer
 
         :param string key: input key
@@ -109,31 +109,31 @@ class IndexAPI(object):
         :rtype: string
         """
 
-    def set_kv(key, value):
+    def set_kv(self, key, value):
         """Insert or update existing key in persistence layer.
 
         :param string key: input key
         :param string value: value to store
         """
 
-    def delete_kv(key):
+    def delete_kv(self, key):
         """Remove key from persistent storage.
 
         :param key: the key to remove
         """
 
-    def delete_kvs():
+    def delete_kvs(self):
         """Remove all crawler persisted data.
         """
 
-    def get_kvs():
+    def get_kvs(self):
         """Retrieve all crawler persisted data.
 
         :return: collection of tuple `(key, value)`
         :rtype: list
         """
 
-    def ping():
+    def ping(self):
         """Test availability of Docido index
 
         :raises SystemError: if Docido index is unreachable
