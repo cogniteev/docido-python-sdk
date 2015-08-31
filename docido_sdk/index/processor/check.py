@@ -37,10 +37,25 @@ class Check(IndexAPIProcessor):
     def push_cards(self, cards):
         for c in cards:
             try:
+                # add 'attachments' field if missing, otherwise voluptuous
+                # yells
+                c.setdefault('attachments', [])
+                self._check_attachments(c)
                 self.card_schema(c)
+
             except voluptuous.MultipleInvalid as e:
                 raise IndexAPIError(e)
         return self._parent.push_cards(cards)
+
+    def _check_attachments(self, card):
+        titles = set()
+        for attachment in card['attachments']:
+            title = attachment['title']
+            if title in titles:
+                IndexAPIError.build(card).message(
+                    "Cannot have 2 attachments with the same 'title'")._raise()
+            titles.add(title)
+
 
     def search_cards(self, query=None):
         try:

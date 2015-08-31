@@ -156,8 +156,7 @@ class TestCheckProcessor(unittest.TestCase):
     def test_push_without_attachments_field(self):
         card = copy.deepcopy(self.VALID_CARD)
         card.pop('attachments')
-        with self.assertRaises(IndexAPIError):
-            self.index.push_cards([card])
+        self.index.push_cards([card])
 
     def test_push_one_attachment(self):
         card = copy.deepcopy(self.VALID_CARD)
@@ -193,6 +192,19 @@ class TestCheckProcessor(unittest.TestCase):
             'type': 'type2',
             'description': 'description2',
         })
+        with self.assertRaises(IndexAPIError):
+            self.index.push_cards([card])
+
+    def test_attachments_with_same_name(self):
+        card = copy.deepcopy(self.VALID_CARD)
+        attachment = {
+            'title': 'title1',
+            'origin_id': 'origin_id1',
+            'type': 'type1',
+            'description': 'description1',
+        }
+        card['attachments'].append(attachment)
+        card['attachments'].append(attachment)
         with self.assertRaises(IndexAPIError):
             self.index.push_cards([card])
 
