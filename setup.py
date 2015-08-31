@@ -7,7 +7,7 @@ __version__ = None
 exec(open('docido_sdk/__init__.py').read())
 
 setup(
-    name=module_name,
+    name='docido-sdk',
     version=__version__,
     description='Docido software development kit for Python',
     author='Cogniteev',
