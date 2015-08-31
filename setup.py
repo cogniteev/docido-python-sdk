@@ -37,5 +37,7 @@ setup(
     install_requires=[
         'setuptools>=0.6',
         'Flask-OAuthlib>=0.8.0',
+        'voluptuous>=0.8.7',
+        'yamlious>=0.1.1',
     ]
 )

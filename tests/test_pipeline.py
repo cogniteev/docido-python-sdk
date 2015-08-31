@@ -2,7 +2,8 @@ import unittest
 
 from docido_sdk.core import Component, implements
 from docido_sdk.env import Environment
-from docido_sdk.index.api import (
+from docido_sdk.index import (
+    IndexAPI,
     IndexAPIConfigurationProvider,
     IndexAPIProcessor,
     IndexAPIProvider,
@@ -80,7 +81,10 @@ class TestPipeline(unittest.TestCase):
         self.assertIsNotNone(index_api._parent)
         self.assertTrue(isinstance(index_api._parent, Processor2))
         self.assertEqual(index_api._parent._config, config)
-        self.assertIsNone(index_api._parent._parent)
+        self.assertTrue(isinstance(
+            index_api._parent._parent,
+            IndexAPI
+        ))
 
     @classmethod
     def tearDownClass(cls):

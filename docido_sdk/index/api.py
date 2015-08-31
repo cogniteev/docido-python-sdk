@@ -7,6 +7,7 @@ __all__ = [
     'IndexAPIProcessor',
     'IndexAPIProvider',
     'IndexPipelineConfig',
+    'PullCrawlerIndexingConfig',
 ]
 
 
@@ -195,13 +196,13 @@ class IndexAPIConfigurationProvider(Interface):
     def get_index_api_conf(service, docido_user_id, account_login):
         """ Provides a configuration object given to every index processors
 
-        :param basestring: service:
+        :param: basestring: service:
           account service name (gmail, trello, ...)
 
-        :param basestring: docido_user_id:
+        :param: basestring: docido_user_id:
           the Docido user identifier for which the IndexAPI is meant form
 
-        :param basestring: account_login
+        :param: basestring: account_login
           the user account login for which the IndexAPI is meant for
 
         :return: IndexAPI Configuration
@@ -221,3 +222,23 @@ class IndexPipelineConfig(Interface):
         :rtype: :py:class:`docido_sdk.index.IndexAPIProvider`
         """
         pass
+
+
+class PullCrawlerIndexingConfig(Interface):
+    def core():
+        """ Providers common pull-crawlers indexing configuration
+
+        :return:
+          description of pull-crawlers indexing Configuration
+        :rtype: dict
+        """
+
+    def service(service):
+        """ Provides crawler specific indexing configuration.
+
+        :param: basestring service:
+
+        :return:
+          description of the crawler custom indexing Configuration
+        :rtype: dict
+        """
