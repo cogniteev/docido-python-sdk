@@ -1,10 +1,7 @@
 import copy
-import os
-import tempfile
 import unittest
 
-import yaml
-
+import docido_sdk.config as docido_config
 from docido_sdk.core import (
     Component,
     implements,
@@ -52,7 +49,7 @@ class TestCheckProcessor(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        config = {
+        docido_config._push().update({
             'pull_crawlers': {
                 'crawlers': {
                     TEST_CRAWLER_NAME: {
@@ -111,12 +108,7 @@ class TestCheckProcessor(unittest.TestCase):
                     },
                 }
             }
-        }
-        fd, cls.config_file = tempfile.mkstemp(suffix='.yml')
-        os.close(fd)
-        with open(cls.config_file, 'w') as ostr:
-            yaml.dump(config, ostr)
-        os.environ['DOCIDO_CONFIG'] = cls.config_file
+        })
         cls.env = Environment()
         cls.env[IndexPipelineProvider]
         cls.env[LocalDumbIndex]
@@ -126,10 +118,9 @@ class TestCheckProcessor(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        docido_config._pop()
         cleanup_components()
         YamlPullCrawlersIndexingConfig.unregister()
-        os.remove(cls.config_file)
-        os.environ.pop('DOCIDO_CONFIG')
 
     @lazy
     def index(self):
