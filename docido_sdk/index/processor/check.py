@@ -56,7 +56,6 @@ class Check(IndexAPIProcessor):
                     "Cannot have 2 attachments with the same 'title'")._raise()
             titles.add(title)
 
-
     def search_cards(self, query=None):
         try:
             self.query_schema(query or {})
