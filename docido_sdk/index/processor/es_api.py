@@ -32,11 +32,11 @@ class ElasticsearchProcessor(IndexAPIProcessor):
         self.__routing = config.get('elasticsearch', {}).get('routing')
         self.__es = _Elasticsearch(
             es_config.ES_HOST,
-            **es_config.connection_params
+            **es_config.get('connection_params', {})
         )
         self.__es_store = _Elasticsearch(
             es_config.ES_STORE_HOST,
-            **es_config.connection_params
+            **es_config.get('connection_params', {})
         )
 
     def ping(self):
