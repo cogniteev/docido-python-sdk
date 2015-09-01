@@ -38,13 +38,16 @@ class ExtensionPoint(property):
     def extension(self, component):
         components = self.extensions(component)
         if len(components) != 1:
-            raise Exception(
-                "Expected one {} component, but found {}: {}".format(
-                    component.__class__.__name__,
-                    len(components),
-                    ", ".join(map(lambda c: c.__class__.__name__, components))
-                )
-            )
+            error = "Expected one '{interface}' component, but found {count}"
+            if len(components) != 0:
+                error += ': {hits}'
+            hits = list(map(lambda c: c.__class__.__name__, components))
+            hits.sort()
+            raise Exception(error.format(
+                interface=self.interface.__name__,
+                count=len(components),
+                hits=', '.join(hits)
+            ))
         else:
             return components[0]
 
