@@ -31,8 +31,9 @@ setup(
     test_suite='docido.sdk.test.suite',
     zip_safe=True,
     install_requires=[
-        'setuptools>=0.6',
         'Flask-OAuthlib>=0.8.0',
+        'ProxyTypes==0.9',
+        'setuptools>=0.6',
         'voluptuous>=0.8.7',
         'yamlious>=0.1.1',
     ]

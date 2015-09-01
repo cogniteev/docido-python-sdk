@@ -1,6 +1,34 @@
 import unittest
 
-from docido_sdk.toolbox.collections_ext import nameddict
+from docido_sdk.toolbox.collections_ext import nameddict, contextobj
+
+
+class TestContextObj(unittest.TestCase):
+    def test_push_n_pop(self):
+        a = {'foo': 'bar'}
+        p1 = contextobj(a)
+        self.assertEquals(p1['foo'], 'bar')
+        p1._push()
+        self.assertEquals(p1['foo'], 'bar')
+        p1['foo'] = 'foobar'
+        p1['john'] = 'doe'
+        p1._pop()
+        self.assertEqual(p1['foo'], 'bar')
+        self.assertFalse('john' in p1)
+
+    def test_with_statement(self):
+        a = {'foo': 'bar'}
+        proxy = contextobj(a)
+
+        class MyException(Exception):
+            pass
+
+        with self.assertRaises(MyException):
+            with proxy:
+                proxy['foo'] = 'foobar'
+                self.assertEquals(proxy['foo'], 'foobar')
+                raise MyException()
+        self.assertEquals(proxy['foo'], 'bar')
 
 
 class TestNamedDict(unittest.TestCase):
