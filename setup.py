@@ -37,5 +37,9 @@ setup(
         'setuptools>=0.6',
         'voluptuous>=0.8.7',
         'yamlious>=0.1.1',
-    ]
+    ],
+    entry_points="""
+        [console_scripts]
+        dcc-run = docido_sdk.scripts.dcc_run:run
+    """
 )

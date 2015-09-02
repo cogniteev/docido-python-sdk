@@ -16,7 +16,7 @@ class ICrawler(Interface):
         :rtype: string
         """
 
-    def iter_crawl_tasks(index, oauth_token, logger, full=False):
+    def iter_crawl_tasks(index, oauth_token, logger, full):
         """Split the crawl in smaller independant actions,
         and returns them for delayed execution.
 

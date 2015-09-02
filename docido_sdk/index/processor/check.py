@@ -27,11 +27,13 @@ class Check(IndexAPIProcessor):
     Based on predefined voluptuous Schema, every document will be checked or
     an IndexAPIError will be raised
     """
-    def __init__(self, card_schema, query_schema, **kwargs):
+    def __init__(self, card_schema, contact_schema, query_schema, **kwargs):
         super(Check, self).__init__(**kwargs)
         assert isinstance(card_schema, voluptuous.Schema)
+        assert isinstance(contact_schema, voluptuous.Schema)
         assert isinstance(query_schema, voluptuous.Schema)
         self.card_schema = card_schema
+        self.contact_schema = contact_schema
         self.query_schema = query_schema
 
     def push_cards(self, cards):
@@ -40,16 +42,23 @@ class Check(IndexAPIProcessor):
                 # add 'attachments' field if missing, otherwise voluptuous
                 # yells
                 c.setdefault('attachments', [])
-                self._check_attachments(c)
-                self.card_schema(c)
+                # self._check_attachments(c)
+                if c['kind'] != 'contact':
+                    self.card_schema(c)
+                else:
+                    self.contact_schema(c)
 
             except voluptuous.MultipleInvalid as e:
+                import pprint
+                pprint.pprint(c)
                 raise IndexAPIError(e)
         return self._parent.push_cards(cards)
 
     def _check_attachments(self, card):
         titles = set()
         for attachment in card['attachments']:
+            if 'title' not in attachment:
+                continue
             title = attachment['title']
             if title in titles:
                 IndexAPIError.build(card).message(
@@ -82,6 +91,9 @@ class CheckProcessorSchemaProvider(Interface):
     def card_schema(service):
         pass
 
+    def contact_schema(service):
+        pass
+
     def query_schema(service):
         pass
 
@@ -94,7 +106,8 @@ class CheckProcessor(Component):
         service = config['service']
         card_schema = self.schema_provider.card_schema(service)
         query_schema = self.schema_provider.query_schema(service)
-        return Check(card_schema, query_schema, **config)
+        contact_schema = self.schema_provider.contact_schema(service)
+        return Check(card_schema, contact_schema, query_schema, **config)
 
 
 class DocidoCheckProcessorSchemaProvider(Component):
@@ -118,6 +131,9 @@ class DocidoCheckProcessorSchemaProvider(Component):
             copy.deepcopy(self._crawler_config(service).get(type, {}))
         ))
         return voluptuous.Schema(schema, **options)
+
+    def contact_schema(self, service):
+        return self._get_schema(service, 'contact')
 
     def card_schema(self, service):
         return self._get_schema(service, 'card')
