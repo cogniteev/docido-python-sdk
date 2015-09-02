@@ -85,6 +85,14 @@ class TestNamedDict(unittest.TestCase):
         with self.assertRaises(AttributeError):
             e.foo.bar = 'pika'
 
+    def test_uppercase_keys(self):
+        e = nameddict({'FOO': 'bar'})
+        self.assertFalse('foo' in e)
+        with self.assertRaises(AttributeError):
+            e.foo
+        self.assertEqual(e['FOO'], 'bar')
+        self.assertEqual(e.FOO, 'bar')
+
 
 if __name__ == '__main__':
     unittest.main()
