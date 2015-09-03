@@ -1,39 +1,27 @@
-from ..env import env
-
-from ..oauth import OAuthToken
-
-import logging
-
 from .. import loader
-
-from ..index.processor import (
-    Elasticsearch,
-    CheckProcessor,
-)
-
-from ..index.test import LocalKV, LocalDumbIndex
-
-from .. import config as docido_config
-
+from ..env import env
+from ..oauth import OAuthToken
 from ..core import (
     implements,
     Component,
     ExtensionPoint,
 )
-
+from ..crawler import ICrawler
 from ..index.config import YamlPullCrawlersIndexingConfig
-
-from ..index import IndexAPIProvider
-
+from ..index.test import LocalKV, LocalDumbIndex
+from ..index.processor import (
+    Elasticsearch,
+    CheckProcessor,
+)
 from ..index.pipeline import (
     IndexPipelineProvider,
     IndexAPIConfigurationProvider,
-    IndexPipelineConfig,
 )
 
-from ..crawler import ICrawler
-
+import logging
 import yaml
+import pickle
+from pickle import PickleError
 
 
 class YamlAPIConfigurationProvider(Component):
@@ -64,13 +52,15 @@ def oauth_tokens_from_file():
 class LocalRunner(Component):
     crawlers = ExtensionPoint(ICrawler)
 
-    def run(self):
+    def run(self, full=False):
         tokens = oauth_tokens_from_file()
         index_pipeline_provider = env[IndexPipelineProvider]
         for crawler, launches in tokens.iteritems():
-            c = filter(lambda c: c.get_service_name() == crawler, self.crawlers)
+            c = [c for c in self.crawlers if c.get_service_name() == crawler]
             if len(c) != 1:
-                raise Exception('unknown crawler for service: {}'.format(crawler))
+                raise Exception(
+                    'unknown crawler for service: {}'.format(crawler)
+                )
             c = c[0]
             for launch, oauth in launches.iteritems():
                 logger = logging.getLogger(
@@ -79,8 +69,13 @@ class LocalRunner(Component):
                 index_api = index_pipeline_provider.get_index_api(
                     crawler, None, None
                 )
-                Full = True # TODO parse it
-                tasks = c.iter_crawl_tasks(index_api, oauth, logger, Full)
+                raw_tasks = c.iter_crawl_tasks(index_api, oauth, logger, full)
+                try:
+                    tasks = [pickle.loads(pickle.dumps(t)) for t in raw_tasks]
+                except PickleError as e:
+                    raise Exception(
+                        'unable to serialize crawl tasks: {}'.format(str(e))
+                    )
 
                 def _runtask(task):
                     task(index_api, oauth, logger)
@@ -97,6 +92,24 @@ class LocalRunner(Component):
 
 
 def run(*args):
+    from optparse import OptionParser
+
+    parser = OptionParser()
+    parser.add_option('-i', action='store_true', dest='incremental')
+    parser.add_option(
+        '-v', '--verbose',
+        action='count',
+        dest='verbose'
+    )
+    (options, args) = parser.parse_args()
+    verbose = options.verbose if options.verbose is not None else 0
+    logging_level = logging.WARN
+    if verbose == 1:
+        logging_level = logging.INFO
+    elif verbose > 1:
+        logging.level = logging.DEBUG
+    logging.basicConfig(level=logging_level)
+
     loader.load_components(env)
     env[YamlPullCrawlersIndexingConfig]
     env[Elasticsearch]
@@ -105,7 +118,4 @@ def run(*args):
     env[LocalKV]
     env[LocalDumbIndex]
     runner = env[LocalRunner]
-    runner.run()
-
-if __name__ == '__main__':
-    run()
+    runner.run(full=not options.incremental)
