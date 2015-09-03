@@ -52,6 +52,9 @@ def oauth_tokens_from_file():
 class LocalRunner(Component):
     crawlers = ExtensionPoint(ICrawler)
 
+    def _check_pickle(self, tasks):
+        return [pickle.dumps(t) for t in tasks]
+
     def run(self, full=False):
         tokens = oauth_tokens_from_file()
         index_pipeline_provider = env[IndexPipelineProvider]
@@ -69,9 +72,9 @@ class LocalRunner(Component):
                 index_api = index_pipeline_provider.get_index_api(
                     crawler, None, None
                 )
-                raw_tasks = c.iter_crawl_tasks(index_api, oauth, logger, full)
+                tasks = c.iter_crawl_tasks(index_api, oauth, logger, full)
                 try:
-                    tasks = [pickle.loads(pickle.dumps(t)) for t in raw_tasks]
+                    self._check_pickle(tasks)
                 except PickleError as e:
                     raise Exception(
                         'unable to serialize crawl tasks: {}'.format(str(e))
