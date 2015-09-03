@@ -10,7 +10,48 @@ from docido_sdk.index import (
 )
 import docido_sdk.config as docido_config
 
-__all__ = ['Elasticsearch']
+__all__ = ['Elasticsearch', 'ElasticsearchMapping']
+
+
+class ElasticsearchMappingProcessor(IndexAPIProcessor):
+    def __init__(self, **config):
+        super(ElasticsearchMapping, self).__init__(self, **config)
+        service = config['service_name']
+        self.update_mapping(docido_config, service)
+
+    def update_mapping(self, docido_config, service):
+        config = docido_config.elasticsearch
+        es = Elasticsearch(
+            config.ES_HOST,
+            **config.get('connection_params', {})
+        )
+        for (index, doc_type) in [(config.ES_INDEX, config.ES_CARD_TYPE)]:
+            if not es.exists(index):
+                es.create(index)
+            mappings = [config.MAPPING[index]]
+            pr_config = docido_config.get('pull_crawlers', {})
+            crawlers_config = pr_config.get('crawlers', {})
+            crawler_config = crawlers_config.get(service, {})
+            crawler_index_config = crawler_config.get('indexing', {})
+            crawler_es = crawler_index_config.get('elasticsearch', {})
+            crawler_mapping = crawler_es.get('mapping', {})
+            if any(crawler_mapping):
+                mappings.append(crawler_mapping)
+            for mapping in mappings:
+                for field in mapping.keys():
+                    mapping_response = es.indices.get_field_mapping(
+                        index=index,
+                        field=field
+                    )
+                index_mapping = mapping_response[index]['mappings']
+                doc_type_mapping = index_mapping.get(doc_type)
+                if doc_type_mapping is None or field not in doc_type_mapping:
+                    mapping_update_response = es.indices.put_mapping(
+                        index=index,
+                        doc_type=doc_type,
+                        body=mapping[field]
+                    )
+                    print mapping_update_response
 
 
 class ElasticsearchProcessor(IndexAPIProcessor):
@@ -148,3 +189,10 @@ class Elasticsearch(Component):
 
     def get_index_api(self, **config):
         return ElasticsearchProcessor(**config)
+
+
+class ElasticsearchMapping(Component):
+    implements(IndexAPIProvider)
+
+    def get_index_api(self, **config):
+        return ElasticsearchMappingProcessor(**config)
