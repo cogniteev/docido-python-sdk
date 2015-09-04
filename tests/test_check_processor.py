@@ -70,38 +70,40 @@ class TestCheckProcessor(unittest.TestCase):
                     'check_processor': {
                         'schemas': {
                             'card': {
-                                'options': {
-                                    'extra': True,
-                                    'required': True,
-                                },
-                                'content': {
-                                    'id': 'str',
-                                    'title': 'str',
-                                    'description': 'str',
-                                    'date': {
-                                        'All': [
-                                            'int',
-                                            {
-                                                'Range': {
-                                                    'min': 0,
+                                'default': {
+                                    'options': {
+                                        'extra': True,
+                                        'required': True,
+                                    },
+                                    'content': {
+                                        'id': 'str',
+                                        'title': 'str',
+                                        'description': 'str',
+                                        'date': {
+                                            'All': [
+                                                'int',
+                                                {
+                                                    'Range': {
+                                                        'min': 0,
+                                                    },
                                                 },
-                                            },
+                                            ],
+                                        },
+                                        'kind': 'str',
+                                        'author': {
+                                            'nested': {
+                                                'name': 'str',
+                                            }
+                                        },
+                                        'attachments': [
+                                            {
+                                                'title': 'str',
+                                                'origin_id': 'str',
+                                                'type': 'str',
+                                                'description': 'str',
+                                            }
                                         ],
                                     },
-                                    'kind': 'str',
-                                    'author': {
-                                        'nested': {
-                                            'name': 'str',
-                                        }
-                                    },
-                                    'attachments': [
-                                        {
-                                            'title': 'str',
-                                            'origin_id': 'str',
-                                            'type': 'str',
-                                            'description': 'str',
-                                        }
-                                    ],
                                 },
                             }
                         },

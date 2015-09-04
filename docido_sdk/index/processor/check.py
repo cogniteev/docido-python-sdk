@@ -1,9 +1,11 @@
 import copy
+import sys
 
 import voluptuous
 from yamlious import from_dict, merge_dicts
 from docido_sdk.index import (
     IndexAPIError,
+    IndexAPIErrorBuilder,
     IndexAPIProcessor,
     IndexAPIProvider,
     PullCrawlerIndexingConfig,
@@ -38,52 +40,58 @@ class Check(IndexAPIProcessor):
         self.query_schema = query_schema
 
     def push_cards(self, cards):
-        for c in cards:
+        for i in range(len(cards)):
             try:
-                # add 'attachments' field if missing, otherwise voluptuous
-                # yells
-                c.setdefault('attachments', [])
-                # self._check_attachments(c)
+                c = cards[i]
+                if 'kind' not in c:
+                    raise IndexAPIErrorBuilder(c)\
+                        .message("Missing 'kind' field")\
+                        .exception()
+                self._check_attachments(c)
                 if c['kind'] in self.card_schemas:
-                    self.card_schemas[c['kind']](c)
+                    cards[i] = self.card_schemas[c['kind']](c)
                 else:
-                    self.default_schema(c)
-
+                    cards[i] = self.default_schema(c)
             except voluptuous.MultipleInvalid as e:
-                raise IndexAPIError(e)
-        return self._parent.push_cards(cards)
+                traceback = sys.exc_info()[2]
+                raise IndexAPIErrorBuilder(c)\
+                    .message(e)\
+                    .exception(), None, traceback
+        return super(Check, self).push_cards(cards)
 
     def _check_attachments(self, card):
-        titles = set()
-        for attachment in card['attachments']:
-            if 'title' not in attachment:
+        origin_ids = set()
+        # add 'attachments' field if missing, otherwise voluptuous yells
+        for attachment in card.setdefault('attachments', []):
+            if 'origin_id' not in attachment:
                 continue
-            title = attachment['title']
-            if title in titles:
-                IndexAPIError.build(card).message(
-                    "Cannot have 2 attachments with the same 'title'")._raise()
-            titles.add(title)
+            origin_id = attachment['origin_id']
+            if origin_id in origin_ids:
+                raise IndexAPIError.build(card).message(
+                    "Cannot have 2 attachments with "
+                    "the same 'origin_id'").exception()
+            origin_ids.add(origin_id)
 
     def search_cards(self, query=None):
         try:
             self.query_schema(query or {})
         except voluptuous.MultipleInvalid as e:
             raise IndexAPIError(e)
-        return self._parent.search_cards(query)
+        return super(Check, self).search_cards(query)
 
     def delete_thumbnails(self, query=None):
         try:
             self.query_schema(query)
         except voluptuous.MultipleInvalid as e:
             raise IndexAPIError(e)
-        return self._parent.delete_thumbnails(query)
+        return super(Check, self).delete_thumbnails(query)
 
     def delete_cards(self, query=None):
         try:
             self.query_schema(query)
         except voluptuous.MultipleInvalid as e:
             raise IndexAPIError(e)
-        return self._parent.delete_cards(query)
+        return super(Check, self).delete_cards(query)
 
 
 class CheckProcessorSchemaProvider(Interface):

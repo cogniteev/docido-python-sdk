@@ -6,7 +6,7 @@ class IndexAPIError(Exception):
 
 
 class IndexAPIErrorBuilder(object):
-    def __init__(self, card):
+    def __init__(self, card, exception=None):
         """ Prepare an IndexAPIError
 
         :param: dict: card
@@ -17,6 +17,7 @@ class IndexAPIErrorBuilder(object):
         assert 'id' in card
         self.card = card
         self._message = ''
+        self._exception = exception
 
     def message(self, message):
         """ Provides a message to the exception to be raised
@@ -34,6 +35,3 @@ class IndexAPIErrorBuilder(object):
             self.card['id'],
             self._message)
         )
-
-    def _raise(self):
-        raise self.exception()
