@@ -5,6 +5,12 @@
 [![Code Climate](https://codeclimate.com/github/cogniteev/docido-python-sdk/badges/gpa.svg)](https://codeclimate.com/github/cogniteev/docido-python-sdk)
 [![Code Health](https://landscape.io/github/cogniteev/docido-python-sdk/master/landscape.svg?style=plastic)](https://landscape.io/github/cogniteev/docido-python-sdk/master)
 
+# Installation
+
+```shell
+$ pip install docido-python-sdk
+```
+
 # License
 
 Docido python SDK is licensed under the Apache License, Version 2.0.
