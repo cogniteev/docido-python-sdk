@@ -36,7 +36,7 @@ setup(
         'ProxyTypes==0.9',
         'setuptools>=0.6',
         'voluptuous>=0.8.7',
-        'yamlious>=0.1.1',
+        'yamlious>=0.1.2',
     ],
     entry_points="""
         [console_scripts]
