@@ -53,7 +53,7 @@ class LocalRunner(Component):
     crawlers = ExtensionPoint(ICrawler)
 
     def _check_pickle(self, tasks):
-        return [pickle.dumps(t) for t in tasks]
+        return pickle.dumps(tasks)
 
     def run(self, full=False):
         tokens = oauth_tokens_from_file()
