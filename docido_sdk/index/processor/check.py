@@ -27,13 +27,14 @@ class Check(IndexAPIProcessor):
     Based on predefined voluptuous Schema, every document will be checked or
     an IndexAPIError will be raised
     """
-    def __init__(self, card_schema, contact_schema, query_schema, **kwargs):
+    def __init__(self, default_schema, card_schemas, query_schema, **kwargs):
         super(Check, self).__init__(**kwargs)
-        assert isinstance(card_schema, voluptuous.Schema)
-        assert isinstance(contact_schema, voluptuous.Schema)
+        assert isinstance(default_schema, voluptuous.Schema)
+        for schema in card_schemas.values():
+            assert isinstance(schema, voluptuous.Schema)
         assert isinstance(query_schema, voluptuous.Schema)
-        self.card_schema = card_schema
-        self.contact_schema = contact_schema
+        self.default_schema = default_schema
+        self.card_schemas = card_schemas
         self.query_schema = query_schema
 
     def push_cards(self, cards):
@@ -43,14 +44,12 @@ class Check(IndexAPIProcessor):
                 # yells
                 c.setdefault('attachments', [])
                 # self._check_attachments(c)
-                if c['kind'] != 'contact':
-                    self.card_schema(c)
+                if c['kind'] in self.card_schemas:
+                    self.card_schemas[c['kind']](c)
                 else:
-                    self.contact_schema(c)
+                    self.default_schema(c)
 
             except voluptuous.MultipleInvalid as e:
-                import pprint
-                pprint.pprint(c)
                 raise IndexAPIError(e)
         return self._parent.push_cards(cards)
 
@@ -88,10 +87,10 @@ class Check(IndexAPIProcessor):
 
 
 class CheckProcessorSchemaProvider(Interface):
-    def card_schema(service):
+    def default_schema(service):
         pass
 
-    def contact_schema(service):
+    def card_schemas(service):
         pass
 
     def query_schema(service):
@@ -104,10 +103,10 @@ class CheckProcessor(Component):
 
     def get_index_api(self, **config):
         service = config['service']
-        card_schema = self.schema_provider.card_schema(service)
+        default_schema = self.schema_provider.default_schema(service)
         query_schema = self.schema_provider.query_schema(service)
-        contact_schema = self.schema_provider.contact_schema(service)
-        return Check(card_schema, contact_schema, query_schema, **config)
+        card_schemas = self.schema_provider.card_schemas(service)
+        return Check(default_schema, card_schemas, query_schema, **config)
 
 
 class DocidoCheckProcessorSchemaProvider(Component):
@@ -125,18 +124,35 @@ class DocidoCheckProcessorSchemaProvider(Component):
     def _crawler_config(self, service):
         return self._get_config(self.indexing_config.service(service))
 
-    def _get_schema(self, service, type):
+    def _schema_from_dicts(self, core_conf, crawler_conf):
         schema, options = from_dict(merge_dicts(
-            copy.deepcopy(self._core_config.get(type, {})),
-            copy.deepcopy(self._crawler_config(service).get(type, {}))
+            copy.deepcopy(core_conf),
+            copy.deepcopy(crawler_conf)
         ))
         return voluptuous.Schema(schema, **options)
 
-    def contact_schema(self, service):
-        return self._get_schema(service, 'contact')
+    def _get_schemas(self, service):
+        kind_schemas = self._core_config.get('card', {}).get('kind', {})
+        schemas = {}
+        for k, v in kind_schemas.iteritems():
+            schema, options = from_dict(merge_dicts(
+                v,
+                copy.deepcopy(self._crawler_config(service).get(k, {}))
+            ))
+            schemas[k] = voluptuous.Schema(schema, **options)
+        return schemas
 
-    def card_schema(self, service):
-        return self._get_schema(service, 'card')
+    def card_schemas(self, service):
+        return self._get_schemas(service)
+
+    def default_schema(self, service):
+        core_default = self._core_config.get('card', {}).get('default', {})
+        crawler_config = self._crawler_config(service).get('card', {}).get(
+            'default', {}
+        )
+        return self._schema_from_dicts(core_default, crawler_config)
 
     def query_schema(self, service):
-        return self._get_schema(service, 'query')
+        core_query = self._core_config.get('query', {})
+        crawler_query = self._crawler_config(service).get('query', {})
+        return self._schema_from_dicts(core_query, crawler_query)
