@@ -87,22 +87,26 @@ class LocalRunner(Component):
                     for t in tasks:
                         t(index_api, oauth, logger)
 
-                if type(tasks) == tuple:
-                    _runtasks(tasks[0])
-                    _runtask(tasks[1])
-                else:
-                    _runtasks(tasks)
+                _runtasks(tasks['tasks'])
+                if 'epilogue' in tasks:
+                    _runtask(tasks['epilogue'])
 
 
 def run(*args):
     from optparse import OptionParser
 
     parser = OptionParser()
-    parser.add_option('-i', action='store_true', dest='incremental')
+    parser.add_option(
+        '-i',
+        action='store_true',
+        dest='incremental',
+        help='trigger incremental crawl'
+    )
     parser.add_option(
         '-v', '--verbose',
         action='count',
-        dest='verbose'
+        dest='verbose',
+        help='set verbosity level'
     )
     (options, args) = parser.parse_args()
     verbose = options.verbose if options.verbose is not None else 0
