@@ -12,23 +12,28 @@ import docido_sdk.config as docido_config
 
 __all__ = ['Elasticsearch', 'ElasticsearchMapping']
 
+ES_BULK_OPERATION = ['index', 'create', 'update', 'delete']
+
 
 class ElasticsearchMappingProcessor(IndexAPIProcessor):
     def __init__(self, **config):
-        super(ElasticsearchMapping, self).__init__(self, **config)
-        service = config['service_name']
-        self.update_mapping(docido_config, service)
+        super(ElasticsearchMappingProcessor, self).__init__(**config)
+        self.update_mapping(config['service_name'])
 
-    def update_mapping(self, docido_config, service):
+    def update_mapping(self, service):
         config = docido_config.elasticsearch
-        es = Elasticsearch(
+        print '>> %r' % config
+        es = _Elasticsearch(
             config.ES_HOST,
             **config.get('connection_params', {})
         )
         for (index, doc_type) in [(config.ES_INDEX, config.ES_CARD_TYPE)]:
-            if not es.exists(index):
-                es.create(index)
-            mappings = [config.MAPPING[index]]
+            if not es.indices.exists(index):
+                es.indices.create(index)
+            mappings = []
+            if 'MAPPING' in config:
+                if index in config.MAPPING:
+                    mappings.append(config.MAPPING[index])
             pr_config = docido_config.get('pull_crawlers', {})
             crawlers_config = pr_config.get('crawlers', {})
             crawler_config = crawlers_config.get(service, {})
@@ -39,19 +44,13 @@ class ElasticsearchMappingProcessor(IndexAPIProcessor):
                 mappings.append(crawler_mapping)
             for mapping in mappings:
                 for field in mapping.keys():
-                    mapping_response = es.indices.get_field_mapping(
-                        index=index,
-                        field=field
-                    )
-                index_mapping = mapping_response[index]['mappings']
-                doc_type_mapping = index_mapping.get(doc_type)
-                if doc_type_mapping is None or field not in doc_type_mapping:
                     mapping_update_response = es.indices.put_mapping(
                         index=index,
                         doc_type=doc_type,
                         body=mapping[field]
                     )
-                    print mapping_update_response
+                    if mapping_update_response != {'acknowledged': True}:
+                        raise Exception("Could not update mapping")
 
 
 class ElasticsearchProcessor(IndexAPIProcessor):
@@ -155,16 +154,17 @@ class ElasticsearchProcessor(IndexAPIProcessor):
         results = es.bulk(**params)
         if results['errors']:
             for index, item in enumerate(results['items']):
-                if item['create']['status'] not in [200, 201]:
-                    error_docs.append(
-                        {
-                            'card': docs[index],
-                            'status': item['create']['status'],
-                            'id': docs[index]['id']
-                            if 'id' in docs[index] else None,
-                            'error': item['create']['error'],
-                        }
-                    )
+                for operation in ES_BULK_OPERATION:
+                    if operation in item:
+                        if item[operation]['status'] not in [200, 201]:
+                            error_docs.append({
+                                'card': docs[index],
+                                'status': item[operation]['status'],
+                                'id': docs[index]['id']
+                                if 'id' in docs[index] else None,
+                                'error': item[operation]['error'],
+                            })
+                            break
         return error_docs
 
     def push_cards(self, cards):
