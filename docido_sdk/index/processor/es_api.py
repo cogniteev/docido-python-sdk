@@ -18,7 +18,7 @@ ES_BULK_OPERATION = ['index', 'create', 'update', 'delete']
 class ElasticsearchMappingProcessor(IndexAPIProcessor):
     def __init__(self, **config):
         super(ElasticsearchMappingProcessor, self).__init__(**config)
-        self.update_mapping(config['service_name'])
+        self.update_mapping(config['service'])
 
     def update_mapping(self, service):
         config = docido_config.elasticsearch

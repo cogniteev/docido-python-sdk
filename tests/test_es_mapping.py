@@ -55,7 +55,7 @@ class TestESMappingProcessor(unittest.TestCase):
         if es.indices.exists(es_index):
             es.indices.delete(es_index)
         self.assertFalse(es.indices.exists(es_index))
-        ElasticsearchMappingProcessor(service_name='a_service')
+        ElasticsearchMappingProcessor(service='a_service')
         self.assertTrue(es.indices.exists(es_index))
         mapping = es.indices.get_mapping(index=es_index, doc_type=es_type)
         doc_type_mapping = mapping[es_index]['mappings'][es_type]
@@ -71,7 +71,7 @@ class TestESMappingProcessor(unittest.TestCase):
             es_type = config.elasticsearch.ES_CARD_TYPE
             if es.indices.exists(es_index):
                 es.indices.delete(es_index)
-            ElasticsearchMappingProcessor(service_name='a_service')
+            ElasticsearchMappingProcessor(service='a_service')
             self.assertTrue(es.indices.exists(es_index))
             mapping = es.indices.get_mapping(index=es_index, doc_type=es_type)
             self.assertFalse(es_index in mapping)
