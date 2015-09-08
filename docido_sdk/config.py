@@ -30,7 +30,7 @@ except IOError as e:
     # Issue happened while loading settings.yml
     if e.errno == errno.ENOENT:
         # Ignore issue only if file was not found
-        config = {}
+        config = Configuration({})
     else:
         raise e
 
