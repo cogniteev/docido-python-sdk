@@ -57,6 +57,7 @@ class contextobj(ObjectWrapper):
 
     def __enter__(self):
         self._push()
+        return self
 
     def __exit__(self, type, value, traceback):
         self._pop()

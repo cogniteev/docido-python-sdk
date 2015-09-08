@@ -30,6 +30,27 @@ class TestContextObj(unittest.TestCase):
                 raise MyException()
         self.assertEquals(proxy['foo'], 'bar')
 
+    def test_copy_on_push(self):
+        proxy = contextobj({'foo': 'bar'})
+        self.assertEqual(proxy['foo'], 'bar')
+        with proxy:
+            self.assertEqual(proxy['foo'], 'bar')
+            proxy['foo'] = 'pika'
+            self.assertEqual(proxy['foo'], 'pika')
+        self.assertEqual(proxy['foo'], 'bar')
+
+    def test_start_from_empty_config(self):
+        p = contextobj(nameddict())
+        p['foo'] = 'bar'
+        with p:
+            self.assertEqual(p['foo'], 'bar')
+            p['foo'] = 'foobar'
+            with p:
+                print p.keys()
+                p.pop('foo')
+            self.assertEqual(p['foo'], 'foobar')
+        self.assertEqual(p['foo'], 'bar')
+
 
 class TestNamedDict(unittest.TestCase):
     def test_init(self):
