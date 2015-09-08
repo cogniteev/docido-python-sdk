@@ -2,6 +2,10 @@ language: python
 sudo: false
 python:
 - '2.7'
+services:
+- elasticsearch
+env:
+- ELASTICSEARCH_HOST=127.0.0.1:9200
 install:
 - travis_retry pip install -r requirements-dev.txt
 - travis_retry pip install tox>=2.1.1 coveralls
