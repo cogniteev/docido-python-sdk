@@ -186,7 +186,7 @@ class LocalDumbIndexProcessor(IndexAPIProcessor):
         #     }
         # }
 
-    def push_thumbnails(self, *thumbnails):
+    def push_thumbnails(self, thumbnails):
         # FIXME: returns expected value
         with self.__update(thumbnails=True):
             for id_, payload, mime in thumbnails:

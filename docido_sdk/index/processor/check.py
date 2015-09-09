@@ -74,7 +74,7 @@ class Check(IndexAPIProcessor):
 
     def search_cards(self, query=None):
         try:
-            self.query_schema(query or {})
+            self.query_schema(query)
         except voluptuous.MultipleInvalid as e:
             raise IndexAPIError(e)
         return super(Check, self).search_cards(query)
@@ -141,14 +141,13 @@ class DocidoCheckProcessorSchemaProvider(Component):
 
     def _get_schemas(self, service):
         kind_schemas = self._core_config.get('card', {}).get('kind', {})
-        schemas = {}
-        for k, v in kind_schemas.iteritems():
-            schema, options = from_dict(merge_dicts(
+        return {
+            k: self._schema_from_dicts(
                 v,
                 copy.deepcopy(self._crawler_config(service).get(k, {}))
-            ))
-            schemas[k] = voluptuous.Schema(schema, **options)
-        return schemas
+            )
+            for k, v in kind_schemas.iteritems()
+        }
 
     def card_schemas(self, service):
         return self._get_schemas(service)

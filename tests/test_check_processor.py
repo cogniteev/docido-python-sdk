@@ -69,7 +69,28 @@ class TestCheckProcessor(unittest.TestCase):
                     ],
                     'check_processor': {
                         'schemas': {
+                            'query': {
+                                'content': {
+                                    'query': 'object'
+                                },
+                                'options': {
+                                    'required': True,
+                                    'extra': True
+                                }
+                            },
                             'card': {
+                                'kind': {
+                                    'test': {
+                                        'options': {
+                                            'extra': True,
+                                            'required': True
+                                        },
+                                        'content': {
+                                            'id': unicode,
+                                            'kind': unicode
+                                        }
+                                    }
+                                },
                                 'default': {
                                     'options': {
                                         'extra': True,
@@ -105,7 +126,7 @@ class TestCheckProcessor(unittest.TestCase):
                                         ],
                                     },
                                 },
-                            }
+                            },
                         },
                     },
                 }
@@ -133,12 +154,18 @@ class TestCheckProcessor(unittest.TestCase):
 
     def test_push_valid_document(self):
         self.index.push_cards([self.VALID_CARD])
-        self.assertEqual([self.VALID_CARD], self.index.search_cards())
+        self.assertEqual(
+            [self.VALID_CARD],
+            self.index.search_cards({'query': {'match_all': {}}})
+        )
 
     def test_push_extra_field(self):
         card = copy.deepcopy(self.VALID_CARD)
         self.index.push_cards([card])
-        self.assertEqual([card], self.index.search_cards())
+        self.assertEqual(
+            [card],
+            self.index.search_cards({'query': {'match_all': {}}})
+        )
 
     def test_push_invalid_field_type(self):
         card = copy.deepcopy(self.VALID_CARD)
@@ -160,6 +187,15 @@ class TestCheckProcessor(unittest.TestCase):
             'description': 'description1',
         })
         self.index.push_cards([card])
+
+    def test_push_other_kind(self):
+        self.index.push_cards([{'id': u'my_test_id', 'kind': u'test'}])
+
+    def test_push_without_kind(self):
+        card = copy.deepcopy(self.VALID_CARD)
+        del card['kind']
+        with self.assertRaises(IndexAPIError):
+            self.index.push_cards([card])
 
     def test_push_three_attachments(self):
         card = copy.deepcopy(self.VALID_CARD)
@@ -200,6 +236,26 @@ class TestCheckProcessor(unittest.TestCase):
         card['attachments'].append(attachment)
         with self.assertRaises(IndexAPIError):
             self.index.push_cards([card])
+
+    def test_search_invalid_query(self):
+        with self.assertRaises(IndexAPIError):
+            self.index.search_cards({})
+
+    def test_delete_thumbnails_invalid_query(self):
+        with self.assertRaises(IndexAPIError):
+            self.index.delete_thumbnails({})
+
+    def test_delete_thumbnails(self):
+        with self.assertRaises(NotImplementedError):
+            self.index.delete_thumbnails({'query': {'match_all': {}}})
+
+    def test_delete_cards(self):
+        with self.assertRaises(NotImplementedError):
+            self.index.delete_cards({'query': {'match_all': {}}})
+
+    def test_delete_cards_invalid_query(self):
+        with self.assertRaises(IndexAPIError):
+            self.index.delete_cards({})
 
 if __name__ == '__main__':
     unittest.main()

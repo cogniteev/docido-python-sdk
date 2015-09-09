@@ -71,6 +71,10 @@ class TestLocalIndex(unittest.TestCase):
         self.index.push_cards(repeat(card, 1))
         self.assertEqual(self.index.search_cards(), [card])
 
+    def test_push_and_get_thumbnails(self):
+        thumb = ('testid', '\x13\x13', 'png')
+        self.index.push_thumbnails([thumb])
+
     @classmethod
     def tearDownClass(cls):
         cleanup_components()
