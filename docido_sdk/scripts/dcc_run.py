@@ -144,9 +144,6 @@ def run(*args):
         'urllib3.connectionpool',
     ]:
         logging.getLogger(l).setLevel(logging.WARNING)
-
-
-
     loader.load_components(env)
     env[YamlPullCrawlersIndexingConfig]
     env[Elasticsearch]
