@@ -1,3 +1,11 @@
+import logging
+import os
+import os.path as osp
+import pickle
+from pickle import PickleError
+
+import yaml
+
 from .. import loader
 from ..env import env
 from ..oauth import OAuthToken
@@ -18,10 +26,8 @@ from ..index.pipeline import (
     IndexAPIConfigurationProvider,
 )
 
-import logging
-import yaml
-import pickle
-from pickle import PickleError
+import docido_sdk.config as docido_config
+from ..toolbox.collections_ext import nameddict
 
 
 class YamlAPIConfigurationProvider(Component):
@@ -35,18 +41,23 @@ class YamlAPIConfigurationProvider(Component):
         }
 
 
-def oauth_tokens_from_file():
-    import os
-    oauth_path = os.getenv('DOCIDO_TOKENS', '.oauth_token.yml')
+def oauth_tokens_from_file(full=True, config=None):
+    oauth_path = os.getenv('DOCIDO_CC_RUNS', '.dcc-runs.yml')
     with open(oauth_path, 'r') as oauth_file:
-        oauth_settings = yaml.load(oauth_file)
-        tokens = {}
-        for crawler_name, launches in oauth_settings.iteritems():
-            tokens[crawler_name] = {
-                k: OAuthToken(**v)
-                for k, v in launches.iteritems()
-            }
-        return tokens
+        crawlers = nameddict(yaml.load(oauth_file))
+        for crawler, runs in crawlers.iteritems():
+            for run, run_config in runs.iteritems():
+                run_config.token = OAuthToken(**run_config.token)
+                run_config.setdefault('config', config)
+                run_config.setdefault('full', full)
+        return crawlers
+
+
+def load_yaml(path):
+    if not osp.exists(path) and not osp.isabs(path):
+        path = osp.join(osp.dirname(osp.abspath(__file__)), path)
+    with open(path, 'r') as istr:
+        return nameddict(yaml.load(istr))
 
 
 class LocalRunner(Component):
@@ -55,41 +66,49 @@ class LocalRunner(Component):
     def _check_pickle(self, tasks):
         return pickle.dumps(tasks)
 
-    def run(self, full=False):
-        tokens = oauth_tokens_from_file()
+    def run(self, full=False, config=None):
+        crawler_runs = oauth_tokens_from_file(full=full, config=config)
         index_pipeline_provider = env[IndexPipelineProvider]
-        for crawler, launches in tokens.iteritems():
+        for crawler, launches in crawler_runs.iteritems():
             c = [c for c in self.crawlers if c.get_service_name() == crawler]
             if len(c) != 1:
                 raise Exception(
                     'unknown crawler for service: {}'.format(crawler)
                 )
             c = c[0]
-            for launch, oauth in launches.iteritems():
+            for launch, launch_config in launches.iteritems():
                 logger = logging.getLogger(
                     '{crawler}.{launch}'.format(crawler=crawler, launch=launch)
                 )
-                index_api = index_pipeline_provider.get_index_api(
-                    crawler, None, None
-                )
-                tasks = c.iter_crawl_tasks(index_api, oauth, logger, full)
-                try:
-                    self._check_pickle(tasks)
-                except PickleError as e:
-                    raise Exception(
-                        'unable to serialize crawl tasks: {}'.format(str(e))
+                with docido_config._push():
+                    if launch_config.config is not None:
+                        docido_config.clear()
+                        docido_config.update(load_yaml(launch_config.config))
+
+                    index_api = index_pipeline_provider.get_index_api(
+                        crawler, None, None
                     )
+                    tasks = c.iter_crawl_tasks(index_api, launch_config.token,
+                                               logger, launch_config.full)
+                    try:
+                        self._check_pickle(tasks)
+                    except PickleError as e:
+                        raise Exception(
+                            'unable to serialize crawl tasks: {}'.format(
+                                str(e)
+                            )
+                        )
 
-                def _runtask(task):
-                    task(index_api, oauth, logger)
+                    def _runtask(task):
+                        task(index_api, launch_config.token, logger)
 
-                def _runtasks(tasks):
-                    for t in tasks:
-                        t(index_api, oauth, logger)
+                    def _runtasks(tasks):
+                        for t in tasks:
+                            t(index_api, launch_config.token, logger)
 
-                _runtasks(tasks['tasks'])
-                if 'epilogue' in tasks:
-                    _runtask(tasks['epilogue'])
+                    _runtasks(tasks['tasks'])
+                    if 'epilogue' in tasks:
+                        _runtask(tasks['epilogue'])
 
 
 def run(*args):
