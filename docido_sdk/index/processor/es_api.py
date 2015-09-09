@@ -28,7 +28,7 @@ class ElasticsearchMappingProcessor(IndexAPIProcessor):
         )
         for (index, doc_type) in [(config.ES_INDEX, config.ES_CARD_TYPE)]:
             index = index.format(service=service)
-            doc_type = index.format(service=service)
+            doc_type = doc_type.format(service=service)
             if not es.indices.exists(index):
                 es.indices.create(index)
             mappings = []

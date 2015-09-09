@@ -58,9 +58,10 @@ class TestESMappingProcessor(unittest.TestCase):
         ElasticsearchMappingProcessor(service='a_service')
         self.assertTrue(es.indices.exists(es_index))
         mapping = es.indices.get_mapping(index=es_index, doc_type=es_type)
-        print mapping
         self.assertTrue(es_index in mapping)
-        doc_type_mapping = mapping[es_index]['mappings'][es_type]
+        mappings = mapping[es_index]['mappings']
+        self.assertTrue(es_type in mappings)
+        doc_type_mapping = mappings[es_type]
         self.assertIsNotNone(doc_type_mapping)
         self.assertNotEquals(doc_type_mapping, {})
 
