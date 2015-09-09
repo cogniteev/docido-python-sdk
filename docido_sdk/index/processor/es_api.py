@@ -27,6 +27,8 @@ class ElasticsearchMappingProcessor(IndexAPIProcessor):
             **config.get('connection_params', {})
         )
         for (index, doc_type) in [(config.ES_INDEX, config.ES_CARD_TYPE)]:
+            index = index.format(service=service)
+            doc_type = index.format(service=service)
             if not es.indices.exists(index):
                 es.indices.create(index)
             mappings = []
@@ -64,10 +66,12 @@ class ElasticsearchProcessor(IndexAPIProcessor):
     def __init__(self, **config):
         super(ElasticsearchProcessor, self).__init__(**config)
         es_config = docido_config.elasticsearch
-        self.__es_index = es_config.ES_INDEX
-        self.__es_store_index = es_config.ES_STORE_INDEX
-        self.__card_type = es_config.ES_CARD_TYPE
-        self.__store_type = es_config.ES_STORE_TYPE
+        service = config['service']
+        fmt = {'service': service}
+        self.__es_index = es_config.ES_INDEX.format(**fmt)
+        self.__es_store_index = es_config.ES_STORE_INDEX.format(**fmt)
+        self.__card_type = es_config.ES_CARD_TYPE.format(**fmt)
+        self.__store_type = es_config.ES_STORE_TYPE.format(**fmt)
         self.__routing = config.get('elasticsearch', {}).get('routing')
         self.__es = _Elasticsearch(
             es_config.ES_HOST,
