@@ -80,6 +80,7 @@ class LocalRunner(Component):
                 logger = logging.getLogger(
                     '{crawler}.{launch}'.format(crawler=crawler, launch=launch)
                 )
+                logger.info("starting crawl")
                 with docido_config._push():
                     if launch_config.config is not None:
                         docido_config.clear()
@@ -135,6 +136,16 @@ def run(*args):
     elif verbose > 1:
         logging.level = logging.DEBUG
     logging.basicConfig(level=logging_level)
+
+    # please shut up.
+    for l in [
+        'elasticsearch',
+        'requests.packages.urllib3.connectionpool',
+        'urllib3.connectionpool',
+    ]:
+        logging.getLogger(l).setLevel(logging.WARNING)
+
+
 
     loader.load_components(env)
     env[YamlPullCrawlersIndexingConfig]
