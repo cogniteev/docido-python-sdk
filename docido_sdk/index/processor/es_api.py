@@ -22,7 +22,6 @@ class ElasticsearchMappingProcessor(IndexAPIProcessor):
 
     def update_mapping(self, service):
         config = docido_config.elasticsearch
-        print '>> %r' % config
         es = _Elasticsearch(
             config.ES_HOST,
             **config.get('connection_params', {})
