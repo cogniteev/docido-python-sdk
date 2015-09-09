@@ -16,18 +16,23 @@ class TestContextObj(unittest.TestCase):
         self.assertEqual(p1['foo'], 'bar')
         self.assertFalse('john' in p1)
 
+    def test_combined(self):
+        proxy = contextobj(nameddict({'foo': 'bar'}))
+        proxy['john'] = 'doe'
+        print id(proxy.john)
+        self.assertEqual(proxy.john, 'doe')
+        with proxy:
+            proxy.clear()
+            proxy['kikoo'] = 'plop'
+            self.assertEqual(proxy.kikoo, 'plop')
+
     def test_with_statement(self):
         a = {'foo': 'bar'}
         proxy = contextobj(a)
 
-        class MyException(Exception):
-            pass
-
-        with self.assertRaises(MyException):
-            with proxy:
-                proxy['foo'] = 'foobar'
-                self.assertEquals(proxy['foo'], 'foobar')
-                raise MyException()
+        with proxy:
+            proxy['foo'] = 'foobar'
+            self.assertEquals(proxy['foo'], 'foobar')
         self.assertEquals(proxy['foo'], 'bar')
 
     def test_copy_on_push(self):

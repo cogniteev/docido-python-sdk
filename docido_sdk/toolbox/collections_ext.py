@@ -47,17 +47,18 @@ class contextobj(ObjectWrapper):
         self.__obj_stack = []
 
     def _push(self):
-        self.__obj_stack.append(self.__subject__)
-        self.__subject__ = copy.deepcopy(self.__subject__)
+        if not isinstance(self.__subject__, dict):
+            raise NotImplementedError()
+        self.__obj_stack.append(copy.deepcopy(self.__subject__))
         return self
 
     def _pop(self):
-        self.__subject__ = self.__obj_stack.pop()
+        self.__subject__.clear()
+        self.__subject__.update(self.__obj_stack.pop())
         return self
 
     def __enter__(self):
-        self._push()
-        return self
+        return self._push()
 
     def __exit__(self, type, value, traceback):
-        self._pop()
+        return self._pop()
