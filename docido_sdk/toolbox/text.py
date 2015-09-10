@@ -20,7 +20,8 @@ def to_unicode(text, charset=None):
         except UnicodeDecodeError:
             return unicode(text, 'latin1')
     elif isinstance(text, Exception):
-        if os.name == 'nt' and isinstance(text, (OSError, IOError)):
+        if os.name == 'nt' and \
+                isinstance(text, (OSError, IOError)):  # pragma: no cover
             # the exception might have a localized error string encoded with
             # ANSI codepage if OSError and IOError on Windows
             try:

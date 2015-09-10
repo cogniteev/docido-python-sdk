@@ -19,7 +19,6 @@ class TestContextObj(unittest.TestCase):
     def test_combined(self):
         proxy = contextobj(nameddict({'foo': 'bar'}))
         proxy['john'] = 'doe'
-        print id(proxy.john)
         self.assertEqual(proxy.john, 'doe')
         with proxy:
             proxy.clear()
@@ -55,6 +54,13 @@ class TestContextObj(unittest.TestCase):
                 p.pop('foo')
             self.assertEqual(p['foo'], 'foobar')
         self.assertEqual(p['foo'], 'bar')
+
+    def test_push_on_unsupported_type(self):
+        class A():
+            pass
+        proxy = contextobj(A())
+        with self.assertRaises(NotImplementedError):
+            proxy._push()
 
 
 class TestNamedDict(unittest.TestCase):

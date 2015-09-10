@@ -1,10 +1,7 @@
 import logging
-import os
-import os.path as osp
+from optparse import OptionParser
 import pickle
 from pickle import PickleError
-
-import yaml
 
 from .. import loader
 from ..env import env
@@ -27,7 +24,7 @@ from ..index.pipeline import (
 )
 
 import docido_sdk.config as docido_config
-from ..toolbox.collections_ext import nameddict
+from ..toolbox.collections_ext import Configuration
 
 
 class YamlAPIConfigurationProvider(Component):
@@ -42,79 +39,70 @@ class YamlAPIConfigurationProvider(Component):
 
 
 def oauth_tokens_from_file(full=True, config=None):
-    oauth_path = os.getenv('DOCIDO_CC_RUNS', '.dcc-runs.yml')
-    with open(oauth_path, 'r') as oauth_file:
-        crawlers = nameddict(yaml.load(oauth_file))
-        for crawler, runs in crawlers.iteritems():
-            for run, run_config in runs.iteritems():
-                run_config.token = OAuthToken(**run_config.token)
-                run_config.setdefault('config', config)
-                run_config.setdefault('full', full)
-        return crawlers
-
-
-def load_yaml(path):
-    if not osp.exists(path) and not osp.isabs(path):
-        path = osp.join(osp.dirname(osp.abspath(__file__)), path)
-    with open(path, 'r') as istr:
-        return nameddict(yaml.load(istr))
+    crawlers = Configuration.from_env('DOCIDO_CC_RUNS', '.dcc-runs.yml',
+                                      Configuration())
+    for crawler, runs in crawlers.iteritems():
+        for run, run_config in runs.iteritems():
+            run_config.token = OAuthToken(**run_config.token)
+            run_config.setdefault('config', config)
+            run_config.setdefault('full', full)
+    return crawlers
 
 
 class LocalRunner(Component):
     crawlers = ExtensionPoint(ICrawler)
 
     def _check_pickle(self, tasks):
-        return pickle.dumps(tasks)
+        try:
+            return pickle.dumps(tasks)
+        except PickleError as e:
+            raise Exception(
+                'unable to serialize crawl tasks: {}'.format(str(e))
+            )
 
-    def run(self, full=False, config=None):
+    def run(self, logger, config, crawler):
+        index_provider = env[IndexPipelineProvider]
+        logger.info("starting crawl")
+        with docido_config._push():
+            if config.config is not None:
+                docido_config.clear()
+                new_config = Configuration.from_file(config.config)
+                docido_config.update(new_config)
+
+            index_api = index_provider.get_index_api(
+                self.service, None, None
+            )
+            tasks = crawler.iter_crawl_tasks(index_api, config.token,
+                                             logger, config.full)
+            self._check_pickle(tasks)
+
+            def _runtask(task):
+                task(index_api, config.token, logger)
+
+            map(_runtask, tasks['tasks'])
+            if 'epilogue' in tasks:
+                _runtask(tasks['epilogue'])
+
+    def run_all(self, full=False, config=None):
         crawler_runs = oauth_tokens_from_file(full=full, config=config)
-        index_pipeline_provider = env[IndexPipelineProvider]
-        for crawler, launches in crawler_runs.iteritems():
-            c = [c for c in self.crawlers if c.get_service_name() == crawler]
+        for service, launches in crawler_runs.iteritems():
+            self.service = service
+            c = [c for c in self.crawlers if c.get_service_name() == service]
             if len(c) != 1:
                 raise Exception(
-                    'unknown crawler for service: {}'.format(crawler)
+                    'unknown crawler for service: {}'.format(service)
                 )
             c = c[0]
-            for launch, launch_config in launches.iteritems():
+            for launch, config in launches.iteritems():
+                self.launch = launch
                 logger = logging.getLogger(
-                    '{crawler}.{launch}'.format(crawler=crawler, launch=launch)
+                    '{service}.{launch}'.format(service=self.service,
+                                                launch=self.launch)
                 )
-                logger.info("starting crawl")
-                with docido_config._push():
-                    if launch_config.config is not None:
-                        docido_config.clear()
-                        docido_config.update(load_yaml(launch_config.config))
-
-                    index_api = index_pipeline_provider.get_index_api(
-                        crawler, None, None
-                    )
-                    tasks = c.iter_crawl_tasks(index_api, launch_config.token,
-                                               logger, launch_config.full)
-                    try:
-                        self._check_pickle(tasks)
-                    except PickleError as e:
-                        raise Exception(
-                            'unable to serialize crawl tasks: {}'.format(
-                                str(e)
-                            )
-                        )
-
-                    def _runtask(task):
-                        task(index_api, launch_config.token, logger)
-
-                    def _runtasks(tasks):
-                        for t in tasks:
-                            t(index_api, launch_config.token, logger)
-
-                    _runtasks(tasks['tasks'])
-                    if 'epilogue' in tasks:
-                        _runtask(tasks['epilogue'])
+                self.run(logger, config, c)
 
 
-def run(*args):
-    from optparse import OptionParser
-
+def parse_options(*args):
     parser = OptionParser()
     parser.add_option(
         '-i',
@@ -126,24 +114,29 @@ def run(*args):
         '-v', '--verbose',
         action='count',
         dest='verbose',
-        help='set verbosity level'
+        help='set verbosity level',
+        default=0
     )
     (options, args) = parser.parse_args()
-    verbose = options.verbose if options.verbose is not None else 0
+
+
+def configure_loggers(verbose):
     logging_level = logging.WARN
     if verbose == 1:
         logging_level = logging.INFO
     elif verbose > 1:
         logging.level = logging.DEBUG
     logging.basicConfig(level=logging_level)
-
-    # please shut up.
+    # shut up a bunch of loggers
     for l in [
         'elasticsearch',
         'requests.packages.urllib3.connectionpool',
         'urllib3.connectionpool',
     ]:
         logging.getLogger(l).setLevel(logging.WARNING)
+
+
+def get_crawls_runner():
     loader.load_components(env)
     env[YamlPullCrawlersIndexingConfig]
     env[Elasticsearch]
@@ -151,5 +144,10 @@ def run(*args):
     env[IndexPipelineProvider]
     env[LocalKV]
     env[LocalDumbIndex]
-    runner = env[LocalRunner]
-    runner.run(full=not options.incremental)
+    return env[LocalRunner]
+
+
+def run(*args):
+    options, args = parse_options(*args)
+    configure_loggers(options.verbose)
+    get_crawls_runner.run_all(full=not options.incremental)

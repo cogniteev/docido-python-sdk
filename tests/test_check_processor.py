@@ -20,6 +20,89 @@ from docido_sdk.test import (
 )
 
 TEST_CRAWLER_NAME = 'check-processor-test'
+TEST_CONFIG = {
+    'pull_crawlers': {
+        'crawlers': {
+            TEST_CRAWLER_NAME: {
+                'indexing': {
+                    'schemas': {
+                        'card': {
+                            'foo': basestring
+                        },
+                    },
+                },
+            },
+        },
+        'indexing': {
+            'pipeline': [
+                'CheckProcessor',
+                'LocalDumbIndex',
+            ],
+            'check_processor': {
+                'schemas': {
+                    'query': {
+                        'content': {
+                            'query': 'object'
+                        },
+                        'options': {
+                            'required': True,
+                            'extra': True
+                        }
+                    },
+                    'card': {
+                        'kind': {
+                            'test': {
+                                'options': {
+                                    'extra': True,
+                                    'required': True
+                                },
+                                'content': {
+                                    'id': unicode,
+                                    'kind': unicode
+                                }
+                            }
+                        },
+                        'default': {
+                            'options': {
+                                'extra': True,
+                                'required': True,
+                            },
+                            'content': {
+                                'id': 'str',
+                                'title': 'str',
+                                'description': 'str',
+                                'date': {
+                                    'All': [
+                                        'int',
+                                        {
+                                            'Range': {
+                                                'min': 0,
+                                            },
+                                        },
+                                    ],
+                                },
+                                'kind': 'str',
+                                'author': {
+                                    'nested': {
+                                        'name': 'str',
+                                    }
+                                },
+                                'attachments': [
+                                    {
+                                        'title': 'str',
+                                        'origin_id': 'str',
+                                        'type': 'str',
+                                        'description': 'str',
+                                    }
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+        }
+    }
+}
 
 
 @cleanup_component
@@ -49,89 +132,7 @@ class TestCheckProcessor(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        docido_config._push().update({
-            'pull_crawlers': {
-                'crawlers': {
-                    TEST_CRAWLER_NAME: {
-                        'indexing': {
-                            'schemas': {
-                                'card': {
-                                    'foo': basestring
-                                },
-                            },
-                        },
-                    },
-                },
-                'indexing': {
-                    'pipeline': [
-                        'CheckProcessor',
-                        'LocalDumbIndex',
-                    ],
-                    'check_processor': {
-                        'schemas': {
-                            'query': {
-                                'content': {
-                                    'query': 'object'
-                                },
-                                'options': {
-                                    'required': True,
-                                    'extra': True
-                                }
-                            },
-                            'card': {
-                                'kind': {
-                                    'test': {
-                                        'options': {
-                                            'extra': True,
-                                            'required': True
-                                        },
-                                        'content': {
-                                            'id': unicode,
-                                            'kind': unicode
-                                        }
-                                    }
-                                },
-                                'default': {
-                                    'options': {
-                                        'extra': True,
-                                        'required': True,
-                                    },
-                                    'content': {
-                                        'id': 'str',
-                                        'title': 'str',
-                                        'description': 'str',
-                                        'date': {
-                                            'All': [
-                                                'int',
-                                                {
-                                                    'Range': {
-                                                        'min': 0,
-                                                    },
-                                                },
-                                            ],
-                                        },
-                                        'kind': 'str',
-                                        'author': {
-                                            'nested': {
-                                                'name': 'str',
-                                            }
-                                        },
-                                        'attachments': [
-                                            {
-                                                'title': 'str',
-                                                'origin_id': 'str',
-                                                'type': 'str',
-                                                'description': 'str',
-                                            }
-                                        ],
-                                    },
-                                },
-                            },
-                        },
-                    },
-                }
-            }
-        })
+        docido_config._push().update(TEST_CONFIG)
         cls.env = Environment()
         cls.env[IndexPipelineProvider]
         cls.env[LocalDumbIndex]
