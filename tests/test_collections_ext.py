@@ -1,6 +1,13 @@
+import os
+import tempfile
+import shutil
 import unittest
 
-from docido_sdk.toolbox.collections_ext import nameddict, contextobj
+from docido_sdk.toolbox.collections_ext import (
+    Configuration,
+    contextobj,
+    nameddict,
+)
 
 
 class TestContextObj(unittest.TestCase):
@@ -125,6 +132,17 @@ class TestNamedDict(unittest.TestCase):
         self.assertEqual(e['FOO'], 'bar')
         self.assertEqual(e.FOO, 'bar')
 
+
+class TestConfiguration(unittest.TestCase):
+    def test_env_error(self):
+        try:
+            tmpdir = tempfile.mkdtemp()
+            envvar = 'TestConfigurationSettings'
+            os.environ[envvar] = tmpdir
+            with self.assertRaises(IOError):
+                Configuration.from_env(envvar, None, {})
+        finally:
+            shutil.rmtree(tmpdir)
 
 if __name__ == '__main__':
     unittest.main()
