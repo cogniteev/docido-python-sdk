@@ -1,7 +1,9 @@
+from contextlib import contextmanager
 import logging
 from optparse import OptionParser
 import pickle
 from pickle import PickleError
+import sys
 
 from .. import loader
 from ..env import env
@@ -25,17 +27,6 @@ from ..index.pipeline import (
 
 import docido_sdk.config as docido_config
 from ..toolbox.collections_ext import Configuration
-
-
-class YamlAPIConfigurationProvider(Component):
-    implements(IndexAPIConfigurationProvider)
-
-    def get_index_api_conf(self, service, docido_user_id, account_login):
-        return {
-            'service': service,
-            'docido_user_id': docido_user_id,
-            'account_login': account_login
-        }
 
 
 def oauth_tokens_from_file(full=True, config=None):
@@ -102,7 +93,9 @@ class LocalRunner(Component):
                 self.run(logger, config, c)
 
 
-def parse_options(*args):
+def parse_options(args=None):
+    if args is None:
+        args = sys.argv[1:]
     parser = OptionParser()
     parser.add_option(
         '-i',
@@ -117,7 +110,7 @@ def parse_options(*args):
         help='set verbosity level',
         default=0
     )
-    (options, args) = parser.parse_args()
+    return parser.parse_args(args)
 
 
 def configure_loggers(verbose):
@@ -136,18 +129,35 @@ def configure_loggers(verbose):
         logging.getLogger(l).setLevel(logging.WARNING)
 
 
-def get_crawls_runner():
-    loader.load_components(env)
-    env[YamlPullCrawlersIndexingConfig]
-    env[Elasticsearch]
-    env[CheckProcessor]
-    env[IndexPipelineProvider]
-    env[LocalKV]
-    env[LocalDumbIndex]
-    return env[LocalRunner]
+@contextmanager
+def get_crawls_runner(environment=None):
+
+    class YamlAPIConfigurationProvider(Component):
+        implements(IndexAPIConfigurationProvider)
+
+        def get_index_api_conf(self, service, docido_user_id, account_login):
+            return {
+                'service': service,
+                'docido_user_id': docido_user_id,
+                'account_login': account_login
+            }
+    try:
+        environment = environment or env
+        loader.load_components(environment)
+        from docido_sdk.core import ComponentMeta
+        environment[YamlPullCrawlersIndexingConfig]
+        environment[Elasticsearch]
+        environment[CheckProcessor]
+        environment[IndexPipelineProvider]
+        environment[LocalKV]
+        environment[LocalDumbIndex]
+        yield env[LocalRunner]
+    finally:
+        YamlAPIConfigurationProvider.unregister()
 
 
-def run(*args):
-    options, args = parse_options(*args)
+def run(args=None, environment=None):
+    options, args = parse_options(args)
     configure_loggers(options.verbose)
-    get_crawls_runner.run_all(full=not options.incremental)
+    with get_crawls_runner(environment) as runner:
+        runner.run_all(full=not options.incremental)
