@@ -17,17 +17,17 @@ class YamlPullCrawlersIndexingConfig(Component):
     index_api_providers = ExtensionPoint(IndexAPIProvider)
 
     def service(self, service):
-        crawlers_config = docido_config['pull_crawlers']['crawlers']
+        crawlers_config = docido_config.pull_crawlers.crawlers
         if service not in crawlers_config:
             raise Exception("Cannot find config for crawler " + service)
         return crawlers_config[service].get('indexing', {})
 
     def core(self):
-        return docido_config['pull_crawlers']['indexing']
+        return docido_config.pull_crawlers.indexing
 
     def get_pipeline(self):
         indexing_config = self.core()
-        processor_pipeline = indexing_config['pipeline']
+        processor_pipeline = indexing_config.pipeline
         providers = dict([
             (p.__class__.__name__, p)
             for p in list(self.index_api_providers)
