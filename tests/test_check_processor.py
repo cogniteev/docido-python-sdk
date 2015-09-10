@@ -1,4 +1,5 @@
 import copy
+import os.path as osp
 import unittest
 
 import docido_sdk.config as docido_config
@@ -7,6 +8,7 @@ from docido_sdk.core import (
     implements,
 )
 from docido_sdk.toolbox.decorators import lazy
+from docido_sdk.toolbox.collections_ext import Configuration
 from docido_sdk.env import Environment
 from docido_sdk.index.config import YamlPullCrawlersIndexingConfig
 from docido_sdk.index.pipeline import IndexPipelineProvider
@@ -18,91 +20,6 @@ from docido_sdk.test import (
     cleanup_component,
     cleanup_components,
 )
-
-TEST_CRAWLER_NAME = 'check-processor-test'
-TEST_CONFIG = {
-    'pull_crawlers': {
-        'crawlers': {
-            TEST_CRAWLER_NAME: {
-                'indexing': {
-                    'schemas': {
-                        'card': {
-                            'foo': basestring
-                        },
-                    },
-                },
-            },
-        },
-        'indexing': {
-            'pipeline': [
-                'CheckProcessor',
-                'LocalDumbIndex',
-            ],
-            'check_processor': {
-                'schemas': {
-                    'query': {
-                        'content': {
-                            'query': 'object'
-                        },
-                        'options': {
-                            'required': True,
-                            'extra': True
-                        }
-                    },
-                    'card': {
-                        'kind': {
-                            'test': {
-                                'options': {
-                                    'extra': True,
-                                    'required': True
-                                },
-                                'content': {
-                                    'id': unicode,
-                                    'kind': unicode
-                                }
-                            }
-                        },
-                        'default': {
-                            'options': {
-                                'extra': True,
-                                'required': True,
-                            },
-                            'content': {
-                                'id': 'str',
-                                'title': 'str',
-                                'description': 'str',
-                                'date': {
-                                    'All': [
-                                        'int',
-                                        {
-                                            'Range': {
-                                                'min': 0,
-                                            },
-                                        },
-                                    ],
-                                },
-                                'kind': 'str',
-                                'author': {
-                                    'nested': {
-                                        'name': 'str',
-                                    }
-                                },
-                                'attachments': [
-                                    {
-                                        'title': 'str',
-                                        'origin_id': 'str',
-                                        'type': 'str',
-                                        'description': 'str',
-                                    }
-                                ],
-                            },
-                        },
-                    },
-                },
-            },
-        }
-    }
-}
 
 
 @cleanup_component
@@ -132,7 +49,8 @@ class TestCheckProcessor(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        docido_config._push().update(TEST_CONFIG)
+        config_yaml = osp.splitext(__file__)[0] + '.yml'
+        docido_config._push().update(Configuration.from_file(config_yaml))
         cls.env = Environment()
         cls.env[IndexPipelineProvider]
         cls.env[LocalDumbIndex]
@@ -150,7 +68,7 @@ class TestCheckProcessor(unittest.TestCase):
     def index(self):
         index_builder = self.env[IndexPipelineProvider]
         return index_builder.get_index_api(
-            TEST_CRAWLER_NAME, 'user2', 'account3'
+            'check-processor-test', 'user2', 'account3'
         )
 
     def test_push_valid_document(self):

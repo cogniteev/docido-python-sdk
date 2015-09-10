@@ -1,0 +1,50 @@
+pull_crawlers:
+  crawlers:
+    check-processor-test:
+      indexing:
+        schemas:
+          card:
+            foo: basestring
+  indexing:
+    check_processor:
+      schemas:
+        card:
+          default:
+            content:
+              attachments:
+              - description: str
+                origin_id: str
+                title: str
+                type: str
+              author:
+                nested:
+                  name: str
+              date:
+                All:
+                - int
+                - Range:
+                    min: 0
+              description: str
+              id: str
+              kind: str
+              title: str
+            options:
+              extra: true
+              required: true
+          kind:
+            test:
+              content:
+                id: unicode
+                kind: unicode
+              options:
+                extra: true
+                required: true
+        query:
+          content:
+            query: object
+          options:
+            extra: true
+            required: true
+    pipeline:
+    - CheckProcessor
+    - LocalDumbIndex
