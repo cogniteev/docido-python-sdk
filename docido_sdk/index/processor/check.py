@@ -94,7 +94,7 @@ class Check(IndexAPIProcessor):
         return super(Check, self).delete_cards(query)
 
 
-class CheckProcessorSchemaProvider(Interface):
+class CheckProcessorSchemaProvider(Interface):  # pragma: no cover
     def default_schema(service):
         pass
 

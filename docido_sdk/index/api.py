@@ -11,7 +11,7 @@ __all__ = [
 ]
 
 
-class IndexAPIProvider(Interface):
+class IndexAPIProvider(Interface):  # pragma: no cover
     """ Provide an implementation of IndexAPI
     """
     def get_index_api(**config):
@@ -189,7 +189,7 @@ class IndexAPIProcessor(IndexAPI):
         return self._parent.ping()
 
 
-class IndexAPIConfigurationProvider(Interface):
+class IndexAPIConfigurationProvider(Interface):  # pragma: no cover
     """ An interface to provide a configuration consumed by
     :py:class:`docido_sdk.index.IndexAPIProcessor`
     """
@@ -211,7 +211,7 @@ class IndexAPIConfigurationProvider(Interface):
         pass
 
 
-class IndexPipelineConfig(Interface):
+class IndexPipelineConfig(Interface):  # pragma: no cover
     """ Provides list of :py:class:`docido_sdk.index.IndexAPIProvider`
     to link together in order to create the indexing pipeline.
     """

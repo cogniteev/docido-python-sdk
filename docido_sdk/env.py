@@ -18,6 +18,7 @@ class Environment(Component, ComponentManager):
         gets an additional member variable: `env` (the environment object)
         """
         component.env = self
+        super(Environment, self).component_activated(component)
 
     def get_index_api(self, service, user_id, account_login):
         """Provides `IndexAPI` dedicated to a crawl
