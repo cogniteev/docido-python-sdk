@@ -1,0 +1,8 @@
+fake-crawler:
+  launch:
+    token:
+      access_token: the_access_token
+      refresh_token: the_refresh_token
+      token_secret: the_token_secret
+      consumer_key: the_consumer_key
+      expires: the_expires

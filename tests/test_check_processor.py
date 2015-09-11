@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import copy
 import os.path as osp
 import unittest
@@ -7,31 +8,12 @@ from docido_sdk.core import (
     Component,
     implements,
 )
-from docido_sdk.toolbox.decorators import lazy
 from docido_sdk.toolbox.collections_ext import Configuration
 from docido_sdk.env import Environment
-from docido_sdk.index.config import YamlPullCrawlersIndexingConfig
 from docido_sdk.index.pipeline import IndexPipelineProvider
 import docido_sdk.index.processor as processor
 from docido_sdk.index.test import LocalDumbIndex
 from docido_sdk.index import IndexAPIConfigurationProvider, IndexAPIError
-
-from docido_sdk.test import (
-    cleanup_component,
-    cleanup_components,
-)
-
-
-@cleanup_component
-class DumbIndexAPIConfiguration(Component):
-    implements(IndexAPIConfigurationProvider)
-
-    def get_index_api_conf(self, service, docido_user_id, account_login):
-        return {
-            'service': service,
-            'docido_user_id': docido_user_id,
-            'account_login': account_login,
-        }
 
 
 class TestCheckProcessor(unittest.TestCase):
@@ -48,54 +30,69 @@ class TestCheckProcessor(unittest.TestCase):
     }
 
     @classmethod
-    def setUpClass(cls):
-        config_yaml = osp.splitext(__file__)[0] + '.yml'
-        docido_config._push().update(Configuration.from_file(config_yaml))
-        cls.env = Environment()
-        cls.env[IndexPipelineProvider]
-        cls.env[LocalDumbIndex]
-        cls.env[YamlPullCrawlersIndexingConfig]
-        cls.env[processor.CheckProcessor]
-        cls.env[DumbIndexAPIConfiguration]
+    def _setup_test_components(cls, env):
+        class DumbIndexAPIConfiguration(Component):
+            implements(IndexAPIConfigurationProvider)
 
-    @classmethod
-    def tearDownClass(cls):
-        docido_config._pop()
-        cleanup_components()
-        YamlPullCrawlersIndexingConfig.unregister()
+            def get_index_api_conf(self, service, docido_user_id,
+                                   account_login):
+                return {
+                    'service': service,
+                    'docido_user_id': docido_user_id,
+                    'account_login': account_login,
+                }
+        return [DumbIndexAPIConfiguration]
 
-    @lazy
+    @contextmanager
     def index(self):
-        index_builder = self.env[IndexPipelineProvider]
-        return index_builder.get_index_api(
-            'check-processor-test', 'user2', 'account3'
-        )
+        from docido_sdk.index.config import YamlPullCrawlersIndexingConfig
+        config_yaml = osp.splitext(__file__)[0] + '.yml'
+        with docido_config:
+            docido_config.clear()
+            docido_config.update(Configuration.from_file(config_yaml))
+            env = Environment()
+            test_components = self._setup_test_components(env)
+            env[IndexPipelineProvider]
+            env[LocalDumbIndex]
+            env[processor.CheckProcessor]
+            try:
+                env[YamlPullCrawlersIndexingConfig]
+                index_builder = env[IndexPipelineProvider]
+                yield index_builder.get_index_api(
+                    'check-processor-test', 'user2', 'account3'
+                )
+            finally:
+                for test_component in test_components:
+                    test_component.unregister()
 
     def test_push_valid_document(self):
-        self.index.push_cards([self.VALID_CARD])
-        self.assertEqual(
-            [self.VALID_CARD],
-            self.index.search_cards({'query': {'match_all': {}}})
-        )
+        with self.index() as index:
+            index.push_cards([self.VALID_CARD])
+            self.assertEqual(
+                [self.VALID_CARD],
+                index.search_cards({'query': {'match_all': {}}})
+            )
 
     def test_push_extra_field(self):
         card = copy.deepcopy(self.VALID_CARD)
-        self.index.push_cards([card])
-        self.assertEqual(
-            [card],
-            self.index.search_cards({'query': {'match_all': {}}})
-        )
+        with self.index() as index:
+            index.push_cards([card])
+            self.assertEqual(
+                [card],
+                index.search_cards({'query': {'match_all': {}}})
+            )
 
     def test_push_invalid_field_type(self):
         card = copy.deepcopy(self.VALID_CARD)
         card['description'] = 12345
-        with self.assertRaises(IndexAPIError):
-            self.index.push_cards([card])
+        with self.index() as index, self.assertRaises(IndexAPIError):
+            index.push_cards([card])
 
     def test_push_without_attachments_field(self):
         card = copy.deepcopy(self.VALID_CARD)
         card.pop('attachments')
-        self.index.push_cards([card])
+        with self.index() as index:
+            index.push_cards([card])
 
     def test_push_one_attachment(self):
         card = copy.deepcopy(self.VALID_CARD)
@@ -105,16 +102,18 @@ class TestCheckProcessor(unittest.TestCase):
             'type': 'type1',
             'description': 'description1',
         })
-        self.index.push_cards([card])
+        with self.index() as index:
+            index.push_cards([card])
 
     def test_push_other_kind(self):
-        self.index.push_cards([{'id': u'my_test_id', 'kind': u'test'}])
+        with self.index() as index:
+            index.push_cards([{'id': u'my_test_id', 'kind': u'test'}])
 
     def test_push_without_kind(self):
         card = copy.deepcopy(self.VALID_CARD)
         del card['kind']
-        with self.assertRaises(IndexAPIError):
-            self.index.push_cards([card])
+        with self.index() as index, self.assertRaises(IndexAPIError):
+            index.push_cards([card])
 
     def test_push_three_attachments(self):
         card = copy.deepcopy(self.VALID_CARD)
@@ -124,7 +123,8 @@ class TestCheckProcessor(unittest.TestCase):
             'type': 'type' + str(i),
             'description': 'description' + str(i),
         } for i in range(1, 4)]
-        self.index.push_cards([card])
+        with self.index() as index:
+            index.push_cards([card])
 
     def test_push_invalid_attachment(self):
         card = copy.deepcopy(self.VALID_CARD)
@@ -140,8 +140,8 @@ class TestCheckProcessor(unittest.TestCase):
             'type': 'type2',
             'description': 'description2',
         })
-        with self.assertRaises(IndexAPIError):
-            self.index.push_cards([card])
+        with self.index() as index, self.assertRaises(IndexAPIError):
+            index.push_cards([card])
 
     def test_attachments_with_same_name(self):
         card = copy.deepcopy(self.VALID_CARD)
@@ -153,28 +153,28 @@ class TestCheckProcessor(unittest.TestCase):
         }
         card['attachments'].append(attachment)
         card['attachments'].append(attachment)
-        with self.assertRaises(IndexAPIError):
-            self.index.push_cards([card])
+        with self.index() as index, self.assertRaises(IndexAPIError):
+            index.push_cards([card])
 
     def test_search_invalid_query(self):
-        with self.assertRaises(IndexAPIError):
-            self.index.search_cards({})
+        with self.index() as index, self.assertRaises(IndexAPIError):
+            index.search_cards({})
 
     def test_delete_thumbnails_invalid_query(self):
-        with self.assertRaises(IndexAPIError):
-            self.index.delete_thumbnails({})
+        with self.index() as index, self.assertRaises(IndexAPIError):
+            index.delete_thumbnails({})
 
     def test_delete_thumbnails(self):
-        with self.assertRaises(NotImplementedError):
-            self.index.delete_thumbnails({'query': {'match_all': {}}})
+        with self.index() as index, self.assertRaises(NotImplementedError):
+            index.delete_thumbnails({'query': {'match_all': {}}})
 
     def test_delete_cards(self):
-        with self.assertRaises(NotImplementedError):
-            self.index.delete_cards({'query': {'match_all': {}}})
+        with self.index() as index, self.assertRaises(NotImplementedError):
+            index.delete_cards({'query': {'match_all': {}}})
 
     def test_delete_cards_invalid_query(self):
-        with self.assertRaises(IndexAPIError):
-            self.index.delete_cards({})
+        with self.index() as index, self.assertRaises(IndexAPIError):
+            index.delete_cards({})
 
 if __name__ == '__main__':
     unittest.main()

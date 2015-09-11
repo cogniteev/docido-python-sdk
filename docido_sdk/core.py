@@ -61,7 +61,7 @@ class ComponentMeta(type):
 
     Takes care of component and extension point registration.
     """
-    _components = []
+    _components = set()
     _registry = {}
 
     def __new__(mcs, name, bases, d):
@@ -76,15 +76,19 @@ class ComponentMeta(type):
             # Don't put abstract component classes in the registry
             return new_class
 
-        ComponentMeta._components.append(new_class)
-        registry = ComponentMeta._registry
-        for cls in new_class.__mro__:
+        return ComponentMeta.register(new_class)
+
+    @classmethod
+    def register(cls, component=None):
+        component = component or cls
+        cls._components.add(component)
+        registry = cls._registry
+        for cls in component.__mro__:
             for interface in cls.__dict__.get('_implements', ()):
                 classes = registry.setdefault(interface, [])
-                if new_class not in classes:
-                    classes.append(new_class)
-
-        return new_class
+                if component not in classes:
+                    classes.append(component)
+        return component
 
     @classmethod
     def unregister(cls, component):

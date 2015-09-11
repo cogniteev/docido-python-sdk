@@ -26,3 +26,12 @@ def restore_dict_kv(a_dict, key, copy_func=copy.deepcopy):
             a_dict[key] = backup
         else:
             a_dict.pop(key, None)
+
+
+@contextmanager
+def unregister_component(component):
+    try:
+        component.unregister()
+        yield component
+    finally:
+        component.register()
