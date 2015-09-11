@@ -1,7 +1,6 @@
 import unittest
 import os.path as osp
 
-import time
 import tempfile
 import shutil
 from contextlib import contextmanager
