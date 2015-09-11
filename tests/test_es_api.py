@@ -1,6 +1,7 @@
 import unittest
 import os.path as osp
 
+import time
 import tempfile
 import shutil
 from contextlib import contextmanager
@@ -68,30 +69,25 @@ class TestEsAPI(unittest.TestCase):
             DumbIndexAPIConfiguration
         ]
 
-    def test_push_cards(self):
+    def test_ping(self):
+        with self.index() as index:
+            index.ping()
+
+    def test_push_and_delete_cards(self):
         with self.index() as index:
             result = index.push_cards([self.TEST_DOC])
             self.assertEqual(result, [])
-
-    def test_delete_cards(self):
-        with self.index() as index:
             index.delete_cards({'query': {'match_all': {}}})
 
-    def test_push_and_get(self):
+    def test_push_and_get_card(self):
         with self.index() as index:
             index.push_cards([self.TEST_DOC])
             cards_gen = index.search_cards({'query': {'match_all': {}}})
             cards = list(cards_gen)
             self.assertIn(self.TEST_DOC, cards)
+            index.delete_cards({'query': {'match_all': {}}})
 
-    def test_push_thumbnails(self):
+    def test_push_and_delete_thumbnails(self):
         with self.index() as index:
             index.push_thumbnails([self.TEST_THUMB])
-
-    def test_delete_thumbnails(self):
-        with self.index() as index:
             index.delete_thumbnails({'query': {'match_all': {}}})
-
-    def test_ping(self):
-        with self.index() as index:
-            index.ping()
