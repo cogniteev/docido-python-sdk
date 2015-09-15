@@ -139,17 +139,29 @@ class LocalDumbIndexProcessor(IndexAPIProcessor):
             self.__lock.writer_release()
 
     def push_cards(self, cards):
-        # FIXME: returns expected value
         with self.__update(cards=True):
             for card in cards:
                 self.__cards[card['id']] = card
 
     def delete_cards(self, query=None):
-        # FIXME: returns expected value
+        if query != {'query': {'match_all': {}}}:
+            raise IndexAPIError(
+                'only match_all query is currently supported, you should use' +
+                ' the ElasticSearch processor along with es-settings.yml ' +
+                'config file instead'
+            )
         with self.__update(cards=True):
-            if query:
-                raise NotImplementedError()
             self.__cards.clear()
+
+    def delete_cards_by_id(self, ids):
+        errors = []
+        with self.__update(cards=True):
+            for _id in ids:
+                if _id not in self.__cards:
+                    errors.append({'status': 404, 'id': _id})
+                    continue
+                del self.__cards[_id]
+            return errors
 
     def search_cards(self, query=None):
         with self.__lock.read():
@@ -187,17 +199,29 @@ class LocalDumbIndexProcessor(IndexAPIProcessor):
         # }
 
     def push_thumbnails(self, thumbnails):
-        # FIXME: returns expected value
         with self.__update(thumbnails=True):
             for id_, payload, mime in thumbnails:
                 self.__thumbnails[id_] = (payload, mime)
 
-    def delete_thumbnails(self, query=None):
-        # FIXME: returns expected value
-        if query:
-            raise NotImplementedError()
+    def delete_thumbnails(self, query):
+        if query != {'query': {'match_all': {}}}:
+            raise IndexAPIError(
+                'only match_all query is currently supported, you should use' +
+                ' the ElasticSearch processor along with es-settings.yml ' +
+                'config file instead'
+            )
         with self.__update(thumbnails=True):
             self.__thumbnails.clear()
+
+    def delete_thumbnails_by_id(self, ids):
+        errors = []
+        with self.__update(thumbnails=True):
+            for _id in ids:
+                if _id not in self.__thumbnails:
+                    errors.append({'status': 404, 'id': _id})
+                    continue
+                del self.__thumbnails[_id]
+            return errors
 
     @classmethod
     def load_index(cls, path):

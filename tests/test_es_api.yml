@@ -8,8 +8,18 @@ elasticsearch:
     ES_STORE_HOST: *elasticsearch
     ES_STORE_INDEX: store_docido_test
     ES_STORE_TYPE: cached_item_test
+    MAPPING:
+        store_docido_test:
+            _id:
+                _id:
+                    path: id
+        docido_test_es:
+            _id:
+                _id:
+                    path: id
 
 pull_crawlers:
     indexing:
         pipeline:
             - Elasticsearch
+            - ElasticsearchMapping

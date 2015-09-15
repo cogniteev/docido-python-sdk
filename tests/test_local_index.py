@@ -20,18 +20,48 @@ from docido_sdk.toolbox.contextlib_ext import unregister_component
 
 
 class TestLocalIndex(unittest.TestCase):
-    def test_push_and_get_card(self):
-        card = {
-            'id': 12345
-        }
-        with self.index() as index:
-            index.push_cards(repeat(card, 1))
-            self.assertEqual(index.search_cards(), [card])
+    TEST_CARD = {
+        'id': 12345
+    }
 
-    def test_push_and_get_thumbnails(self):
+    def test_push_and_get_card(self):
+        with self.index() as index:
+            index.push_cards(repeat(self.TEST_CARD, 1))
+            self.assertListEqual(index.search_cards(), [self.TEST_CARD])
+
+    def test_push_and_delete_card(self):
+        with self.index() as index:
+            index.push_cards(repeat(self.TEST_CARD, 1))
+            index.delete_cards({'query': {'match_all': {}}})
+            self.assertListEqual(index.search_cards(), [])
+
+    def test_push_and_delete_by_id(self):
+        with self.index() as index:
+            index.push_cards([self.TEST_CARD, {'id': 54321}])
+            delete_result = index.delete_cards_by_id([54321])
+            self.assertListEqual(delete_result, [])
+            self.assertListEqual(index.search_cards(), [self.TEST_CARD])
+
+    def test_delete_invalid_id_card(self):
+        with self.index() as index:
+            delete_result = index.delete_cards_by_id(['aFakeId'])
+            self.assertListEqual(
+                delete_result, [{'status': 404, 'id': 'aFakeId'}]
+            )
+
+    def test_push_and_delete_thumbnails(self):
         thumb = ('testid', '\x13\x13', 'png')
         with self.index() as index:
             index.push_thumbnails([thumb])
+            delete_result = index.delete_thumbnails_by_id(['testid'])
+            self.assertListEqual(delete_result, [])
+
+    def test_delete_invalid_thumbnail(self):
+        with self.index() as index:
+            delete_result = index.delete_thumbnails_by_id(['aFakeId'])
+            self.assertListEqual(
+                delete_result, [{'status': 404, 'id': 'aFakeId'}]
+            )
 
     @contextmanager
     def index(self):

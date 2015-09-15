@@ -14,7 +14,7 @@ from docido_sdk.index.pipeline import IndexPipelineProvider
 import docido_sdk.config as docido_config
 
 from docido_sdk.toolbox.collections_ext import Configuration
-from docido_sdk.index.processor import Elasticsearch
+from docido_sdk.index.processor import Elasticsearch, ElasticsearchMapping
 
 
 class TestEsAPI(unittest.TestCase):
@@ -35,6 +35,7 @@ class TestEsAPI(unittest.TestCase):
             test_components = self._setup_test_components(env)
             pipeline = env[IndexPipelineProvider]
             env[Elasticsearch]
+            env[ElasticsearchMapping]
             try:
                 # build and provide an IndexAPI
                 env[YamlPullCrawlersIndexingConfig]
@@ -75,8 +76,39 @@ class TestEsAPI(unittest.TestCase):
     def test_push_and_delete_cards(self):
         with self.index() as index:
             result = index.push_cards([self.TEST_DOC])
-            self.assertEqual(result, [])
+            self.assertListEqual(result, [])
+            self.assertListEqual(
+                list(index.search_cards(
+                    {'query': {'match_all': {}}})
+                ), [self.TEST_DOC]
+            )
             index.delete_cards({'query': {'match_all': {}}})
+            self.assertListEqual(
+                list(index.search_cards(
+                    {'query': {'match_all': {}}})
+                ), []
+            )
+
+    def test_push_invalid_doc(self):
+        with self.index() as index:
+            push_result = index.push_cards([[]])
+            self.assertEqual(len(push_result), 1)
+
+    def test_delete_invalid_doc(self):
+        with self.index() as index:
+            delete_result = index.delete_cards_by_id(['aFakeId'])
+            self.assertEqual(delete_result, [{'status': 404, 'id': 'aFakeId'}])
+
+    def test_push_and_delete_by_id(self):
+        with self.index() as index:
+            index.push_cards([self.TEST_DOC])
+            del_result = index.delete_cards_by_id([self.TEST_DOC['id']])
+            self.assertListEqual(del_result, [])
+            self.assertListEqual(
+                list(index.search_cards(
+                    {'query': {'match_all': {}}})
+                ), []
+            )
 
     def test_push_and_get_card(self):
         with self.index() as index:
@@ -90,3 +122,16 @@ class TestEsAPI(unittest.TestCase):
         with self.index() as index:
             index.push_thumbnails([self.TEST_THUMB])
             index.delete_thumbnails({'query': {'match_all': {}}})
+
+    def test_push_and_delete_thumbnails_by_id(self):
+        with self.index() as index:
+            index.push_thumbnails([self.TEST_THUMB])
+            delete_result = index.delete_thumbnails_by_id([self.TEST_THUMB[0]])
+            self.assertListEqual(delete_result, [])
+
+    def test_delete_invalid_thumbnail(self):
+        with self.index() as index:
+            delete_result = index.delete_thumbnails_by_id(['aFakeId'])
+            self.assertListEqual(delete_result, [
+                {'status': 404, 'id': 'aFakeId'}
+            ])

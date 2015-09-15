@@ -79,14 +79,14 @@ class Check(IndexAPIProcessor):
             raise IndexAPIError(e)
         return super(Check, self).search_cards(query)
 
-    def delete_thumbnails(self, query=None):
+    def delete_thumbnails(self, query):
         try:
             self.query_schema(query)
         except voluptuous.MultipleInvalid as e:
             raise IndexAPIError(e)
         return super(Check, self).delete_thumbnails(query)
 
-    def delete_cards(self, query=None):
+    def delete_cards(self, query):
         try:
             self.query_schema(query)
         except voluptuous.MultipleInvalid as e:

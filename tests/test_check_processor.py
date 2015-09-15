@@ -164,17 +164,17 @@ class TestCheckProcessor(unittest.TestCase):
         with self.index() as index, self.assertRaises(IndexAPIError):
             index.delete_thumbnails({})
 
-    def test_delete_thumbnails(self):
-        with self.index() as index, self.assertRaises(NotImplementedError):
+    def test_delete_thumbnails_valid_query(self):
+        with self.index() as index:
             index.delete_thumbnails({'query': {'match_all': {}}})
 
-    def test_delete_cards(self):
-        with self.index() as index, self.assertRaises(NotImplementedError):
+    def test_delete_cards_valid_query(self):
+        with self.index() as index:
             index.delete_cards({'query': {'match_all': {}}})
 
     def test_delete_cards_invalid_query(self):
         with self.index() as index, self.assertRaises(IndexAPIError):
-            index.delete_cards({})
+            index.delete_cards([])
 
 if __name__ == '__main__':
     unittest.main()

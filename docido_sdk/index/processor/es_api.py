@@ -25,10 +25,17 @@ class ElasticsearchMappingProcessor(IndexAPIProcessor):
     def update_mapping(self, service):
         config = docido_config.elasticsearch
         es = _Elasticsearch(
-            config.ES_HOST,
+            os.getenv('ELASTICSEARCH_HOST', config.ES_HOST),
             **config.get('connection_params', {})
         )
-        for (index, doc_type) in [(config.ES_INDEX, config.ES_CARD_TYPE)]:
+        to_update_mappings = [
+            (config.ES_INDEX, config.ES_CARD_TYPE),
+        ]
+        if config.get('ES_STORE_INDEX') and config.get('ES_STORE_TYPE'):
+            to_update_mappings.append(
+                (config.ES_STORE_INDEX, config.ES_STORE_TYPE)
+            )
+        for (index, doc_type) in to_update_mappings:
             index = index.format(service=service)
             doc_type = doc_type.format(service=service)
             if not es.indices.exists(index):
@@ -129,6 +136,35 @@ class ElasticsearchProcessor(IndexAPIProcessor):
             self.__card_type
         )
 
+    def delete_cards_by_id(self, ids):
+        body = []
+        error_docs = []
+
+        for _id in ids:
+            body.append({
+                'delete': {
+                    '_index': self.__es_index,
+                    '_type': self.__card_type,
+                    '_id': _id
+                }
+            })
+        params = {
+            'body': body,
+            'refresh': True,
+        }
+        if self.__routing:
+            params['routing'] = self.__routing
+
+        results = self.__es.bulk(**params)
+        for index, result in enumerate(results['items']):
+            if result['delete']['status'] is not 200:
+                error_docs.append({
+                    'status': result['delete']['status'],
+                    'id': ids[index],
+                })
+
+        return error_docs
+
     def delete_thumbnails(self, query):
         return self.__delete_es_docs(
             query,
@@ -136,6 +172,35 @@ class ElasticsearchProcessor(IndexAPIProcessor):
             self.__es_store_index,
             self.__store_type
         )
+
+    def delete_thumbnails_by_id(self, ids):
+        body = []
+        error_docs = []
+
+        for _id in ids:
+            body.append({
+                'delete': {
+                    '_index': self.__es_store_index,
+                    '_type': self.__store_type,
+                    '_id': _id
+                }
+            })
+        params = {
+            'body': body,
+            'refresh': True,
+        }
+        if self.__routing:
+            params['routing'] = self.__routing
+
+        results = self.__es.bulk(**params)
+        for index, result in enumerate(results['items']):
+            if result['delete']['status'] is not 200:
+                error_docs.append({
+                    'status': result['delete']['status'],
+                    'id': ids[index],
+                })
+
+        return error_docs
 
     def __push_es_docs(self, docs, es, index, doc_type):
         body = []
@@ -182,7 +247,15 @@ class ElasticsearchProcessor(IndexAPIProcessor):
 
     def push_thumbnails(self, thumbnails):
         return self.__push_es_docs(
-            thumbnails,
+            [
+                {
+                    'id': t[0],
+                    'content': {
+                        'data': t[1],
+                        'mimetype': t[2]
+                    }
+                }
+                for t in thumbnails],
             self.__es_store,
             self.__es_store_index,
             self.__store_type

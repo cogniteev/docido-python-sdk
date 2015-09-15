@@ -94,13 +94,15 @@ class TestForwardProcessor(unittest.TestCase):
 
     def test_delete_cards_forward(self):
         with self.index() as index:
-            with self.assertRaises(NotImplementedError):
-                index.delete_cards({'query': {'match_all'}})
+            index.delete_cards({'query': {'match_all': {}}})
+
+    def test_delete_cards_by_id(self):
+        with self.index() as index:
+            index.delete_cards_by_id([])
 
     def test_delete_thumbnails_forward(self):
         with self.index() as index:
-            with self.assertRaises(NotImplementedError):
-                index.delete_thumbnails({'query': {'match_all'}})
+            index.delete_thumbnails({'query': {'match_all': {}}})
 
     def test_search_cards_forward(self):
         with self.index() as index:
