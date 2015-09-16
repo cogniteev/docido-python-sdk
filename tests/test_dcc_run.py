@@ -21,8 +21,8 @@ epilogue_called = True
 
 
 def _check_task_parameters(*args):
-    assert len(args) == 3
-    index, token, logger = args
+    assert len(args) == 4
+    index, token, result, logger = args
     assert isinstance(index, IndexAPI)
     assert isinstance(token, OAuthToken)
     assert isinstance(logger, logging.Logger)
@@ -64,11 +64,9 @@ class TestDCCRun(unittest.TestCase):
         global epilogue_called
         tasks_counter = 0
         epilogue_called = False
-        try:
-            yield
-        finally:
-            self.assertEqual(tasks_counter, tasks_count)
-            self.assertEqual(epilogue_called, with_epilogue)
+        yield
+        self.assertEqual(tasks_counter, tasks_count)
+        self.assertEqual(epilogue_called, with_epilogue)
 
     @contextmanager
     def crawler(self, *args, **kwargs):
