@@ -23,16 +23,16 @@ class nameddict(dict):
 
     def __namify(self, a_dict):
         for key in a_dict.keys():
-            if isinstance(a_dict[key], dict):
+            if type(a_dict[key]) == dict:
                 a_dict[key] = nameddict(a_dict[key])
 
     def __setitem__(self, key, value):
-        if isinstance(value, dict):
+        if type(value) == dict:
             value = nameddict(value)
         super(nameddict, self).__setitem__(key, value)
 
     def __setattr__(self, key, value):
-        if key != '__dict__' and isinstance(value, dict):
+        if key != '__dict__' and type(value) == dict:
             value = nameddict(value)
         super(nameddict, self).__setattr__(key, value)
 
