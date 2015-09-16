@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 import logging
 from optparse import OptionParser
+import os
 import pickle
 from pickle import PickleError
 import sys
@@ -24,13 +25,20 @@ import docido_sdk.config as docido_config
 from ..toolbox.collections_ext import Configuration
 
 
-def oauth_tokens_from_file(full=True, config=None):
+def oauth_tokens_from_file(full=True):
+    path = os.environ.get('DOCIDO_DCC_RUNS', '.dcc-runs.yml')
     crawlers = Configuration.from_env('DOCIDO_CC_RUNS', '.dcc-runs.yml',
                                       Configuration())
     for crawler, runs in crawlers.iteritems():
         for run, run_config in runs.iteritems():
+            for k in 'config', 'token':
+                if not k in run_config:
+                    message = ("In file {}: missing config key '{}'"
+                               " in '{}/{}' crawl description.")
+                    raise Exception(message.format(path, k, crawler, run))
+            if 'config' not in run_config:
+                raise Exception("Missing 'config' key")
             run_config.token = OAuthToken(**run_config.token)
-            run_config.setdefault('config', config)
             run_config.setdefault('full', full)
     return crawlers
 
@@ -70,8 +78,8 @@ class LocalRunner(Component):
             if 'epilogue' in tasks:
                 _runtask(tasks['epilogue'], previous_result)
 
-    def run_all(self, full=False, config=None):
-        crawler_runs = oauth_tokens_from_file(full=full, config=config)
+    def run_all(self, full=False):
+        crawler_runs = oauth_tokens_from_file(full=full)
         for service, launches in crawler_runs.iteritems():
             self.service = service
             c = [c for c in self.crawlers if c.get_service_name() == service]
