@@ -3,8 +3,10 @@ Provides a set of Exception classes a crawler may raise when it is
 not possible to consume source API because of OAuth-related issues.
 """
 
+from .. core import DocidoError
 
-class CrawlerError(Exception):
+
+class CrawlerError(DocidoError):
     """Common base exception class for crawl issues"""
     def __init__(self, message=None):
         """
