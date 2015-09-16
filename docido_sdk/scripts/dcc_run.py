@@ -61,12 +61,14 @@ class LocalRunner(Component):
                                              logger, config.full)
             self._check_pickle(tasks)
 
-            def _runtask(task):
-                task(index_api, config.token, logger)
+            def _runtask(task, previous_result=None):
+                return task(index_api, config.token, previous_result, logger)
 
-            map(_runtask, tasks['tasks'])
+            previous_result = None
+            for task in tasks['tasks']:
+                previous_result = _runtask(task, previous_result)
             if 'epilogue' in tasks:
-                _runtask(tasks['epilogue'])
+                _runtask(tasks['epilogue'], previous_result)
 
     def run_all(self, full=False, config=None):
         crawler_runs = oauth_tokens_from_file(full=full, config=config)
