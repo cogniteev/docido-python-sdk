@@ -1,5 +1,8 @@
 
-class IndexAPIError(Exception):
+from .. core import DocidoError
+
+
+class IndexAPIError(DocidoError):
     @classmethod
     def build(cls, card):
         return IndexAPIErrorBuilder(card)
