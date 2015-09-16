@@ -69,12 +69,15 @@ class LocalRunner(Component):
                                              logger, config.full)
             self._check_pickle(tasks)
 
-            def _runtask(task, previous_result=None):
-                return task(index_api, config.token, previous_result, logger)
+            def _runtask(task, prev_result):
+                return task(index_api, config.token, prev_result, logger)
 
             previous_result = None
             for task in tasks['tasks']:
-                previous_result = _runtask(task, previous_result)
+                try:
+                    previous_result = _runtask(task, previous_result)
+                except Exception as e:
+                    previous_result = e
             if 'epilogue' in tasks:
                 _runtask(tasks['epilogue'], previous_result)
 
