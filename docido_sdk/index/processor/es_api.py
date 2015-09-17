@@ -148,6 +148,10 @@ class ElasticsearchProcessor(IndexAPIProcessor):
                     '_id': _id
                 }
             })
+
+        if len(body) == 0:
+            return error_docs
+
         params = {
             'body': body,
             'refresh': True,
@@ -185,6 +189,10 @@ class ElasticsearchProcessor(IndexAPIProcessor):
                     '_id': _id
                 }
             })
+
+        if len(body) == 0:
+            return error_docs
+
         params = {
             'body': body,
             'refresh': True,
@@ -215,6 +223,10 @@ class ElasticsearchProcessor(IndexAPIProcessor):
             }
             body.append(action)
             body.append(doc)
+
+        if len(body) == 0:
+            return error_docs
+
         params = {
             'body': body,
             'refresh': True,
