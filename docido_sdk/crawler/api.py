@@ -60,17 +60,3 @@ class ICrawler(Interface):
         Therefore you may provide functions defined outside
         your crawler class definition.
         """
-
-    def clear_account(index, oauth_token, logger):
-        """Remove from Docido index all data previously indexed for
-        this account. Persisted data must also be cleared.
-
-        :param docido_sdk.push.IndexAPI index:
-          To manipulate Docido index
-
-        :param docido_sdk.oauth.OAuthToken oauth_token:
-          OAuth credentials
-
-        :param logging.Logger logger:
-          to emit messages
-        """
