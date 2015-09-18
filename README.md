@@ -26,6 +26,14 @@ $ pip install tox
 $ tox
 ```
 
+The test-suite needs an Elasticsearch node to be up and running. You can provide `tox` the `ELASTICSEARCH_HOST` environment variable to override the default location, for instance:
+
+```shell
+$ export ELASTICSEARCH_HOST=foo.bar:9200
+$ tox
+```
+
+
 # Issues
 
 Pull-requests are welcome. You can also submit your issues to the
