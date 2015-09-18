@@ -8,8 +8,28 @@
 # Installation
 
 ```shell
-$ pip install docido-python-sdk
+$ pip install docido-sdk
 ```
+
+# Tests
+
+You can use `tox` to run the test-suite on every supported platform:
+
+```shell
+# Install and load virtualenv
+$ pip install virtualenv
+$ virtualenv .env
+$ .env/bin/activate
+# Install tox
+$ pip install tox
+# Run the test suites
+$ tox
+```
+
+# Issues
+
+Pull-requests are welcome. You can also submit your issues to the
+[issues tracker](https://github.com/cogniteev/docido-python-sdk/issues)
 
 # License
 
