@@ -36,6 +36,15 @@ class nameddict(dict):
             value = nameddict(value)
         super(nameddict, self).__setattr__(key, value)
 
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        content = dict()
+        for k, v in self.iteritems():
+            content[k] = copy.deepcopy(v, memo)
+        result = cls.__new__(cls)
+        result.__init__(content)
+        return result
+
 
 class Configuration(nameddict):
     @classmethod
