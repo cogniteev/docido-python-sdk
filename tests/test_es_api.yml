@@ -3,17 +3,17 @@ elasticsearch: &elasticsearch local.docker:13000
 elasticsearch:
     ES_CARD_TYPE: item
     ES_HOST: *elasticsearch
-    ES_INDEX: docido_test_es
+    ES_INDEX: python_sdk_ut_es
 
     ES_STORE_HOST: *elasticsearch
-    ES_STORE_INDEX: store_docido_test
+    ES_STORE_INDEX: python_sdk_ut_store_es
     ES_STORE_TYPE: cached_item_test
     MAPPING:
-        store_docido_test:
+        python_sdk_ut_es:
             _id:
                 _id:
                     path: id
-        docido_test_es:
+        python_sdk_ut_store_es:
             _id:
                 _id:
                     path: id
