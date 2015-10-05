@@ -1,6 +1,9 @@
 
 from contextlib import contextmanager
 import copy
+import os
+import shutil
+import tempfile
 
 
 @contextmanager
@@ -35,3 +38,22 @@ def unregister_component(component):
         yield component
     finally:
         component.register()
+
+
+@contextmanager
+def tempdir(**kwargs):
+    path = tempfile.mkdtemp(**kwargs)
+    try:
+        yield path
+    finally:
+        shutil.rmtree(path)
+
+
+@contextmanager
+def pushd(path):
+    cwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield path
+    finally:
+        os.chdir(cwd)
