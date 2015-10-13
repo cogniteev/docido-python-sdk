@@ -34,6 +34,8 @@ setup(
         'elasticsearch>=1.6.0',
         'Flask-OAuthlib>=0.8.0',
         'ProxyTypes==0.9',
+        'python-dateutil>=2.4.2',
+        'pytz>=2015.6',
         'setuptools>=0.6',
         'voluptuous>=0.8.7',
         'yamlious>=0.1.3',
