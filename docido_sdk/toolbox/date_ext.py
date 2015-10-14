@@ -55,12 +55,23 @@ class timestamp_ms(object):
     def from_imap_header(cls, date_header_value):
         if re.match(r".*\d{4}.*\d{4}", date_header_value):
             # replace '-0000' timezone information to '-00:00'
-            date_header_value = re.sub(
+            value = re.sub(
                 r"(.*)(\s+[\+-]?\d\d)(\d\d).*$",
                 r"\1 \2:\3",
                 date_header_value
             )
-        return cls.from_str(date_header_value)
+        else:
+            value = date_header_value
+        try:
+            return cls.from_str(value)
+        except ValueError:
+            if re.match(r".*[\-+]?\d{2}:\d{2}$", value):
+                value = re.sub(
+                    r"(.*)(\s[\+-]?\d\d:\d\d)$",
+                    r"\1",
+                    value
+                )
+            return cls.from_str(value)
 
     @classmethod
     def now(cls):
