@@ -52,3 +52,27 @@ class OAuthTokenRefreshRequiredError(CrawlerError):
           the error message returned by source API.
         """
         super(OAuthTokenRefreshRequiredError, self).__init__(message)
+
+
+class Retry(Exception):
+    def __init__(self, kwargs=None, countdown=None,
+                 eta=None, max_retries=None):
+        """Retry the task.
+
+        This exception can be raised by a crawl task to tell the framework
+        to retry it later on.
+
+        :param kwargs:
+          task keyword arguments to retry with
+        :param countdown:
+          time in seconds to delay the retry for.
+        :param eta:
+          explicit time and date to run the retry for. Must be
+          a :class:`~datetime.datetime` instance.
+        :param max_retries:
+          if set, overrides the default retry limit
+        """
+        self.kwargs = kwargs
+        self.countdown = countdown
+        self.eta = eta
+        self.max_retries = max_retries
