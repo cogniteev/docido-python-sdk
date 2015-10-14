@@ -3,6 +3,8 @@ Provides a set of Exception classes a crawler may raise when it is
 not possible to consume source API because of OAuth-related issues.
 """
 
+import sys
+
 from .. core import DocidoError
 
 
@@ -55,7 +57,7 @@ class OAuthTokenRefreshRequiredError(CrawlerError):
 
 
 class Retry(Exception):
-    def __init__(self, kwargs=None, countdown=None,
+    def __init__(self, kwargs=None, countdown=None, exc=None,
                  eta=None, max_retries=None):
         """Retry the task.
 
@@ -66,6 +68,8 @@ class Retry(Exception):
           task keyword arguments to retry with
         :param countdown:
           time in seconds to delay the retry for.
+        :param exc:
+          custom exception to report when the max restart limit exceeded.
         :param eta:
           explicit time and date to run the retry for. Must be
           a :class:`~datetime.datetime` instance.
@@ -73,6 +77,8 @@ class Retry(Exception):
           if set, overrides the default retry limit
         """
         self.kwargs = kwargs
+        self.exc = exc
         self.countdown = countdown
         self.eta = eta
         self.max_retries = max_retries
+        self.traceback = sys.exc_info[2]
