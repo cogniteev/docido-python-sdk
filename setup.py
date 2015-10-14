@@ -4,7 +4,10 @@ module_name = 'docido-python-sdk'
 root_url = 'https://github.com/cogniteev/' + module_name
 
 __version__ = None
-exec(open('docido_sdk/__init__.py').read())
+with open('docido_sdk/__init__.py') as istr:
+    for l in filter(lambda l: l.startswith('__version__ ='), istr):
+        exec(l)
+__version__ = '.'.join(map(str, __version__))
 
 setup(
     name='docido-sdk',
