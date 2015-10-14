@@ -28,6 +28,42 @@ KIOTO_DROPBOX_TZ = 'Thu, 11 Dec 1997 17:33:47 Z'
 
 
 class TestDateExt(unittest.TestCase):
+    def test_feeling_lucky(self):
+        self.assertEqual(
+            timestamp_ms.feeling_lucky(KIOTO_ISO_8601),
+            KIOTO_TIMESTAMP_MS
+        )
+        self.assertEqual(
+            timestamp_ms.feeling_lucky(KIOTO_ISO_8601_TZ),
+            KIOTO_TIMESTAMP_MS
+        )
+        self.assertEqual(
+            timestamp_ms.feeling_lucky(KIOTO_RFC_2822),
+            KIOTO_TIMESTAMP_MS
+        )
+        self.assertEqual(
+            timestamp_ms.feeling_lucky(KIOTO_RFC_3339),
+            KIOTO_TIMESTAMP_MS
+        )
+        self.assertEqual(
+            timestamp_ms.feeling_lucky(KIOTO_DATETIME),
+            KIOTO_TIMESTAMP_MS
+        )
+        self.assertEqual(
+            timestamp_ms.feeling_lucky(KIOTO_IMAP_HEADER),
+            KIOTO_TIMESTAMP_MS
+        )
+        self.assertEqual(
+            timestamp_ms.feeling_lucky(KIOTO_IMAP_HEADER_FIXED_TZ),
+            KIOTO_TIMESTAMP_MS
+        )
+        self.assertEqual(
+            timestamp_ms.feeling_lucky(KIOTO_TIMESTAMP_SEC),
+            KIOTO_TIMESTAMP_MS
+        )
+        with self.assertRaises(Exception):
+            timestamp_ms.feeling_lucky(Exception('invalid obj'))
+
     def test_dropbox(self):
         """dropbox dates - using formatter
 
