@@ -6,6 +6,8 @@ import os.path as osp
 import shutil
 import tempfile
 
+import six
+
 from docido_sdk.core import (
     Component,
     implements,
@@ -49,7 +51,7 @@ class LocalKVProcessor(IndexAPIProcessor):
 
     @reraise
     def get_key(self, key):
-        assert isinstance(key, basestring)
+        assert isinstance(key, six.string_types)
         with self.__lock.read():
             return self.__store.get(key)
 
@@ -60,15 +62,15 @@ class LocalKVProcessor(IndexAPIProcessor):
 
     @reraise
     def set_key(self, key, value):
-        assert isinstance(key, basestring)
-        assert isinstance(value, basestring)
+        assert isinstance(key, six.string_types)
+        assert isinstance(value, six.string_types)
         with self.__lock.write():
             self.__store[key] = value
             self.__persist()
 
     @reraise
     def delete_key(self, key):
-        assert isinstance(key, basestring)
+        assert isinstance(key, six.string_types)
         with self.__lock.write():
             self.__store.pop(key, None)
             self.__persist()

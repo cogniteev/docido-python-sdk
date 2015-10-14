@@ -37,6 +37,7 @@ setup(
         'python-dateutil>=2.4.2',
         'pytz>=2015.6',
         'setuptools>=0.6',
+        'six>=1.10.0',
         'voluptuous>=0.8.7',
         'yamlious>=0.1.3',
     ],
