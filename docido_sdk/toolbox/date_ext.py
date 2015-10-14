@@ -26,7 +26,7 @@ class timestamp_ms(object):
         elif isinstance(obj, datetime):
             return cls.from_datetime(obj)
         else:
-            raise Exception("Don't know how to get timestamp")
+            raise ValueError("Don't know how to get timestamp")
 
     @classmethod
     def from_str(cls, timestr):
