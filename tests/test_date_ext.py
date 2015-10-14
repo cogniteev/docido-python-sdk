@@ -14,6 +14,8 @@ KIOTO_DATETIME = datetime.datetime(1997, 12, 11, 17, 33, 47)
 
 KIOTO_IMAP_HEADER = 'Thu, 11 Dec 1997 17:33:47 -0000'
 KIOTO_IMAP_HEADER_FIXED_TZ = 'Thu, 11 Dec 1997 17:33:47 -00:00'
+KIOTO_IMAP_HEADER_SPURIOUS_TZ = 'Thu, 11 Dec 1997 17:33:47 -42:00'
+KIOTO_IMAP_HEADER_SPURIOUS2_TZ = 'Thu, 11 Dec 1997 17:33:47 -42:FF'
 
 KIOTO_SOUNDCLOUD_FORMATS = [
     "1997/12/11 17:33:47 +0000",
@@ -93,6 +95,14 @@ class TestDateExt(unittest.TestCase):
             timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_FIXED_TZ),
             KIOTO_TIMESTAMP_MS
         )
+        # timezone information will be deleted
+        self.assertEqual(
+            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_SPURIOUS_TZ),
+            KIOTO_TIMESTAMP_MS
+        )
+        # tz is such a mess it is not removed, so dateutil raises
+        with self.assertRaises(ValueError):
+            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_SPURIOUS2_TZ)
 
     def test_posix_timestamp(self):
         """instagram / evernote / linkedin POSIX timestamps"""
