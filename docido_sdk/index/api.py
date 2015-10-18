@@ -14,7 +14,7 @@ __all__ = [
 class IndexAPIProvider(Interface):  # pragma: no cover
     """ Provide an implementation of IndexAPI
     """
-    def get_index_api(**config):
+    def get_index_api(self, **config):
         """ Create a new instance of :py:class:`docido_sdk.index.IndexAPI`
 
         :param dict: config:
@@ -175,7 +175,7 @@ class IndexAPIProcessor(IndexAPI):
     def push_cards(self, cards):
         return self._parent.push_cards(cards)
 
-    def delete_cards(self, query=None):
+    def delete_cards(self, query):
         return self._parent.delete_cards(query)
 
     def delete_cards_by_id(self, ids):
@@ -187,7 +187,7 @@ class IndexAPIProcessor(IndexAPI):
     def push_thumbnails(self, thumbnails):
         return self._parent.push_thumbnails(thumbnails)
 
-    def delete_thumbnails(self, query=None):
+    def delete_thumbnails(self, query):
         return self._parent.delete_thumbnails(query)
 
     def get_kv(self, key):
@@ -235,7 +235,7 @@ class IndexPipelineConfig(Interface):  # pragma: no cover
     """ Provides list of :py:class:`docido_sdk.index.IndexAPIProvider`
     to link together in order to create the indexing pipeline.
     """
-    def get_pipeline():
+    def get_pipeline(self):
         """
         :return:
           description of the index pipeline to create
@@ -245,7 +245,7 @@ class IndexPipelineConfig(Interface):  # pragma: no cover
 
 
 class PullCrawlerIndexingConfig(Interface):
-    def core():
+    def core(self):
         """ Providers common pull-crawlers indexing configuration
 
         :return:

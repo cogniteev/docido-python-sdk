@@ -10,7 +10,7 @@ class ICrawler(Interface):
     """Extension point interface for components willing to
     provide additional Docido crawlers.
     """
-    def get_service_name():
+    def get_service_name(self):
         """
         :return: crawler name
         :rtype: string

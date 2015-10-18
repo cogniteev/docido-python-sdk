@@ -17,7 +17,7 @@ class nameddict(dict):
     syntax: `obj.key`
     """
     def __init__(self, *args, **kwargs):
-        super(nameddict, self).__init__(*args, **kwargs)
+        dict.__init__(self, *args, **kwargs)
         self.__dict__ = self
         self.__namify(self.__dict__)
 

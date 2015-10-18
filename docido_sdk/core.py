@@ -223,6 +223,7 @@ class ComponentManager(object):
         """Can be overridden by sub-classes so that special
         initialization for components can be provided.
         """
+        del component  # unused
         return True
 
     def is_component_enabled(self, cls):
@@ -234,4 +235,5 @@ class ComponentManager(object):
         enabled nor disabled explicitly. In both cases, the component
         with the given class will not be available.
         """
+        del cls  # unused
         return True

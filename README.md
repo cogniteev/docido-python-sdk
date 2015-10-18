@@ -1,5 +1,6 @@
 # Docido Python SDK
 
+[![PyPI version](https://badge.fury.io/py/docido-sdk.svg)](https://badge.fury.io/py/docido-sdk)
 [![Build Status](https://travis-ci.org/cogniteev/docido-python-sdk.svg)](https://travis-ci.org/cogniteev/docido-python-sdk)
 [![Coverage Status](https://coveralls.io/repos/cogniteev/docido-python-sdk/badge.svg?branch=master&service=github)](https://coveralls.io/github/cogniteev/docido-python-sdk?branch=master)
 [![Code Climate](https://codeclimate.com/github/cogniteev/docido-python-sdk/badges/gpa.svg)](https://codeclimate.com/github/cogniteev/docido-python-sdk)
