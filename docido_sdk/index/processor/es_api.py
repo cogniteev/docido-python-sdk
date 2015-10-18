@@ -36,31 +36,39 @@ class ElasticsearchMappingProcessor(IndexAPIProcessor):
                 (config.ES_STORE_INDEX, config.ES_STORE_TYPE)
             )
         for (index, doc_type) in to_update_mappings:
-            index = index.format(service=service)
-            doc_type = doc_type.format(service=service)
-            if not es.indices.exists(index):
-                es.indices.create(index)
-            mappings = []
-            if 'MAPPING' in config:
-                if index in config.MAPPING:
-                    mappings.append(config.MAPPING[index])
-            pr_config = docido_config.get('pull_crawlers', {})
-            crawlers_config = pr_config.get('crawlers', {})
-            crawler_config = crawlers_config.get(service, {})
-            crawler_index_config = crawler_config.get('indexing', {})
-            crawler_es = crawler_index_config.get('elasticsearch', {})
-            crawler_mapping = crawler_es.get('mapping', {})
-            if any(crawler_mapping):
-                mappings.append(crawler_mapping)
-            for mapping in mappings:
-                for field in mapping.keys():
-                    mapping_update_response = es.indices.put_mapping(
-                        index=index,
-                        doc_type=doc_type,
-                        body=mapping[field]
-                    )
-                    if mapping_update_response != {'acknowledged': True}:
-                        raise Exception("Could not update mapping")
+            self.__update_index_mapping(es, service, index, doc_type)
+
+    @classmethod
+    def __get_crawler_mapping_config(cls, service):
+        pr_config = docido_config.get('pull_crawlers', {})
+        crawlers_config = pr_config.get('crawlers', {})
+        crawler_config = crawlers_config.get(service, {})
+        crawler_index_config = crawler_config.get('indexing', {})
+        crawler_es = crawler_index_config.get('elasticsearch', {})
+        return crawler_es.get('mapping', {})
+
+    def __update_index_mapping(self, es, service, index, doc_type):
+        config = docido_config.elasticsearch
+        index = index.format(service=service)
+        doc_type = doc_type.format(service=service)
+        if not es.indices.exists(index):
+            es.indices.create(index)
+        mappings = []
+        if 'MAPPING' in config:
+            if index in config.MAPPING:
+                mappings.append(config.MAPPING[index])
+        crawler_mapping = self.__get_crawler_mapping_config(service)
+        if any(crawler_mapping):
+            mappings.append(crawler_mapping)
+        for mapping in mappings:
+            for field in mapping.keys():
+                mapping_update_response = es.indices.put_mapping(
+                    index=index,
+                    doc_type=doc_type,
+                    body=mapping[field]
+                )
+                if mapping_update_response != {'acknowledged': True}:
+                    raise Exception("Could not update mapping")
 
 
 class ElasticsearchProcessor(IndexAPIProcessor):
@@ -137,37 +145,7 @@ class ElasticsearchProcessor(IndexAPIProcessor):
         )
 
     def delete_cards_by_id(self, ids):
-        body = []
-        error_docs = []
-
-        for _id in ids:
-            body.append({
-                'delete': {
-                    '_index': self.__es_index,
-                    '_type': self.__card_type,
-                    '_id': _id
-                }
-            })
-
-        if len(body) == 0:
-            return error_docs
-
-        params = {
-            'body': body,
-            'refresh': True,
-        }
-        if self.__routing:
-            params['routing'] = self.__routing
-
-        results = self.__es.bulk(**params)
-        for index, result in enumerate(results['items']):
-            if result['delete']['status'] is not 200:
-                error_docs.append({
-                    'status': result['delete']['status'],
-                    'id': ids[index],
-                })
-
-        return error_docs
+        return self.__delete_by_id(ids, self.__es_index, self.__card_type)
 
     def delete_thumbnails(self, query):
         return self.__delete_es_docs(
@@ -178,19 +156,20 @@ class ElasticsearchProcessor(IndexAPIProcessor):
         )
 
     def delete_thumbnails_by_id(self, ids):
-        body = []
+        return self.__delete_by_id(ids, self.__es_store_index,
+                                   self.__store_type)
+
+    def __delete_by_id(self, ids, index, type):
         error_docs = []
+        body = [{
+            'delete': {
+                '_index': index,
+                '_type': type,
+                '_id': _id
+            }
+        } for _id in ids]
 
-        for _id in ids:
-            body.append({
-                'delete': {
-                    '_index': self.__es_store_index,
-                    '_type': self.__store_type,
-                    '_id': _id
-                }
-            })
-
-        if len(body) == 0:
+        if not any(body):
             return error_docs
 
         params = {
@@ -207,7 +186,6 @@ class ElasticsearchProcessor(IndexAPIProcessor):
                     'status': result['delete']['status'],
                     'id': ids[index],
                 })
-
         return error_docs
 
     def __push_es_docs(self, docs, es, index, doc_type):
@@ -233,6 +211,7 @@ class ElasticsearchProcessor(IndexAPIProcessor):
         }
         if self.__routing:
             params['routing'] = self.__routing
+
         results = es.bulk(**params)
         if results['errors']:
             for index, item in enumerate(results['items']):
