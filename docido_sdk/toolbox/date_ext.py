@@ -48,8 +48,9 @@ class timestamp_ms(object):
     def from_datetime(cls, date):
         if date.tzinfo is None:
             date = date.replace(tzinfo=pytz.utc)
-        return (date - UTC_EPOCH).total_seconds() * 1e3 + \
-            date.microsecond / 1e3
+        seconds = (date - UTC_EPOCH).total_seconds() * 1e3
+        micro_seconds = date.microsecond / 1e3
+        return int(seconds + micro_seconds)
 
     @classmethod
     def from_imap_header(cls, date_header_value):

@@ -141,6 +141,10 @@ class TestDateExt(unittest.TestCase):
             KIOTO_TIMESTAMP_MS
         )
 
+    def test_ensure_is_number(self):
+        now = timestamp_ms.now()
+        self.assertTrue(isinstance(now, int))
+
     def _test_format(self, format, format_tz):
         self.assertEqual(timestamp_ms.from_str(format),
                          KIOTO_TIMESTAMP_MS)
