@@ -15,6 +15,7 @@ from ..core import (
     ExtensionPoint,
 )
 from ..crawler import ICrawler
+from ..crawler.errors import Retry
 from ..index.config import YamlPullCrawlersIndexingConfig
 from ..index.processor import (
     Elasticsearch,
@@ -76,6 +77,8 @@ class LocalRunner(Component):
             for task in tasks['tasks']:
                 try:
                     previous_result = _runtask(task, previous_result)
+                except Retry as e:
+                    logger.warn('Skip task retry instruction')
                 except Exception as e:
                     logger.exception('Unexpected exception was raised')
                     previous_result = e
