@@ -140,7 +140,7 @@ class DocidoCheckProcessorSchemaProvider(Component):
         return voluptuous.Schema(schema, **options)
 
     def _get_schemas(self, service):
-        kind_schemas = self._core_config.get('card', {}).get('kind', {})
+        kind_schemas = self._core_config.get('card', {}).get('kind', {}) or {}
         return {
             k: self._schema_from_dicts(
                 v,
