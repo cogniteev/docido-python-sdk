@@ -77,6 +77,7 @@ class LocalRunner(Component):
                 try:
                     previous_result = _runtask(task, previous_result)
                 except Exception as e:
+                    logger.exception('Unexpected exception was raised')
                     previous_result = e
             if 'epilogue' in tasks:
                 _runtask(tasks['epilogue'], previous_result)
