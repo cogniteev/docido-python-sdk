@@ -1,6 +1,8 @@
-from contextlib import contextmanager, closing
-from cStringIO import StringIO
-import requests
+from contextlib import closing
+try:
+    from cStringIO import StringIO
+except:
+    from StringIO import StringIO
 
 
 class iterator_to_file(object):
@@ -54,41 +56,3 @@ class iterator_to_file(object):
 
     def next(self):
         return self._it()
-
-
-class stream_from_request(object):
-    """Build streamed file-like instances from an HTTP request.
-    """
-    def __init__(self, url, method='GET', **kwargs):
-        """
-        :param basestring url:
-          Resource URL
-
-        :param basestring method:
-          HTTP method
-
-        :param dict kwargs:
-          Optional parameters given to the `requests.sessions.Session.request`
-          member method.
-        """
-        self.__url = url
-        self.__method = method
-        self.__kwargs = kwargs.copy()
-
-    @contextmanager
-    def open(self, session=None):
-        """
-        :param requests.Session session:
-          Optional requests session
-
-
-        :return:
-          file-like object over the decoded bytes
-        """
-        self.__kwargs.update(stream=True)
-        session = session or requests
-        resp = session.request(self.__method, self.__url, **self.__kwargs)
-        try:
-            yield iterator_to_file(iter(resp))
-        finally:
-            resp.close()
