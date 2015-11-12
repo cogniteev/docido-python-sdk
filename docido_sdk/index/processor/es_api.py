@@ -159,12 +159,12 @@ class ElasticsearchProcessor(IndexAPIProcessor):
         return self.__delete_by_id(ids, self.__es_store_index,
                                    self.__store_type)
 
-    def __delete_by_id(self, ids, index, type):
+    def __delete_by_id(self, ids, index, _type):
         error_docs = []
         body = [{
             'delete': {
                 '_index': index,
-                '_type': type,
+                '_type': _type,
                 '_id': _id
             }
         } for _id in ids]

@@ -1,7 +1,7 @@
 from contextlib import closing
 try:
     from cStringIO import StringIO
-except:
+except ImportError:
     from StringIO import StringIO
 
 
