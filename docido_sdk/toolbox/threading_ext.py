@@ -3,7 +3,7 @@ from contextlib import contextmanager
 import threading
 
 
-class RWLock:
+class RWLock(object):
     """Synchronization object used in a solution of so-called second
     readers-writers problem. In this problem, many readers can simultaneously
     access a share, and a writer has an exclusive access to this share.
@@ -69,7 +69,7 @@ class RWLock:
             self.writer_release()
 
 
-class _LightSwitch:
+class _LightSwitch(object):
     """An auxiliary "light switch"-like object. The first thread turns on the
     "switch", the last one turns it off (see [1, sec. 4.2.2] for details)."""
     def __init__(self):

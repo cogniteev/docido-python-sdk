@@ -1,7 +1,10 @@
 
 import logging
 
-from docido_sdk.core import *
+from docido_sdk.core import (
+    Component,
+    ComponentManager,
+)
 
 
 class Environment(Component, ComponentManager):
@@ -19,20 +22,6 @@ class Environment(Component, ComponentManager):
         """
         component.env = self
         super(Environment, self).component_activated(component)
-
-    def get_index_api(self, service, user_id, account_login):
-        """Provides `IndexAPI` dedicated to a crawl
-
-        :param basestring service:
-          service name
-        :param basestring user_id:
-          Docido user identifier
-        :param basestring account_login:
-          Docido service account login
-        :return: index API to be used by the crawl
-        :rtype: :py:class:`docido_sdk.index.IndexAPI`
-        """
-        # FIXME
 
     def setup(self):
         from docido_sdk.loader import load_components

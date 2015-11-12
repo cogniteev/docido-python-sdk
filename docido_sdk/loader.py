@@ -52,8 +52,8 @@ def load_eggs(entry_point_name):
             )
             try:
                 entry.load(require=True)
-            except Exception as e:
-                _log_error(entry, e)
+            except Exception as exc:
+                _log_error(entry, exc)
             else:
                 _enable_plugin(env, entry.module_name)
     return _load_eggs

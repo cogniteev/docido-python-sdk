@@ -94,12 +94,12 @@ class ComponentMeta(type):
     def unregister(cls, component):
         try:
             cls._components.remove(component)
-        except:
+        except KeyError:
             pass
-        for interface, components in cls._registry.iteritems():
+        for _, components in cls._registry.iteritems():
             try:
                 components.remove(component)
-            except:
+            except ValueError:
                 pass
 
     def __call__(cls, *args, **kwargs):

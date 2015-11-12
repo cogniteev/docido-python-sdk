@@ -87,8 +87,8 @@ class kwargsql(object):
         'istartswith': lambda s, e: s.lower().startswith(e.lower()),
         'endswith': lambda s, e: s.endswith(e),
         'iendswith': lambda s, e: s.lower().endswith(e.lower()),
-        'isinstance': lambda v, c: isinstance(v, c),
-        'issubclass': lambda v, c: issubclass(v, c),
+        'isinstance': isinstance,
+        'issubclass': issubclass,
     }
 
     @classmethod

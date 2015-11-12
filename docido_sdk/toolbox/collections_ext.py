@@ -81,7 +81,7 @@ class contextobj(ObjectWrapper):
     __obj_stack = None
 
     def __init__(self, *args, **kwargs):
-        super(contextobj, self).__init__(*args, **kwargs)
+        ObjectWrapper.__init__(self, *args, **kwargs)
         self.__obj_stack = []
 
     def _push(self):
@@ -98,6 +98,6 @@ class contextobj(ObjectWrapper):
     def __enter__(self):
         return self._push()
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type_, value, traceback):
         self._pop()
         return False
