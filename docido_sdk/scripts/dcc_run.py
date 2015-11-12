@@ -143,13 +143,17 @@ def configure_loggers(verbose):  # pragma: no cover
 def _prepare_environment(environment):
     environment = environment or env
     loader.load_components(environment)
-    environment[YamlPullCrawlersIndexingConfig]
-    environment[Elasticsearch]
-    environment[CheckProcessor]
-    environment[IndexPipelineProvider]
     from ..index.test import LocalKV, LocalDumbIndex
-    environment[LocalKV]
-    environment[LocalDumbIndex]
+    components = [
+        YamlPullCrawlersIndexingConfig,
+        Elasticsearch,
+        CheckProcessor,
+        IndexPipelineProvider,
+        LocalKV,
+        LocalDumbIndex,
+    ]
+    for component in components:
+        _ = environment[component]
     return env
 
 
