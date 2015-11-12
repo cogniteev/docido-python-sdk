@@ -37,7 +37,7 @@ class iterator_to_file(object):
                 data = next(self._it)
             except StopIteration:
                 if len(self._buf) == 0:
-                    raise
+                    return ''
                 else:
                     res = self._buf
                     self._buf = ''
