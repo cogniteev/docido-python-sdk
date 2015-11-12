@@ -154,6 +154,7 @@ def _prepare_environment(environment):
     ]
     for component in components:
         _ = environment[component]
+        del _  # unused
     return env
 
 
