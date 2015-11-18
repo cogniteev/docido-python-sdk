@@ -81,4 +81,4 @@ class Retry(Exception):
         self.countdown = countdown
         self.eta = eta
         self.max_retries = max_retries
-        self.traceback = sys.exc_info[2]
+        self.traceback = sys.exc_info()[2]
