@@ -24,6 +24,10 @@ from ..index.processor import (
 from docido_sdk.index.pipeline import IndexPipelineProvider
 import docido_sdk.config as docido_config
 from ..toolbox.collections_ext import Configuration
+from ..crawler.tasks import (
+    reorg_crawl_tasks,
+    split_crawl_tasks,
+)
 
 
 def oauth_tokens_from_file(full=True):
@@ -69,21 +73,29 @@ class LocalRunner(Component):
             tasks = crawler.iter_crawl_tasks(index_api, config.token,
                                              logger, config.full)
             self._check_pickle(tasks)
+            tasks, epilogue, concurrency = reorg_crawl_tasks(
+                tasks,
+                int(config.get('max_concurrent_tasks', 2))
+            )
+            tasks = split_crawl_tasks(tasks, concurrency)
 
             def _runtask(task, prev_result):
                 return task(index_api, config.token, prev_result, logger)
 
-            previous_result = None
-            for task in tasks['tasks']:
-                try:
-                    previous_result = _runtask(task, previous_result)
-                except Retry as e:
-                    logger.warn('Skip task retry instruction')
-                except Exception as e:
-                    logger.exception('Unexpected exception was raised')
-                    previous_result = e
-            if 'epilogue' in tasks:
-                _runtask(tasks['epilogue'], previous_result)
+            results = []
+            for seq in tasks:
+                for task in seq:
+                    previous_result = None
+                    try:
+                        previous_result = _runtask(task, previous_result)
+                    except Retry as e:
+                        logger.warn('Skip task retry instruction')
+                    except Exception as e:
+                        logger.exception('Unexpected exception was raised')
+                        previous_result = e
+                results.append(previous_result)
+            if epilogue is not None:
+                _runtask(epilogue, results)
 
     def run_all(self, full=False):
         crawler_runs = oauth_tokens_from_file(full=full)
