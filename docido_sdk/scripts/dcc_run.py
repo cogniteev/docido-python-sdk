@@ -1,10 +1,14 @@
 from contextlib import contextmanager
+import datetime
 import logging
 from optparse import OptionParser
 import os
 import pickle
 from pickle import PickleError
 import sys
+import time
+
+import six
 
 from .. import loader
 from ..env import env
@@ -24,10 +28,31 @@ from ..index.processor import (
 from docido_sdk.index.pipeline import IndexPipelineProvider
 import docido_sdk.config as docido_config
 from ..toolbox.collections_ext import Configuration
+from ..toolbox.date_ext import timestamp_ms
 from ..crawler.tasks import (
     reorg_crawl_tasks,
     split_crawl_tasks,
 )
+
+
+def wait_or_raise(logger, retry_exc, attempt):
+    if attempt == retry_exc.max_retries:
+        raise retry_exc
+    if retry_exc.countdown is not None:
+        assert isinstance(retry_exc.countdown, six.integer_types)
+        wait_time = retry_exc.countdown
+        if wait_time < 0:
+            raise (Exception("'countdown' is less than 0"), None,
+                   sys.exc_info()[2])
+    else:
+        assert isinstance(retry_exc.eta, datetime.datetime)
+        target_ts = timestamp_ms.feeling_lucky(retry_exc.eta)
+        now_ts = timestamp_ms.now()
+        wait_time = (target_ts - now_ts) / 1e3
+        if wait_time < 0:
+            raise Exception("'eta' is in the future"), None, sys.exc_info()[2]
+    logger.warn("Retry raised, waiting %s seconds {}".format(wait_time))
+    time.sleep(wait_time)
 
 
 def oauth_tokens_from_file(full=True):
@@ -80,19 +105,35 @@ class LocalRunner(Component):
             tasks = split_crawl_tasks(tasks, concurrency)
 
             def _runtask(task, prev_result):
-                return task(index_api, config.token, prev_result, logger)
+                attempt = 1
+                result = None
+                kwargs = dict()
+                while True:
+                    try:
+                        result = task(index_api, config.token,
+                                      prev_result, logger, **kwargs)
+                        break
+                    except Retry as e:
+                        try:
+                            wait_or_raise(logger, e, attempt)
+                        except:
+                            logger.exception('Max retries reached')
+                            result = e
+                            break
+                        else:
+                            attempt += 1
+                            kwargs = e.kwargs
+                    except Exception as e:
+                        logger.exception('Unexpected exception was raised')
+                        result = e
+                        break
+                return result
 
             results = []
             for seq in tasks:
+                previous_result = None
                 for task in seq:
-                    previous_result = None
-                    try:
-                        previous_result = _runtask(task, previous_result)
-                    except Retry as e:
-                        logger.warn('Skip task retry instruction')
-                    except Exception as e:
-                        logger.exception('Unexpected exception was raised')
-                        previous_result = e
+                    previous_result = _runtask(task, previous_result)
                 results.append(previous_result)
             if epilogue is not None:
                 _runtask(epilogue, results)
