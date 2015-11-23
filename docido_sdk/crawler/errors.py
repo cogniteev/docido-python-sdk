@@ -82,3 +82,13 @@ class Retry(Exception):
         self.eta = eta
         self.max_retries = max_retries
         self.traceback = sys.exc_info()[2]
+
+    def __eq__(self, other):
+        return self.kwargs == other.kwargs and \
+            self.exc == other.exc and \
+            self.countdown == other.countdown and \
+            self.eta == other.eta and \
+            self.max_retries == other.max_retries
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
