@@ -291,3 +291,166 @@ doc_tag-special-layouts:
 
 
 
+
+doc_sandbox_architecture:
+  title: "Application Architecture"
+  url: "doc_sandbox_architecture.html"
+  link: "<a href='doc_sandbox_architecture.html'>Application Architecture</a>"
+
+
+doc_sandbox_crawlers:
+  title: "Crawlers"
+  url: "doc_sandbox_crawlers.html"
+  link: "<a href='doc_sandbox_crawlers.html'>Crawlers</a>"
+
+
+
+
+doc_sandbox_about:
+  title: "About"
+  url: "doc_sandbox_about.html"
+  link: "<a href='doc_sandbox_about.html'>About</a>"
+
+
+doc_sandbox_components:
+  title: "Component lifecycle"
+  url: "doc_sandbox_components.html"
+  link: "<a href='doc_sandbox_components.html'>Component lifecycle</a>"
+
+
+doc_sandbox_devtools:
+  title: "Development tools"
+  url: "doc_sandbox_devtools.html"
+  link: "<a href='doc_sandbox_devtools.html'>Development tools</a>"
+
+
+
+doc_sandbox_architecture:
+  title: "Docido Architecture"
+  url: "doc_sandbox_architecture.html"
+  link: "<a href='doc_sandbox_architecture.html'>Docido Architecture</a>"
+
+
+doc_sandbox_crawlers:
+  title: "Crawlers Architecture"
+  url: "doc_sandbox_crawlers.html"
+  link: "<a href='doc_sandbox_crawlers.html'>Crawlers Architecture</a>"
+
+
+
+
+doc_sandbox_about:
+  title: "Sandbox Application"
+  url: "doc_sandbox_about.html"
+  link: "<a href='doc_sandbox_about.html'>Sandbox Application</a>"
+
+
+doc_sandbox_components:
+  title: "Components lifecycle"
+  url: "doc_sandbox_components.html"
+  link: "<a href='doc_sandbox_components.html'>Components lifecycle</a>"
+
+
+doc_sandbox_devtools:
+  title: "Development tools"
+  url: "doc_sandbox_devtools.html"
+  link: "<a href='doc_sandbox_devtools.html'>Development tools</a>"
+
+
+
+
+doc_dev_dev_about.md:
+  title: "About"
+  url: "doc_dev_dev_about.md"
+  link: "<a href='doc_dev_dev_about.md'>About</a>"
+
+
+doc_dev_courses_classification:
+  title: "Crawlers Classification"
+  url: "doc_dev_courses_classification.html"
+  link: "<a href='doc_dev_courses_classification.html'>Crawlers Classification</a>"
+
+doc_dev_courses_challenges:
+  title: "Crawlers Development Challenges"
+  url: "doc_dev_courses_challenges.html"
+  link: "<a href='doc_dev_courses_challenges.html'>Crawlers Development Challenges</a>"
+
+
+
+doc_dev_dev_source:
+  title: "Source code"
+  url: "doc_dev_dev_source.html"
+  link: "<a href='doc_dev_dev_source.html'>Source code</a>"
+
+doc_dev_dev_sdk:
+  title: "Docido SDK"
+  url: "doc_dev_dev_sdk.html"
+  link: "<a href='doc_dev_dev_sdk.html'>Docido SDK</a>"
+
+doc_dev_dev_testing:
+  title: "Testing"
+  url: "doc_dev_dev_testing.html"
+  link: "<a href='doc_dev_dev_testing.html'>Testing</a>"
+
+
+
+doc_dev_integ_tests:
+  title: "Acceptances Tests"
+  url: "doc_dev_integ_tests.html"
+  link: "<a href='doc_dev_integ_tests.html'>Acceptances Tests</a>"
+
+doc_dev_integ_search:
+  title: "Unique Search Experience"
+  url: "doc_dev_integ_search.html"
+  link: "<a href='doc_dev_integ_search.html'>Unique Search Experience</a>"
+
+
+
+
+
+doc_tuto_new_crawler:
+  title: "Create a new Crawler"
+  url: "doc_tuto_new_crawler.html"
+  link: "<a href='doc_tuto_new_crawler.html'>Create a new Crawler</a>"
+
+
+doc_tuto_promote:
+  title: "Promote a change"
+  url: "doc_tuto_promote.html"
+  link: "<a href='doc_tuto_promote.html'>Promote a change</a>"
+
+
+doc_tuto_crawl:
+  title: "Trigger and Debug a Crawl"
+  url: "doc_tuto_crawl.html"
+  link: "<a href='doc_tuto_crawl.html'>Trigger and Debug a Crawl</a>"
+
+
+
+
+doc_support_contact:
+  title: "Contact Us"
+  url: "doc_support_contact.html"
+  link: "<a href='doc_support_contact.html'>Contact Us</a>"
+
+
+
+
+
+
+
+
+
+
+
+doc_about:
+  title: "About this theme"
+  url: "doc_about.html"
+  link: "<a href='doc_about.html'>About this theme</a>"
+
+
+
+doc_support:
+  title: "Support"
+  url: "doc_support.html"
+  link: "<a href='doc_support.html'>Support</a>"
