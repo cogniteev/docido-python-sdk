@@ -4,6 +4,7 @@ from itertools import repeat
 import logging
 import os
 import os.path as osp
+import shutil
 import unittest
 
 from docido_sdk.core import implements, Component
@@ -160,7 +161,8 @@ class TestDCCRun(unittest.TestCase):
             os.environ['DOCIDO_CC_RUNS'] = config_prefix + '-runs.yml'
             config_settings = config_prefix + '-settings.yml'
             docido_config.update(Configuration.from_file(config_settings))
-            dcc_run.run([], environment=Environment())
+            for c in dcc_run.run([], environment=Environment()):
+                shutil.rmtree(c['crawl_path'])
 
     def test_crawler(self):
         """Start fake crawl"""
