@@ -4,7 +4,7 @@ topnav:
 - title: Topnav
   subcategories:
     - title: Github Repo
-      external_url: https://github.com/tomjohnson1492/documentation-theme-jekyll
+      external_url: https://github.com/cogniteev/docido-python-sdk
       audience: writers, designers
       platform: all
       product: all
@@ -20,26 +20,20 @@ topnav_dropdowns:
       product: all
       version: all
       items:
-        - title: About this theme
-          url: /doc_about.html
+        - title: About us
+          external_url: http://cogniteev.com
           audience: writers, designers
           platform: all
           product: all
           version: all
         - title: Support
-          url: /doc_support.html
+          url: /doc_support_contact.html
           audience: writers, designers
           platform: all
           product: all
           version: all
-        - title: Troubleshooting
-          external_url: ../somedirectory/doc_troubleshooting.html
-          audience: writers, designers
-          platform: all
-          product: all
-          version: all
-        - title: Jekyll Talk
-          external_url: https://talk.jekyllrb.com
+        - title: Docido forum
+          external_url: https://discuss.cogniteev.com/c/products/docido
           audience: writers, designers
           platform: all
           product: all
