@@ -180,4 +180,20 @@ You may only store object's identifier, not their content.
 
 #### Dispatch your API calls among different sub-tasks
 
-The `iter_crawl_tasks` method is only meant to enumerate what is to be done by the returned sub-tasks. You may not call the fetched API to retrieve document's content.
+The `iter_crawl_tasks` method is only meant to enumerate what is to be done by
+the returned sub-tasks. You may not call the fetched API to retrieve document's content.
+
+#### Do not unnecessarily delete objects from index
+
+When a crawler needs to perform incremental indexing a set of objects, one
+basic pattern is to first remove the set from index to then push the new set.
+But this is not the right way to proceed because, during a certain time, those
+objects are not indexed, so not searchable.
+
+Actually what you exactly need to do is:
+
+1. Push objects in source but not in index
+1. Update items already present in index. Actually, we often reindex those
+objects because it most cases, the index queries required to know whether the
+indexed objects are different from the source's are very costly.
+1. Remove from index objects that are not in the source anymore.
