@@ -53,7 +53,7 @@ def wait_or_raise(logger, retry_exc, attempt):
         wait_time = (target_ts - now_ts) / 1e3
         if wait_time < 0:
             raise Exception("'eta' is in the future"), None, sys.exc_info()[2]
-    logger.warn("Retry raised, waiting %s seconds {}".format(wait_time))
+    logger.warn("Retry raised, waiting {} seconds".format(wait_time))
     time.sleep(wait_time)
 
 
