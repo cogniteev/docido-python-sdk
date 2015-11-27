@@ -247,7 +247,7 @@ def configure_loggers(verbose):  # pragma: no cover
     if verbose == 1:
         logging_level = logging.INFO
     elif verbose > 1:
-        logging.level = logging.DEBUG
+        logging_level = logging.DEBUG
     logging.basicConfig(level=logging_level)
     # shut up a bunch of loggers
     for l in [
