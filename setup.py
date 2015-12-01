@@ -7,7 +7,6 @@ __version__ = None
 with open('docido_sdk/__init__.py') as istr:
     for l in filter(lambda l: l.startswith('__version__ ='), istr):
         exec(l)
-__version__ = '.'.join(map(str, __version__))
 
 setup(
     name='docido-sdk',
