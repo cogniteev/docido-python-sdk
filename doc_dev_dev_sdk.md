@@ -75,7 +75,19 @@ The crawler may provide in the same attachment any information regarding the pay
 
 ### Stream
 
-This mode allows you to delay download of the payload later to reduce memory contention of your process. The stream must be an instance of `docido_sdk.toolbox.http_ext.delayed_request`.
+This mode allows you to delay download of the payload later to reduce memory contention of your process. The stream must be an instance of `docido_sdk.toolbox.http_ext.delayed_request` and specified in the `stream` attribute. For instance:
+
+```python
+from docido_sdk.toolbox.http_ext import delayed_request
+
+{
+    'type': u'file',
+    'filename': u'the-filename.pdf',
+    'mime_type': u'application/pdf',
+    'stream': delayed_request('https://private/resource/url',
+                              params=dict(access_token='0123456789ABCDEF')),
+}
+```
 
 ## Tasks dispatch
 
