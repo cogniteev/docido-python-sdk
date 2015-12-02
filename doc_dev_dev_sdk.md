@@ -81,11 +81,16 @@ This mode allows you to delay download of the payload later to reduce memory con
 from docido_sdk.toolbox.http_ext import delayed_request
 
 {
+  "id": "1234",
+  "service": "lambda",
+  "attachments": [
+  {
     'type': u'file',
     'filename': u'the-filename.pdf',
     'mime_type': u'application/pdf',
     'stream': delayed_request('https://private/resource/url',
                               params=dict(access_token='0123456789ABCDEF')),
+  }
 }
 ```
 
