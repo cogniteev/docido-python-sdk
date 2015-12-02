@@ -21,9 +21,12 @@ how much code of your library is executed when the tests are executed.
 
 ### Build HTML report
 
-`tox -e stats` commands provides you a summary of code coverage in the console
-and generate an HTML report providing full details of the branches of
-non-executed code in the `./htmlcov` directory.
+`tox -e stats` commands writes a summary of code coverage to the console output
+and generate an HTML report in the `./htmlcov` directory providing full coverage details:
+
+* executed and not executed lines
+* lines excluded with the `# pragma: no cover` comment.
+* branches partially executed, for instance when the `else` statement of a condition is never executed).
 
 ![Coverage.py sample](images/Coverage.py-sample.png)
 
