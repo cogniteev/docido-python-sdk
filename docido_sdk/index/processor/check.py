@@ -57,7 +57,16 @@ class Check(IndexAPIProcessor):
                 raise IndexAPIErrorBuilder(c)\
                     .message(e)\
                     .exception(), None, traceback
+            self.check_identifier(c)
         return super(Check, self).push_cards(cards)
+
+    def check_identifier(self, card):
+        uri = card['id']
+        if '//' in uri:
+            msg = "'id' field cannot contain 2 consecutive '/' characters"
+            raise IndexAPIErrorBuilder(card)\
+                .message(msg)\
+                .exception(), None, sys.exc_info()[2]
 
     def _check_attachments(self, card):
         origin_ids = set()

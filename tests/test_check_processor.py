@@ -126,6 +126,12 @@ class TestCheckProcessor(unittest.TestCase):
         with self.index() as index:
             index.push_cards([card])
 
+    def test_push_invalid_identifier(self):
+        card = self.VALID_CARD.copy()
+        card['id'] = 'http://foo/bar'
+        with self.index() as index, self.assertRaises(IndexAPIError):
+            index.push_cards([card])
+
     def test_push_invalid_attachment(self):
         card = copy.deepcopy(self.VALID_CARD)
         card['attachments'].append({
