@@ -2,6 +2,7 @@
 from contextlib import closing
 import pickle
 import unittest
+import json
 
 from docido_sdk.toolbox.file_ext import (
     FileProperties,
@@ -13,6 +14,7 @@ from docido_sdk.toolbox.http_ext import delayed_request
 class TestStreamFromRequest(unittest.TestCase):
     def test_pickle(self):
         s = delayed_request('http://google.com')
+        json.dumps(repr(s))
         pickle.dumps(s)
 
     def test_fetch_google(self):
