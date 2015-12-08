@@ -1,7 +1,7 @@
 from contextlib import closing
 try:
     from cStringIO import StringIO
-except ImportError:
+except ImportError:  # flake8: noqa
     from StringIO import StringIO
 
 
@@ -34,7 +34,7 @@ class iterator_to_file(object):
     def _read_n(self, size):
         while len(self._buf) < size:
             try:
-                data = next(self._it)
+                data = self.next()
             except StopIteration:
                 if len(self._buf) == 0:
                     return ''
@@ -55,4 +55,4 @@ class iterator_to_file(object):
         return res
 
     def next(self):
-        return self._it()
+        return self._it.next()

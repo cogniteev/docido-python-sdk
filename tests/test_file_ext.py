@@ -1,3 +1,5 @@
+
+from contextlib import closing
 import pickle
 import unittest
 
@@ -23,6 +25,14 @@ class TestStreamFromRequest(unittest.TestCase):
             istr = iterator_to_file(iter(istr))
             all_content_at_once = istr.read()
         self.assertTrue(all_content_at_once.endswith('</body></html>'))
+
+    def test_iterate(self):
+        content = ['foo', 'bar']
+        result = []
+        with closing(iterator_to_file(iter(content))) as istr:
+            for word in istr:
+                result.append(word)
+        self.assertEqual(content, result)
 
 
 if __name__ == '__main__':
