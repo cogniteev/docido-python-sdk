@@ -3,6 +3,8 @@ from contextlib import closing
 import pickle
 import unittest
 import json
+import mock
+import __builtin__
 
 from docido_sdk.toolbox.file_ext import (
     FileProperties,
@@ -21,13 +23,13 @@ class TestStreamFromRequest(unittest.TestCase):
     def test_json(self):
         s = delayed_request('http://google.com', param=dict(test='test'))
         self.assertEqual(
-            json.dumps('Test'),
-            json.dumps('Test', cls=CustomJSONEncoder)
-        )
-        self.assertEqual(
             '"{\\"param\\": {\\"test\\": \\"test\\"}}"',
             json.dumps(s, cls=CustomJSONEncoder)
         )
+        with mock.patch.object(__builtin__, 'repr',
+                               return_value=None) as test:
+            CustomJSONEncoder().default('Test')
+        test.assert_called_once_with('Test')
 
     def test_fetch_google(self):
         with delayed_request('http://google.com').open() as istr:
