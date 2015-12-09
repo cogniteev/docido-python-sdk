@@ -34,7 +34,8 @@ class IndexAPIErrorBuilder(object):
         return self
 
     def exception(self):
-        return IndexAPIError("in card {}: {}".format(
+        return IndexAPIError("in '{}' card {}: {}".format(
+            self.card.get('kind'),
             self.card['id'],
             self._message)
         )
