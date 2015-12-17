@@ -74,7 +74,6 @@ class TestLocalKV(unittest.TestCase):
     def test_kv(self):
         with self.kv() as kv:
             key = 'key'
-            self.assertIsNone(kv.get_kv(key))
             kv.set_kv(key, 'value1')
             self.assertEqual(kv.get_kv(key), 'value1')
             kv.delete_kv(key)
