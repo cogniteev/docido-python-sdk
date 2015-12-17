@@ -50,7 +50,7 @@ class LocalKVProcessor(IndexAPIProcessor):
                     self.__store = json.load(istr)
 
     @reraise
-    def get_key(self, key):
+    def get_kv(self, key):
         assert isinstance(key, six.string_types)
         with self.__lock.read():
             return self.__store.get(key)
@@ -61,7 +61,7 @@ class LocalKVProcessor(IndexAPIProcessor):
             return copy.copy(self.__store)
 
     @reraise
-    def set_key(self, key, value):
+    def set_kv(self, key, value):
         assert isinstance(key, six.string_types)
         assert isinstance(value, six.string_types)
         with self.__lock.write():
@@ -69,14 +69,14 @@ class LocalKVProcessor(IndexAPIProcessor):
             self.__persist()
 
     @reraise
-    def delete_key(self, key):
+    def delete_kv(self, key):
         assert isinstance(key, six.string_types)
         with self.__lock.write():
             self.__store.pop(key, None)
             self.__persist()
 
     @reraise
-    def delete_keys(self):
+    def delete_kvs(self):
         with self.__lock.write():
             self.__store.clear()
             self.__persist()

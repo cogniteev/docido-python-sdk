@@ -74,33 +74,34 @@ class TestLocalKV(unittest.TestCase):
     def test_kv(self):
         with self.kv() as kv:
             key = 'key'
-            self.assertIsNone(kv.get_key(key))
-            kv.set_key(key, 'value1')
-            self.assertEqual(kv.get_key(key), 'value1')
-            kv.delete_key(key)
-            self.assertIsNone(kv.get_key(key))
+            self.assertIsNone(kv.get_kv(key))
+            kv.set_kv(key, 'value1')
+            self.assertEqual(kv.get_kv(key), 'value1')
+            kv.delete_kv(key)
+            self.assertIsNone(kv.get_kv(key))
             kvs = dict([('key' + str(i), 'value' + str(i))
                        for i in range(1, 4)])
             for k, v in kvs.iteritems():
-                kv.set_key(k, v)
+                kv.set_kv(k, v)
             inserted_kvs = dict(kv.get_kvs())
             self.assertEqual(kvs, inserted_kvs)
-            kv.delete_keys()
+            kv.delete_kvs()
             self.assertEqual({}, kv.get_kvs())
 
     def test_key_is_None(self):
         with self.kv() as kv:
             with self.assertRaises(IndexAPIError):
-                kv.get_key(None)
+                kv.get_kv(None)
             with self.assertRaises(IndexAPIError):
-                kv.set_key(None, 'value1')
+                kv.set_kv(None, 'value1')
             with self.assertRaises(IndexAPIError):
-                kv.delete_key(None)
+                kv.delete_kv(None)
 
     def test_value_is_None(self):
         with self.kv() as kv:
             with self.assertRaises(IndexAPIError):
-                kv.set_key('key', None)
+                kv.set_kv('key', None)
+
 
 if __name__ == '__main__':
     unittest.main()
