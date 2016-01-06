@@ -18,9 +18,7 @@ class YamlPullCrawlersIndexingConfig(Component):
 
     def service(self, service):
         crawlers_config = docido_config.pull_crawlers.crawlers
-        if service not in crawlers_config:
-            raise Exception("Cannot find config for crawler " + service)
-        return crawlers_config[service].get('indexing', {})
+        return crawlers_config.get(service, {}).get('indexing', {})
 
     def core(self):
         return docido_config.pull_crawlers.indexing
