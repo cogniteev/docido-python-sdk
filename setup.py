@@ -40,8 +40,7 @@ setup(
         'pytz>=2015.6',
         'setuptools>=0.6',
         'six>=1.10.0',
-        'voluptuous>=0.8.7',
-        'yamlious>=0.1.3',
+        'yamlious>=0.2',
     ],
     entry_points="""
         [console_scripts]
