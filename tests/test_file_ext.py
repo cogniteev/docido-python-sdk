@@ -3,7 +3,10 @@ from contextlib import closing
 import pickle
 import unittest
 
-from docido_sdk.toolbox.file_ext import iterator_to_file
+from docido_sdk.toolbox.file_ext import (
+    FileProperties,
+    iterator_to_file,
+)
 from docido_sdk.toolbox.http_ext import delayed_request
 
 
@@ -33,6 +36,21 @@ class TestStreamFromRequest(unittest.TestCase):
             for word in istr:
                 result.append(word)
         self.assertEqual(content, result)
+
+
+class TestFileProperties(unittest.TestCase):
+    def test_file_type(self):
+        self.assertEquals(FileProperties.file_type('foo.png'), 'image')
+        self.assertEquals(FileProperties.file_type(None), 'other')
+        self.assertEquals(FileProperties.file_type('foo.unknown'), 'other')
+        self.assertEquals(
+            FileProperties.file_type('foo.unknown', 'image/jpeg'),
+            'image'
+        )
+
+    def test_mime_type(self):
+        self.assertEquals(FileProperties.mime_type('foo.png'), 'image/png')
+        self.assertEquals(FileProperties.mime_type('foo.unknown'), None)
 
 
 if __name__ == '__main__':
