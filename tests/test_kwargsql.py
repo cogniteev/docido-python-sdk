@@ -93,6 +93,7 @@ class TestKwargSQL(unittest.TestCase):
         class DumbSequence(Sequence):
             def __len__(self):
                 return 2
+
             def __getitem__(self, key):
                 return key + 1
         self.assertEqual(kwargsql.get(DumbSequence(), '1'), 2)
