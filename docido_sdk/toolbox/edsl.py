@@ -2,6 +2,7 @@
 """
 Provides Python Embedded Domain Specific Languages.
 """
+from collections import Mapping, Sequence
 import operator
 
 
@@ -192,9 +193,9 @@ class kwargsql(object):
 
     @classmethod
     def _get_obj_attr(cls, obj, field):
-        if isinstance(obj, dict):
+        if isinstance(obj, (dict, Mapping)):
             return obj.get(field)
-        elif isinstance(obj, list):
+        elif isinstance(obj, (list, Sequence)):
             return obj[int(field)]
         else:
             return getattr(obj, field, None)
