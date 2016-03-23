@@ -19,8 +19,40 @@ class TestKwargSQL(unittest.TestCase):
             'another_key': 42,
         },
         'array': [4, 5, 6],
-        'exc': Exception("Error: a comprensive message")
+        'exc': Exception("Error: a comprehensive message"),
+        'nestedl': [
+            dict(foo=1),
+            dict(foo=2, bar=3),
+        ],
     }
+
+    def test_sequence_get(self):
+        self.assertEquals(list(kwargsql.get(self.d, 'nestedl__any__foo')),
+                          [1, 2])
+        # nested elements that produce an error are discarded from the result.
+        self.assertEquals(list(kwargsql.get(self.d, 'nestedl__any__bar')),
+                          [3])
+        self.assertEquals(list(kwargsql.get(self.d, 'nestedl__any__unknown')),
+                          [])
+        # It makes not difference to call `any` or `each` is `kwargsql.get`
+        # because it matters when there is an operation to perform on the
+        # result data.
+        self.assertEquals(list(kwargsql.get(self.d, 'nestedl__each__foo')),
+                          [1, 2])
+        self.assertEquals(list(kwargsql.get(self.d, 'nestedl__each__bar')),
+                          [3])
+        self.assertEquals(list(kwargsql.get(self.d, 'nestedl__any__unknown')),
+                          [])
+
+    def test_sequence_logical(self):
+        # at least one element of `nestedl` has the `foo` attribute
+        self.assertTrue(and_(self.d, nestedl__any__contains='foo'))
+        # at least one element of `nestedl` has the `bar` attribute
+        self.assertTrue(and_(self.d, nestedl__any__contains='bar'))
+        # all elements of `nestedl` have the 'foo' attribute
+        self.assertTrue(and_(self.d, nestedl__each__contains='foo'))
+        # not all elements of `nestedl` have the 'bar' attribute
+        self.assertFalse(and_(self.d, nestedl__each__contains='bar'))
 
     def test_operations(self):
         self.assertFalse(kwargsql.OPERATIONS['ne']('a', u'a'))

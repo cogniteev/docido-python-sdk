@@ -5,6 +5,24 @@ Provides Python Embedded Domain Specific Languages.
 from collections import Mapping, Sequence
 import operator
 
+__all__ = ['kwargsql']
+
+
+class AnySequenceResult(Sequence):
+    """Custom list used internally to distinguish
+    a list of user-data from a user-data-list with the `isinstance`
+    builtin.
+    """
+    def __init__(self, data, join_operation):
+        self.__data = data
+        self.join_operation = join_operation
+
+    def __len__(self):
+        return len(self.__data)
+
+    def __getitem__(self, key):
+        return self.__data[key]
+
 
 class kwargsql(object):
     """Query your Python objects with a `kwargs` syntax.
@@ -68,8 +86,16 @@ class kwargsql(object):
     endswith – string field ends with value
     iendswith – string field ends with value (case insensitive)
 
-    isinstance - same as isinstance(field, value)
-    issubclass - same as issubclass(field, value)
+    isinstance – same as isinstance(field, value)
+    issubclass – same as issubclass(field, value)
+
+    any – applies the remaining kwargsql expression to every elements
+          of a sequence. The result is `True` if the operation is `True`
+          for at least one element.
+
+    each – applies the remaining kwargsql expression to every elements
+           of a sequence. The result is `True` if the operation is `True`
+           for every element of the sequence.
     """
     OPERATIONS = {
         'ne': operator.ne,
@@ -91,6 +117,11 @@ class kwargsql(object):
         'isinstance': isinstance,
         'issubclass': issubclass,
     }
+
+    SEQUENCE_OPERATIONS = dict(
+        any=operator.or_,
+        each=operator.and_,
+    )
 
     @classmethod
     def and_(cls, obj, **kwargs):
@@ -175,10 +206,29 @@ class kwargsql(object):
 
     @classmethod
     def __resolve_path(cls, obj, path):
+        """Follow a kwargsql expression starting from a given object
+        and return the deduced object.
+
+        :param obj: the object to start from
+        :param list path: list of operations to perform. It does not contain
+                          the optional operation of a traditional kwargsql
+                          expression.
+        :return: the found object if any, `None` otherwise.
+
+        For instance:
+        >>> __resolve_path(dict(foo=dict(bar=42)), ['foo', 'bar'])
+        >>> 42
+
+        """
         path = filter(lambda s: s, path)
         if any(path):
-            for attr in path:
-                obj = cls._get_obj_attr(obj, attr)
+            pathes = len(path)
+            i = 0
+            while i < pathes:
+                # _get_obj_attr can supersede `i` because it might
+                # evaluate the entire expression by itself.
+                obj, i = cls._get_obj_attr(obj, path, i)
+                i += 1
         else:
             raise Exception("Nothing to do")
         return obj
@@ -192,13 +242,53 @@ class kwargsql(object):
         )
 
     @classmethod
-    def _get_obj_attr(cls, obj, field):
+    def _get_obj_attr(cls, obj, path, pos):
+        """Resolve one kwargsql expression for a given object and returns
+        its result.
+
+        :param obj: the object to evaluate
+        :param path: the list of all kwargsql expression, including those
+                     previously evaluated.
+        :param int pos: provides index of the expression to evaluate in the
+                        `path` parameter.
+        """
+        field = path[pos]
         if isinstance(obj, (dict, Mapping)):
-            return obj.get(field)
+            return obj[field], pos
         elif isinstance(obj, (list, Sequence)):
-            return obj[int(field)]
+            join_operation = cls.SEQUENCE_OPERATIONS.get(field)
+            if join_operation is not None:
+                return (
+                    AnySequenceResult(
+                        cls._sequence_map(obj, path[pos + 1:]),
+                        join_operation
+                    ),
+                    len(path) + 1,
+                )
+            else:
+                return obj[int(field)], pos
         else:
-            return getattr(obj, field, None)
+            return getattr(obj, field, None), pos
+
+    @classmethod
+    def _sequence_map(cls, seq, path):
+        """Apply a kwargsql expression to every item of a sequence,
+        and returns it.
+
+        :param seq: the list to transform
+        :param path: kwargsql expression to apply to every elements of
+                     the given sequence.
+        """
+        if not any(path):
+            # There is no further kwargsql expression
+            return seq
+        result = []
+        for item in seq:
+            try:
+                result.append(cls.__resolve_path(item, path))
+            except (KeyError, IndexError):
+                pass
+        return result
 
     @classmethod
     def _not(cls, op):
@@ -218,4 +308,13 @@ class kwargsql(object):
         if tokens[0] == 'not':
             op = cls._not(op)
             tokens = tokens[1:]
-        return op(cls.__resolve_path(obj, reversed(tokens)), value)
+        try:
+            computed = cls.__resolve_path(obj, reversed(tokens))
+        except (KeyError, IndexError):
+            computed = None
+        if isinstance(computed, AnySequenceResult):
+            return reduce(computed.join_operation, [
+                op(item, value) for item in computed
+            ])
+        else:
+            return op(computed, value)
