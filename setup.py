@@ -34,10 +34,10 @@ setup(
     zip_safe=True,
     install_requires=[
         'elasticsearch==1.6.0',
-        'Flask-OAuthlib>=0.8.0',
         'ProxyTypes==0.9',
         'python-dateutil>=2.4.2',
         'pytz>=2015.6',
+        'requests>=2.8.1',
         'setuptools>=0.6',
         'six>=1.10.0',
         'yamlious>=0.2.1',
