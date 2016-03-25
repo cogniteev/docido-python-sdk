@@ -53,6 +53,10 @@ class TestKwargSQL(unittest.TestCase):
         self.assertTrue(and_(self.d, nestedl__each__contains='foo'))
         # not all elements of `nestedl` have the 'bar' attribute
         self.assertFalse(and_(self.d, nestedl__each__contains='bar'))
+        # can run operation (here equality) on an empty sequence
+        self.assertFalse(and_(self.d, nestedl__each__unknown='bar'))
+        # can run operation (here equality) on an empty sequence
+        self.assertFalse(or_(self.d, nestedl__each__unknown='bar'))
 
     def test_operations(self):
         self.assertFalse(kwargsql.OPERATIONS['ne']('a', u'a'))

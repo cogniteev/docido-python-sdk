@@ -313,8 +313,12 @@ class kwargsql(object):
         except (KeyError, IndexError):
             computed = None
         if isinstance(computed, AnySequenceResult):
-            return reduce(computed.join_operation, [
-                op(item, value) for item in computed
-            ])
+            data = [op(item, value) for item in computed]
+            if len(data):
+                return reduce(
+                    computed.join_operation,
+                    data,
+                )
+            return False
         else:
             return op(computed, value)
