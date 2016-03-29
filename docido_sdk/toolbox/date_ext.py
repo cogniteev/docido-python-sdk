@@ -26,13 +26,21 @@ class timestamp_ms(object):
         elif isinstance(obj, datetime):
             return cls.from_datetime(obj)
         else:
-            raise ValueError("Don't know how to get timestamp")
+            raise ValueError(
+                u"Don't know how to get timestamp from '{}'".format(obj)
+            )
 
     @classmethod
     def from_str(cls, timestr):
         """Use `dateutil` module to parse the give string
         """
-        return cls.from_datetime(parser.parse(timestr))
+        try:
+            date = parser.parse(timestr)
+        except ValueError:
+            msg = u"Unknown string format: {!r}".format(timestr)
+            raise ValueError(msg)
+        else:
+            return cls.from_datetime(date)
 
     @classmethod
     def from_ymd(cls, year, month=1, day=1):

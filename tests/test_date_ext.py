@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 import datetime
 import unittest
 
@@ -144,6 +146,30 @@ class TestDateExt(unittest.TestCase):
     def test_ensure_is_number(self):
         now = timestamp_ms.now()
         self.assertTrue(isinstance(now, int))
+
+    def test_invalid_format(self):
+        with self.assertRaises(ValueError) as exc:
+            timestamp_ms.from_str('1nv4l1d f0rm47')
+        self.assertEqual(
+            exc.exception.message,
+            "Unknown string format: '1nv4l1d f0rm47'"
+        )
+
+    def test_invalid_unicode_format(self):
+        with self.assertRaises(ValueError) as exc:
+            timestamp_ms.from_str(u'1nv4£1Ð ƒ0rm47')
+        self.assertEqual(
+            exc.exception.message,
+            u"Unknown string format: {!r}".format(u'1nv4£1Ð ƒ0rm47')
+        )
+
+        with self.assertRaises(ValueError) as exc:
+            timestamp_ms.from_str('1nv4£1Ð ƒ0rm47')
+        self.assertEqual(
+            exc.exception.message,
+            u"Unknown string format: "
+            u"'1nv4\\xc2\\xa31\\xc3\\x90 \\xc6\\x920rm47'"
+        )
 
     def _test_format(self, format, format_tz):
         self.assertEqual(timestamp_ms.from_str(format),
