@@ -93,6 +93,16 @@ class TestDateExt(unittest.TestCase):
         with self.assertRaises(ValueError):
             timestamp_ms.feeling_lucky(KIOTO_IMAP_HEADER_SPURIOUS2_TZ)
 
+    def test_australian_dates(self):
+        self.assertEqual(
+            timestamp_ms.from_imap_header(TRACY_CYCLONE),
+            TRACY_CYCLONE_TZ
+        )
+        self.assertEqual(
+            timestamp_ms.from_imap_header(TRACY_CYCLONE_INVALID_DAY),
+            TRACY_CYCLONE_TZ
+        )
+
     def test_bengali_timezone(self):
         self.assertEqual(
             timestamp_ms.feeling_lucky(NEW_YEAR_BENGALI),

@@ -29,6 +29,7 @@ class timestamp_ms(object):
     """Build UTC timestamp in milliseconds
     """
 
+    START_WITH_DAY_OF_WEEK = re.compile('^([a-zA-Z]*)[\s,](.*)')
     @classmethod
     def feeling_lucky(cls, obj):
         """Tries to convert given object to an UTC timestamp is ms, based
