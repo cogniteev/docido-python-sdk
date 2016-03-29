@@ -34,6 +34,7 @@ setup(
     zip_safe=True,
     install_requires=[
         'elasticsearch==1.6.0',
+        'numpy==1.11.0',
         'ProxyTypes==0.9',
         'python-dateutil>=2.4.2',
         'pytz>=2015.6',
