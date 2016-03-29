@@ -186,11 +186,11 @@ class TestDateExt(unittest.TestCase):
         )
 
         with self.assertRaises(ValueError) as exc:
-            timestamp_ms.from_str('1nv4£1Ð ƒ0rm47')
+            timestamp_ms.from_str('invalid ƒ0rm47')
         self.assertEqual(
             exc.exception.message,
             u"Unknown string format: "
-            u"'1nv4\\xc2\\xa31\\xc3\\x90 \\xc6\\x920rm47'"
+            u"'invalid \\xc6\\x920rm47'"
         )
 
     def _test_format(self, format, format_tz):

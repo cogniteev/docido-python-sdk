@@ -73,6 +73,7 @@ class timestamp_ms(object):
         :param bool shaked: whether the input parameter been already
         cleaned or not.
         """
+        orig = timestr
         try:
             date = parser.parse(timestr)
         except ValueError:
@@ -86,8 +87,12 @@ class timestamp_ms(object):
                         timestr = new_timestr
                         shaked = True
                 if shaked:
-                    return cls.from_str(timestr, shaked=True)
-            msg = u"Unknown string format: {!r}".format(timestr)
+                    try:
+                        return cls.from_str(timestr, shaked=True)
+                    except ValueError:
+                        # raise ValueError below with proper message
+                        pass
+            msg = u"Unknown string format: {!r}".format(orig)
             raise ValueError(msg), None, sys.exc_info()[2]
         else:
             return cls.from_datetime(date)
