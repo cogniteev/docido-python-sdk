@@ -7,8 +7,22 @@ from dateutil import parser
 import pytz
 import six
 
+from . text import levenshtein
+
 UTC_EPOCH = datetime(1970, 1, 1).replace(tzinfo=pytz.utc)
 MAX_POSIX_TIMESTAMP = pow(2, 32) - 1
+
+DAYS = {
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday'
+}
+
+DAYS_ABBR = [day[:3] for day in DAYS]
 
 
 class timestamp_ms(object):
@@ -32,12 +46,47 @@ class timestamp_ms(object):
             )
 
     @classmethod
-    def from_str(cls, timestr):
+    def check_mispelled_day(cls, timestr):
+        day_extraction = cls.START_WITH_DAY_OF_WEEK.match(timestr)
+        if day_extraction is not None:
+            day = day_extraction.group(1).lower()
+            if len(day) == 3:
+                dataset = DAYS_ABBR
+            else:
+                dataset = DAYS
+            if day not in dataset:
+                days = list(dataset)
+                days.sort(key=lambda e: levenshtein(day, e))
+                return days[0] + day_extraction.group(2)
+
+    @classmethod
+    def remove_parenthesis_around_tz(cls, timestr):
+        """get rid of parenthesis around timezone: (GMT) => GMT"""
+        parenthesis = cls.TIMEZONE_PARENTHESIS.match(timestr)
+        if parenthesis is not None:
+            return parenthesis.group(1) + parenthesis.group(2)
+
+    def from_str(cls, timestr, shaked=False):
         """Use `dateutil` module to parse the give string
+
+        :param basestring timestr: string representing a date to parse
+        :param bool shaked: whether the input parameter been already
+        cleaned or not.
         """
         try:
             date = parser.parse(timestr)
         except ValueError:
+            if not shaked:
+                shaked = False
+                for checker in [
+                        cls.check_mispelled_day,
+                        cls.remove_parenthesis_around_tz]:
+                    new_timestr = checker(timestr)
+                    if new_timestr is not None:
+                        timestr = new_timestr
+                        shaked = True
+                if shaked:
+                    return cls.from_str(timestr, shaked=True)
             msg = u"Unknown string format: {!r}".format(timestr)
             raise ValueError(msg), None, sys.exc_info()[2]
         else:

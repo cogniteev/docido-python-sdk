@@ -18,6 +18,14 @@ KIOTO_IMAP_HEADER = 'Thu, 11 Dec 1997 17:33:47 -0000'
 KIOTO_IMAP_HEADER_FIXED_TZ = 'Thu, 11 Dec 1997 17:33:47 -00:00'
 KIOTO_IMAP_HEADER_SPURIOUS_TZ = 'Thu, 11 Dec 1997 17:33:47 -42:00'
 KIOTO_IMAP_HEADER_SPURIOUS2_TZ = 'Thu, 11 Dec 1997 17:33:47 -42:FF'
+TRACY_CYCLONE = 'Wed, 25 Dec 1974 09:52 +1100'
+TRACY_CYCLONE_INVALID_DAY = 'Wen, 25 Dec 1974 09:52 +1100'
+TRACY_CYCLONE_TZ = 157157520000
+
+NEW_YEAR_BENGALI = 'Sun, 15 Apr 2015 09:00:00 +05:30'
+NEW_YEAR_BENGALI_DASH = 'Sun, 15 Apr 2015 09:00:00 +05-30'
+NEW_YEAR_BENGALI_DOT = 'Sun, 15 Apr 2015 09:00:00 +05.30'
+NEW_YEAR_BENGALI_TS = 1429068600000
 
 KIOTO_SOUNDCLOUD_FORMATS = [
     "1997/12/11 17:33:47 +0000",
@@ -83,7 +91,21 @@ class TestDateExt(unittest.TestCase):
         )
         # tz is such a mess it is not removed, so dateutil raises
         with self.assertRaises(ValueError):
-            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_SPURIOUS2_TZ)
+            timestamp_ms.feeling_lucky(KIOTO_IMAP_HEADER_SPURIOUS2_TZ)
+
+    def test_bengali_timezone(self):
+        self.assertEqual(
+            timestamp_ms.feeling_lucky(NEW_YEAR_BENGALI),
+            NEW_YEAR_BENGALI_TS
+        )
+        self.assertEqual(
+            timestamp_ms.feeling_lucky(NEW_YEAR_BENGALI_DASH),
+            NEW_YEAR_BENGALI_TS
+        )
+        self.assertEqual(
+            timestamp_ms.feeling_lucky(NEW_YEAR_BENGALI_DOT),
+            NEW_YEAR_BENGALI_TS
+        )
 
     def test_posix_timestamp(self):
         """instagram / evernote / linkedin POSIX timestamps"""
