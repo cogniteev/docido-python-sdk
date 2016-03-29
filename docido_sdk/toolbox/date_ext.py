@@ -1,6 +1,7 @@
 
 from datetime import datetime
 import re
+import sys
 
 from dateutil import parser
 import pytz
@@ -38,7 +39,7 @@ class timestamp_ms(object):
             date = parser.parse(timestr)
         except ValueError:
             msg = u"Unknown string format: {!r}".format(timestr)
-            raise ValueError(msg)
+            raise ValueError(msg), None, sys.exc_info()[2]
         else:
             return cls.from_datetime(date)
 
