@@ -18,6 +18,10 @@ KIOTO_IMAP_HEADER = 'Thu, 11 Dec 1997 17:33:47 -0000'
 KIOTO_IMAP_HEADER_FIXED_TZ = 'Thu, 11 Dec 1997 17:33:47 -00:00'
 KIOTO_IMAP_HEADER_SPURIOUS_TZ = 'Thu, 11 Dec 1997 17:33:47 -42:00'
 KIOTO_IMAP_HEADER_SPURIOUS2_TZ = 'Thu, 11 Dec 1997 17:33:47 -42:FF'
+KIOTO_IMAP_HEADER_GMT = 'Thu, 11 Dec 1997 17:33:47 (GMT)'
+KIOTO_IMAP_HEADER_QUOTED_GMT = 'Thu, 11 Dec 1997 17:33:47 "GMT"'
+KIOTO_IMAP_HEADER_QUOTED_0000 = 'Thu, 11 Dec 1997 17:33:47 "-00:00"'
+
 TRACY_CYCLONE = 'Wed, 25 Dec 1974 09:52 +1100'
 TRACY_CYCLONE_INVALID_DAY = 'Wen, 25 Dec 1974 09:52 +1100'
 TRACY_CYCLONE_TZ = 157157520000
@@ -87,6 +91,18 @@ class TestDateExt(unittest.TestCase):
         # timezone information will be deleted
         self.assertEqual(
             timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_SPURIOUS_TZ),
+            KIOTO_TIMESTAMP_MS
+        )
+        self.assertEqual(
+            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_GMT),
+            KIOTO_TIMESTAMP_MS
+        )
+        self.assertEqual(
+            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_QUOTED_GMT),
+            KIOTO_TIMESTAMP_MS
+        )
+        self.assertEqual(
+            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_QUOTED_0000),
             KIOTO_TIMESTAMP_MS
         )
         # tz is such a mess it is not removed, so dateutil raises

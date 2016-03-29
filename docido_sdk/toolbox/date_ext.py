@@ -29,7 +29,11 @@ class timestamp_ms(object):
     """Build UTC timestamp in milliseconds
     """
 
+    TIMEZONE_PARENTHESIS = re.compile('(.*)\(([a-zA-Z]+)\)$')
+    TIMEZONE_SEPARATOR = re.compile('(.*)(\d\d)[.-](\d\d)$')
+    QUOTED_TIMEZONE = re.compile("""(.*)['"]([\w:+-]+)['"]?$""")
     START_WITH_DAY_OF_WEEK = re.compile('^([a-zA-Z]*)[\s,](.*)')
+
     @classmethod
     def feeling_lucky(cls, obj):
         """Tries to convert given object to an UTC timestamp is ms, based
@@ -67,6 +71,20 @@ class timestamp_ms(object):
         if parenthesis is not None:
             return parenthesis.group(1) + parenthesis.group(2)
 
+    @classmethod
+    def remove_quotes_around_tz(cls, timestr):
+        quoted = cls.QUOTED_TIMEZONE.match(timestr)
+        if quoted is not None:
+            return quoted.group(1) + quoted.group(2)
+
+    @classmethod
+    def fix_timezone_separator(cls, timestr):
+        tz_sep = cls.TIMEZONE_SEPARATOR.match(timestr)
+        if tz_sep is not None:
+            return tz_sep.group(1) + tz_sep.group(2) + ':' + tz_sep.group(3)
+        return timestr
+
+    @classmethod
     def from_str(cls, timestr, shaked=False):
         """Use `dateutil` module to parse the give string
 
@@ -75,6 +93,8 @@ class timestamp_ms(object):
         cleaned or not.
         """
         orig = timestr
+        if not shaked:
+            timestr = cls.fix_timezone_separator(timestr)
         try:
             date = parser.parse(timestr)
         except ValueError:
@@ -82,7 +102,8 @@ class timestamp_ms(object):
                 shaked = False
                 for checker in [
                         cls.check_mispelled_day,
-                        cls.remove_parenthesis_around_tz]:
+                        cls.remove_parenthesis_around_tz,
+                        cls.remove_quotes_around_tz]:
                     new_timestr = checker(timestr)
                     if new_timestr is not None:
                         timestr = new_timestr
