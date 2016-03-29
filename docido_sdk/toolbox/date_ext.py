@@ -78,6 +78,15 @@ class timestamp_ms(object):
             return quoted.group(1) + quoted.group(2)
 
     @classmethod
+    def remove_timezone(cls, timestr):
+        if re.match(r".*[\-+]?\d{2}:\d{2}$", timestr):
+            return re.sub(
+                r"(.*)(\s[\+-]?\d\d:\d\d)$",
+                r"\1",
+                timestr
+            )
+
+    @classmethod
     def fix_timezone_separator(cls, timestr):
         tz_sep = cls.TIMEZONE_SEPARATOR.match(timestr)
         if tz_sep is not None:
@@ -117,7 +126,14 @@ class timestamp_ms(object):
             msg = u"Unknown string format: {!r}".format(orig)
             raise ValueError(msg), None, sys.exc_info()[2]
         else:
-            return cls.from_datetime(date)
+            try:
+                return cls.from_datetime(date)
+            except ValueError:
+                new_str = cls.remove_timezone(orig)
+                if new_str is not None:
+                    return cls.from_str(new_str)
+                else:
+                    raise
 
     @classmethod
     def from_ymd(cls, year, month=1, day=1):
@@ -136,28 +152,6 @@ class timestamp_ms(object):
         seconds = (date - UTC_EPOCH).total_seconds() * 1e3
         micro_seconds = date.microsecond / 1e3
         return int(seconds + micro_seconds)
-
-    @classmethod
-    def from_imap_header(cls, date_header_value):
-        if re.match(r".*\d{4}.*\d{4}", date_header_value):
-            # replace '-0000' timezone information to '-00:00'
-            value = re.sub(
-                r"(.*)(\s+[\+-]?\d\d)(\d\d).*$",
-                r"\1 \2:\3",
-                date_header_value
-            )
-        else:
-            value = date_header_value
-        try:
-            return cls.from_str(value)
-        except ValueError:
-            if re.match(r".*[\-+]?\d{2}:\d{2}$", value):
-                value = re.sub(
-                    r"(.*)(\s[\+-]?\d\d:\d\d)$",
-                    r"\1",
-                    value
-                )
-            return cls.from_str(value)
 
     @classmethod
     def now(cls):

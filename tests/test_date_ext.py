@@ -80,42 +80,30 @@ class TestDateExt(unittest.TestCase):
         )
 
     def test_gmail(self):
-        self.assertEqual(
-            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER),
-            KIOTO_TIMESTAMP_MS
-        )
-        self.assertEqual(
-            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_FIXED_TZ),
-            KIOTO_TIMESTAMP_MS
-        )
+        self.assertEqual(timestamp_ms.from_str(KIOTO_IMAP_HEADER),
+                         KIOTO_TIMESTAMP_MS)
+        self.assertEqual(timestamp_ms.from_str(KIOTO_IMAP_HEADER_FIXED_TZ),
+                         KIOTO_TIMESTAMP_MS)
         # timezone information will be deleted
-        self.assertEqual(
-            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_SPURIOUS_TZ),
-            KIOTO_TIMESTAMP_MS
-        )
-        self.assertEqual(
-            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_GMT),
-            KIOTO_TIMESTAMP_MS
-        )
-        self.assertEqual(
-            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_QUOTED_GMT),
-            KIOTO_TIMESTAMP_MS
-        )
-        self.assertEqual(
-            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_QUOTED_0000),
-            KIOTO_TIMESTAMP_MS
-        )
+        self.assertEqual(timestamp_ms.from_str(KIOTO_IMAP_HEADER_SPURIOUS_TZ),
+                         KIOTO_TIMESTAMP_MS)
+        self.assertEqual(timestamp_ms.from_str(KIOTO_IMAP_HEADER_GMT),
+                         KIOTO_TIMESTAMP_MS)
+        self.assertEqual(timestamp_ms.from_str(KIOTO_IMAP_HEADER_QUOTED_GMT),
+                         KIOTO_TIMESTAMP_MS)
+        self.assertEqual(timestamp_ms.from_str(KIOTO_IMAP_HEADER_QUOTED_0000),
+                         KIOTO_TIMESTAMP_MS)
         # tz is such a mess it is not removed, so dateutil raises
         with self.assertRaises(ValueError):
             timestamp_ms.feeling_lucky(KIOTO_IMAP_HEADER_SPURIOUS2_TZ)
 
     def test_australian_dates(self):
         self.assertEqual(
-            timestamp_ms.from_imap_header(TRACY_CYCLONE),
+            timestamp_ms.from_str(TRACY_CYCLONE),
             TRACY_CYCLONE_TZ
         )
         self.assertEqual(
-            timestamp_ms.from_imap_header(TRACY_CYCLONE_INVALID_DAY),
+            timestamp_ms.from_str(TRACY_CYCLONE_INVALID_DAY),
             TRACY_CYCLONE_TZ
         )
 
