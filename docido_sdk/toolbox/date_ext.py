@@ -52,6 +52,10 @@ class timestamp_ms(object):
 
     @classmethod
     def fix_mispelled_day(cls, timestr):
+        """fix mispelled day when written in english
+
+        :return: `None` if the day was not modified, the new date otherwise
+        """
         day_extraction = cls.START_WITH_DAY_OF_WEEK.match(timestr)
         if day_extraction is not None:
             day = day_extraction.group(1).lower()
@@ -66,19 +70,29 @@ class timestamp_ms(object):
 
     @classmethod
     def remove_parenthesis_around_tz(cls, timestr):
-        """get rid of parenthesis around timezone: (GMT) => GMT"""
+        """get rid of parenthesis around timezone: (GMT) => GMT
+
+        :return: the new string if parenthesis were found, `None` otherwise
+        """
         parenthesis = cls.TIMEZONE_PARENTHESIS.match(timestr)
         if parenthesis is not None:
             return parenthesis.group(1) + parenthesis.group(2)
 
     @classmethod
     def remove_quotes_around_tz(cls, timestr):
+        """Remove quotes (single and double) around timezone otherwise
+        `dateutil.parser.parse` raises
+        """
         quoted = cls.QUOTED_TIMEZONE.match(timestr)
         if quoted is not None:
             return quoted.group(1) + quoted.group(2)
 
     @classmethod
     def remove_timezone(cls, timestr):
+        """Completely remove timezone information, if any.
+
+        :return: the new string if timezone was found, `None` otherwise
+        """
         if re.match(r".*[\-+]?\d{2}:\d{2}$", timestr):
             return re.sub(
                 r"(.*)(\s[\+-]?\d\d:\d\d)$",
@@ -88,6 +102,12 @@ class timestamp_ms(object):
 
     @classmethod
     def fix_timezone_separator(cls, timestr):
+        """Replace invalid timezone separator to prevent
+        `dateutil.parser.parse` to raise.
+
+        :return: the new string if invalid separators were found,
+                 `None` otherwise
+        """
         tz_sep = cls.TIMEZONE_SEPARATOR.match(timestr)
         if tz_sep is not None:
             return tz_sep.group(1) + tz_sep.group(2) + ':' + tz_sep.group(3)
