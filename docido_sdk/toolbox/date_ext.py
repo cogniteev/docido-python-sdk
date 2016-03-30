@@ -51,7 +51,7 @@ class timestamp_ms(object):
             )
 
     @classmethod
-    def check_mispelled_day(cls, timestr):
+    def fix_mispelled_day(cls, timestr):
         day_extraction = cls.START_WITH_DAY_OF_WEEK.match(timestr)
         if day_extraction is not None:
             day = day_extraction.group(1).lower()
@@ -109,11 +109,11 @@ class timestamp_ms(object):
         except ValueError:
             if not shaked:
                 shaked = False
-                for checker in [
-                        cls.check_mispelled_day,
+                for shaker in [
+                        cls.fix_mispelled_day,
                         cls.remove_parenthesis_around_tz,
                         cls.remove_quotes_around_tz]:
-                    new_timestr = checker(timestr)
+                    new_timestr = shaker(timestr)
                     if new_timestr is not None:
                         timestr = new_timestr
                         shaked = True
