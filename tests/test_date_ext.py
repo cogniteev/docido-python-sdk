@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 import datetime
 import unittest
 
@@ -16,6 +18,18 @@ KIOTO_IMAP_HEADER = 'Thu, 11 Dec 1997 17:33:47 -0000'
 KIOTO_IMAP_HEADER_FIXED_TZ = 'Thu, 11 Dec 1997 17:33:47 -00:00'
 KIOTO_IMAP_HEADER_SPURIOUS_TZ = 'Thu, 11 Dec 1997 17:33:47 -42:00'
 KIOTO_IMAP_HEADER_SPURIOUS2_TZ = 'Thu, 11 Dec 1997 17:33:47 -42:FF'
+KIOTO_IMAP_HEADER_GMT = 'Thu, 11 Dec 1997 17:33:47 (GMT)'
+KIOTO_IMAP_HEADER_QUOTED_GMT = 'Thu, 11 Dec 1997 17:33:47 "GMT"'
+KIOTO_IMAP_HEADER_QUOTED_0000 = 'Thu, 11 Dec 1997 17:33:47 "-00:00"'
+
+TRACY_CYCLONE = 'Wed, 25 Dec 1974 09:52 +1100'
+TRACY_CYCLONE_INVALID_DAY = 'Wen, 25 Dec 1974 09:52 +1100'
+TRACY_CYCLONE_TZ = 157157520000
+
+NEW_YEAR_BENGALI = 'Sun, 15 Apr 2015 09:00:00 +05:30'
+NEW_YEAR_BENGALI_DASH = 'Sun, 15 Apr 2015 09:00:00 +05-30'
+NEW_YEAR_BENGALI_DOT = 'Sun, 15 Apr 2015 09:00:00 +05.30'
+NEW_YEAR_BENGALI_TS = 1429068600000
 
 KIOTO_SOUNDCLOUD_FORMATS = [
     "1997/12/11 17:33:47 +0000",
@@ -66,22 +80,46 @@ class TestDateExt(unittest.TestCase):
         )
 
     def test_gmail(self):
-        self.assertEqual(
-            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER),
-            KIOTO_TIMESTAMP_MS
-        )
-        self.assertEqual(
-            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_FIXED_TZ),
-            KIOTO_TIMESTAMP_MS
-        )
+        self.assertEqual(timestamp_ms.from_str(KIOTO_IMAP_HEADER),
+                         KIOTO_TIMESTAMP_MS)
+        self.assertEqual(timestamp_ms.from_str(KIOTO_IMAP_HEADER_FIXED_TZ),
+                         KIOTO_TIMESTAMP_MS)
         # timezone information will be deleted
-        self.assertEqual(
-            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_SPURIOUS_TZ),
-            KIOTO_TIMESTAMP_MS
-        )
+        self.assertEqual(timestamp_ms.from_str(KIOTO_IMAP_HEADER_SPURIOUS_TZ),
+                         KIOTO_TIMESTAMP_MS)
+        self.assertEqual(timestamp_ms.from_str(KIOTO_IMAP_HEADER_GMT),
+                         KIOTO_TIMESTAMP_MS)
+        self.assertEqual(timestamp_ms.from_str(KIOTO_IMAP_HEADER_QUOTED_GMT),
+                         KIOTO_TIMESTAMP_MS)
+        self.assertEqual(timestamp_ms.from_str(KIOTO_IMAP_HEADER_QUOTED_0000),
+                         KIOTO_TIMESTAMP_MS)
         # tz is such a mess it is not removed, so dateutil raises
         with self.assertRaises(ValueError):
-            timestamp_ms.from_imap_header(KIOTO_IMAP_HEADER_SPURIOUS2_TZ)
+            timestamp_ms.feeling_lucky(KIOTO_IMAP_HEADER_SPURIOUS2_TZ)
+
+    def test_australian_dates(self):
+        self.assertEqual(
+            timestamp_ms.from_str(TRACY_CYCLONE),
+            TRACY_CYCLONE_TZ
+        )
+        self.assertEqual(
+            timestamp_ms.from_str(TRACY_CYCLONE_INVALID_DAY),
+            TRACY_CYCLONE_TZ
+        )
+
+    def test_bengali_timezone(self):
+        self.assertEqual(
+            timestamp_ms.feeling_lucky(NEW_YEAR_BENGALI),
+            NEW_YEAR_BENGALI_TS
+        )
+        self.assertEqual(
+            timestamp_ms.feeling_lucky(NEW_YEAR_BENGALI_DASH),
+            NEW_YEAR_BENGALI_TS
+        )
+        self.assertEqual(
+            timestamp_ms.feeling_lucky(NEW_YEAR_BENGALI_DOT),
+            NEW_YEAR_BENGALI_TS
+        )
 
     def test_posix_timestamp(self):
         """instagram / evernote / linkedin POSIX timestamps"""
@@ -144,6 +182,30 @@ class TestDateExt(unittest.TestCase):
     def test_ensure_is_number(self):
         now = timestamp_ms.now()
         self.assertTrue(isinstance(now, int))
+
+    def test_invalid_format(self):
+        with self.assertRaises(ValueError) as exc:
+            timestamp_ms.from_str('1nv4l1d f0rm47')
+        self.assertEqual(
+            exc.exception.message,
+            "Unknown string format: '1nv4l1d f0rm47'"
+        )
+
+    def test_invalid_unicode_format(self):
+        with self.assertRaises(ValueError) as exc:
+            timestamp_ms.from_str(u'1nv4£1Ð ƒ0rm47')
+        self.assertEqual(
+            exc.exception.message,
+            u"Unknown string format: {!r}".format(u'1nv4£1Ð ƒ0rm47')
+        )
+
+        with self.assertRaises(ValueError) as exc:
+            timestamp_ms.from_str('invalid ƒ0rm47')
+        self.assertEqual(
+            exc.exception.message,
+            u"Unknown string format: "
+            u"'invalid \\xc6\\x920rm47'"
+        )
 
     def _test_format(self, format, format_tz):
         self.assertEqual(timestamp_ms.from_str(format),
