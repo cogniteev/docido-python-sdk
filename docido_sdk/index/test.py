@@ -23,6 +23,7 @@ from docido_sdk.toolbox.http_ext import delayed_request
 
 
 reraise = reraise(IndexAPIError)
+ALLOWED_CHECKPOINT_VALUE_TYPES = six.string_types + (int, long, float)
 
 
 class CustomJSONEncoder(json.JSONEncoder):
@@ -71,7 +72,7 @@ class LocalKVProcessor(IndexAPIProcessor):
     @reraise
     def set_kv(self, key, value):
         assert isinstance(key, six.string_types)
-        assert isinstance(value, six.string_types)
+        assert isinstance(value, ALLOWED_CHECKPOINT_VALUE_TYPES)
         with self.__lock.write():
             self.__store[key] = value
             self.__persist()

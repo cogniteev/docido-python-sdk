@@ -87,6 +87,21 @@ class TestLocalKV(unittest.TestCase):
             kv.delete_kvs()
             self.assertEqual({}, kv.get_kvs())
 
+    def test_valid_value(self):
+        with self.kv() as kv:
+            kv.set_kv('k1', 'a_string')
+            kv.set_kv('k2', 42)
+            kv.set_kv('k3', long(42))
+            kv.set_kv('k4', 3.14)
+            self.assertEqual(kv.get_kv('k1'), 'a_string')
+            self.assertEqual(type(kv.get_kv('k1')), str)
+            self.assertEqual(kv.get_kv('k2'), 42)
+            self.assertEqual(type(kv.get_kv('k2')), int)
+            self.assertEqual(kv.get_kv('k3'), 42)
+            self.assertEqual(type(kv.get_kv('k3')), long)
+            self.assertEqual(kv.get_kv('k4'), 3.14)
+            self.assertEqual(type(kv.get_kv('k4')), float)
+
     def test_key_is_None(self):
         with self.kv() as kv:
             with self.assertRaises(IndexAPIError):
