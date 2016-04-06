@@ -1,6 +1,7 @@
 
 import functools
 import inspect
+import sys
 
 
 class lazy(object):
@@ -77,6 +78,6 @@ def reraise(clazz):
             try:
                 return f(*args, **kwargs)
             except Exception as e:
-                raise clazz(e)
+                raise clazz(e), None, sys.exc_info()[2]
         return _wrap
     return _decorator
