@@ -1,4 +1,4 @@
-elasticsearch: &elasticsearch local.docker:13000
+elasticsearch: &elasticsearch local.docker:9200
 
 elasticsearch:
     ES_CARD_TYPE: item

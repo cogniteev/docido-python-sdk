@@ -15,7 +15,7 @@ class TestESMappingProcessor(unittest.TestCase):
 
         config.elasticsearch = {
             'ES_INDEX': 'do_sdk_ut',
-            'ES_HOST': os.getenv('ELASTICSEARCH_HOST', 'local.docker:13000'),
+            'ES_HOST': os.getenv('ELASTICSEARCH_HOST', 'local.docker:9200'),
             'ES_CARD_TYPE': 'crawl_element',
             'MAPPING': {
                 'do_sdk_ut': {
