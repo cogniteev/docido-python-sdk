@@ -1,5 +1,7 @@
 from elasticsearch import Elasticsearch as _Elasticsearch
+from elasticsearch.helpers import scan
 
+from docido_sdk.toolbox.collections_ext import chunks
 from docido_sdk.core import (
     Component,
     implements,
@@ -128,13 +130,15 @@ class ElasticsearchProcessor(IndexAPIProcessor):
 
     def __delete_es_docs(self, body, es, index, doc_type):
         query = {
-            'body': body,
+            'query': body,
             'index': index,
             'doc_type': doc_type,
+            'fields': ['_id']
         }
         if self.__routing:
             query['routing'] = self.__routing
-        es.delete_by_query(**query)
+        for chunk in chunks(scan(es, **query), 50):
+            self.delete_cards_by_id(chunk)
 
     def delete_cards(self, query):
         return self.__delete_es_docs(
