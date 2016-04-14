@@ -137,8 +137,9 @@ class ElasticsearchProcessor(IndexAPIProcessor):
         )
         if self.__routing:
             query['routing'] = self.__routing
-        for chunk in chunks(scan(es, **query), 50):
-            self.delete_cards_by_id(chunk)
+        for chunk in chunks(scan(es, **query), 500):
+            ids = [item['_id'] for item in chunk]
+            self.delete_cards_by_id(ids)
 
     def delete_cards(self, query):
         return self.__delete_es_docs(
