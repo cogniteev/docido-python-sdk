@@ -108,13 +108,13 @@ class ElasticsearchProcessor(IndexAPIProcessor):
         generated_results = 0
         batch_size = 10
         offset = 0
-        body = {
-            'body': query,
-            'index': self.__es_index,
-            'doc_type': self.__card_type,
-            'size': batch_size,
-            'from_': offset,
-        }
+        body = dict(
+            body=query,
+            index=self.__es_index,
+            doc_type=self.__card_type,
+            size=batch_size,
+            from_=offset,
+        )
         if self.__routing:
             body['routing'] = self.__routing
         search_results = self.__es.search(**body)
@@ -129,12 +129,12 @@ class ElasticsearchProcessor(IndexAPIProcessor):
             search_results = self.__es.search(**body)
 
     def __delete_es_docs(self, body, es, index, doc_type):
-        query = {
-            'query': body,
-            'index': index,
-            'doc_type': doc_type,
-            'fields': ['_id']
-        }
+        query = dict(
+            query=body,
+            index=index,
+            doc_type=doc_type,
+            fields=['_id']
+        )
         if self.__routing:
             query['routing'] = self.__routing
         for chunk in chunks(scan(es, **query), 50):
