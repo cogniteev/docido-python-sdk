@@ -8,18 +8,8 @@ elasticsearch:
     ES_STORE_HOST: *elasticsearch
     ES_STORE_INDEX: python_sdk_ut_store_es
     ES_STORE_TYPE: cached_item_test
-    MAPPING:
-        python_sdk_ut_es:
-            _id:
-                _id:
-                    path: id
-        python_sdk_ut_store_es:
-            _id:
-                _id:
-                    path: id
 
 pull_crawlers:
     indexing:
         pipeline:
             - Elasticsearch
-            - ElasticsearchMapping
