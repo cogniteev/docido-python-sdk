@@ -29,6 +29,7 @@ TRACY_CYCLONE_TZ = 157157520000
 NEW_YEAR_BENGALI = 'Sun, 15 Apr 2015 09:00:00 +05:30'
 NEW_YEAR_BENGALI_DASH = 'Sun, 15 Apr 2015 09:00:00 +05-30'
 NEW_YEAR_BENGALI_DOT = 'Sun, 15 Apr 2015 09:00:00 +05.30'
+NEW_YEAR_BENGALI_EXTRA_PARENT = 'Sun, 15 Apr 2015 09:00:00 +0530 (GMT+05:30)'
 NEW_YEAR_BENGALI_TS = 1429068600000
 
 KIOTO_SOUNDCLOUD_FORMATS = [
@@ -118,6 +119,10 @@ class TestDateExt(unittest.TestCase):
         )
         self.assertEqual(
             timestamp_ms.feeling_lucky(NEW_YEAR_BENGALI_DOT),
+            NEW_YEAR_BENGALI_TS
+        )
+        self.assertEqual(
+            timestamp_ms.feeling_lucky(NEW_YEAR_BENGALI_EXTRA_PARENT),
             NEW_YEAR_BENGALI_TS
         )
 

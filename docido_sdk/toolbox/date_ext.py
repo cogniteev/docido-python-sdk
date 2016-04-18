@@ -29,7 +29,7 @@ class timestamp_ms(object):
     """Build UTC timestamp in milliseconds
     """
 
-    TIMEZONE_PARENTHESIS = re.compile('(.*)\(([a-zA-Z]+)\)$')
+    TIMEZONE_PARENTHESIS = re.compile('(.*)\(([a-zA-Z]+)[-+0-9:.]*\)$')
     TIMEZONE_SEPARATOR = re.compile('(.*)(\d\d)[.-](\d\d)$')
     QUOTED_TIMEZONE = re.compile("""(.*)['"]([\w:+-]+)['"]?$""")
     START_WITH_DAY_OF_WEEK = re.compile('^([a-zA-Z]*)[\s,](.*)')
@@ -76,7 +76,7 @@ class timestamp_ms(object):
         """
         parenthesis = cls.TIMEZONE_PARENTHESIS.match(timestr)
         if parenthesis is not None:
-            return parenthesis.group(1) + parenthesis.group(2)
+            return parenthesis.group(1)
 
     @classmethod
     def remove_quotes_around_tz(cls, timestr):
