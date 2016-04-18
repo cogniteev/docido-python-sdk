@@ -1,3 +1,5 @@
+from collections import Mapping
+
 from elasticsearch import Elasticsearch as _Elasticsearch
 from elasticsearch.helpers import scan
 
@@ -144,14 +146,22 @@ class ElasticsearchProcessor(IndexAPIProcessor):
         error_docs = []
 
         for doc in docs:
-            action = {
-                'index': {
-                    '_index': index,
-                    '_type': doc_type
-                }
-            }
-            body.append(action)
-            body.append(doc)
+            if not isinstance(doc, (dict, Mapping)):
+                error_docs.append(doc)
+            else:
+                doc_id = doc.get('id')
+                if doc_id is None:
+                    error_docs.append(doc)
+                else:
+                    action = {
+                        'index': {
+                            '_index': index,
+                            '_type': doc_type,
+                            '_id': doc['id']
+                        }
+                    }
+                    body.append(action)
+                    body.append(doc)
 
         if len(body) == 0:
             return error_docs
