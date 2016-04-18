@@ -14,7 +14,7 @@ from docido_sdk.index.pipeline import IndexPipelineProvider
 import docido_sdk.config as docido_config
 
 from docido_sdk.toolbox.collections_ext import Configuration
-from docido_sdk.index.processor import Elasticsearch, ElasticsearchMapping
+from docido_sdk.index.processor import Elasticsearch
 
 
 class TestEsAPI(unittest.TestCase):
@@ -35,7 +35,6 @@ class TestEsAPI(unittest.TestCase):
             test_components = self._setup_test_components(env)
             pipeline = env[IndexPipelineProvider]
             env[Elasticsearch]
-            env[ElasticsearchMapping]
             try:
                 # build and provide an IndexAPI
                 env[YamlPullCrawlersIndexingConfig]

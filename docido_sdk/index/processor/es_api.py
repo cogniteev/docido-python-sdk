@@ -14,63 +14,9 @@ import docido_sdk.config as docido_config
 
 import os
 
-__all__ = ['Elasticsearch', 'ElasticsearchMapping']
+__all__ = ['Elasticsearch']
 
 ES_BULK_OPERATION = ['index', 'create', 'update', 'delete']
-
-
-class ElasticsearchMappingProcessor(IndexAPIProcessor):
-    def __init__(self, **config):
-        super(ElasticsearchMappingProcessor, self).__init__(**config)
-        self.update_mapping(config['service'])
-
-    def update_mapping(self, service):
-        config = docido_config.elasticsearch
-        es = _Elasticsearch(
-            os.getenv('ELASTICSEARCH_HOST', config.ES_HOST),
-            **config.get('connection_params', {})
-        )
-        to_update_mappings = [
-            (config.ES_INDEX, config.ES_CARD_TYPE),
-        ]
-        if config.get('ES_STORE_INDEX') and config.get('ES_STORE_TYPE'):
-            to_update_mappings.append(
-                (config.ES_STORE_INDEX, config.ES_STORE_TYPE)
-            )
-        for (index, doc_type) in to_update_mappings:
-            self.__update_index_mapping(es, service, index, doc_type)
-
-    @classmethod
-    def __get_crawler_mapping_config(cls, service):
-        pr_config = docido_config.get('pull_crawlers', {})
-        crawlers_config = pr_config.get('crawlers', {})
-        crawler_config = crawlers_config.get(service, {})
-        crawler_index_config = crawler_config.get('indexing', {})
-        crawler_es = crawler_index_config.get('elasticsearch', {})
-        return crawler_es.get('mapping', {})
-
-    def __update_index_mapping(self, es, service, index, doc_type):
-        config = docido_config.elasticsearch
-        index = index.format(service=service)
-        doc_type = doc_type.format(service=service)
-        if not es.indices.exists(index):
-            es.indices.create(index)
-        mappings = []
-        if 'MAPPING' in config:
-            if index in config.MAPPING:
-                mappings.append(config.MAPPING[index])
-        crawler_mapping = self.__get_crawler_mapping_config(service)
-        if any(crawler_mapping):
-            mappings.append(crawler_mapping)
-        for mapping in mappings:
-            for field in mapping.keys():
-                mapping_update_response = es.indices.put_mapping(
-                    index=index,
-                    doc_type=doc_type,
-                    body=mapping[field]
-                )
-                if mapping_update_response != {'acknowledged': True}:
-                    raise Exception("Could not update mapping")
 
 
 class ElasticsearchProcessor(IndexAPIProcessor):
@@ -263,10 +209,3 @@ class Elasticsearch(Component):
 
     def get_index_api(self, **config):
         return ElasticsearchProcessor(**config)
-
-
-class ElasticsearchMapping(Component):
-    implements(IndexAPIProvider)
-
-    def get_index_api(self, **config):
-        return ElasticsearchMappingProcessor(**config)
