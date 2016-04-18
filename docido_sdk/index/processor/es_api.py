@@ -141,38 +141,32 @@ class ElasticsearchProcessor(IndexAPIProcessor):
                 })
         return error_docs
 
-    def __push_es_docs(self, docs, es, index, doc_type):
+    @classmethod
+    def _prepare_index_bulk_query(cls, docs, action):
         body = []
-        error_docs = []
-
+        errors = []
         for doc in docs:
             if not isinstance(doc, (dict, Mapping)):
-                error_docs.append(doc)
+                errors.append(doc)
             else:
                 doc_id = doc.get('id')
                 if doc_id is None:
-                    error_docs.append(doc)
+                    errors.append(doc)
                 else:
-                    action = {
-                        'index': {
-                            '_index': index,
-                            '_type': doc_type,
-                            '_id': doc['id']
-                        }
-                    }
-                    body.append(action)
+                    new_action = action.copy()
+                    new_action.values()[0].update(_id=doc['id'])
+                    body.append(new_action)
                     body.append(doc)
+        return body, errors
 
+    def __push_es_docs(self, docs, es, index, doc_type):
+        action = dict(index=dict(_index=index, _type=doc_type))
+        body, error_docs = self._prepare_index_bulk_query(docs, action)
         if len(body) == 0:
             return error_docs
-
-        params = {
-            'body': body,
-            'refresh': True,
-        }
+        params = dict(body=body, refresh=True)
         if self.__routing:
             params['routing'] = self.__routing
-
         results = es.bulk(**params)
         if results['errors']:
             for index, item in enumerate(results['items']):

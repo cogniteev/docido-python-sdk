@@ -100,7 +100,8 @@ class TestEsAPI(unittest.TestCase):
 
     def test_push_and_delete_by_id(self):
         with self.index() as index:
-            index.push_cards([self.TEST_DOC])
+            resp = index.push_cards([self.TEST_DOC])
+            self.assertEqual(resp, [])
             del_result = index.delete_cards_by_id([self.TEST_DOC['id']])
             self.assertListEqual(del_result, [])
             self.assertListEqual(
