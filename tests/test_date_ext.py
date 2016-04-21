@@ -218,6 +218,18 @@ class TestDateExt(unittest.TestCase):
         self.assertEqual(timestamp_ms.from_str(format_tz),
                          KIOTO_TIMESTAMP_MS)
 
+    def test_simple_date(self):
+        kioto_date = datetime.datetime(
+            KIOTO_DATETIME.year,
+            KIOTO_DATETIME.month,
+            KIOTO_DATETIME.day
+        )
+        kioto_date_str = '{0.year}-{0.month}-{0.day}'.format(kioto_date)
+        self.assertEqual(
+            timestamp_ms.from_str(kioto_date_str),
+            timestamp_ms.from_datetime(kioto_date)
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

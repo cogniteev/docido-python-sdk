@@ -30,7 +30,7 @@ class timestamp_ms(object):
     """
 
     TIMEZONE_PARENTHESIS = re.compile('(.*)\(([a-zA-Z]+)[-+0-9:.]*\)$')
-    TIMEZONE_SEPARATOR = re.compile('(.*)(\d\d)[.-](\d\d)$')
+    TIMEZONE_SEPARATOR = re.compile('(.* .*)(\d\d)[.-](\d\d)$')
     QUOTED_TIMEZONE = re.compile("""(.*)['"]([\w:+-]+)['"]?$""")
     START_WITH_DAY_OF_WEEK = re.compile('^([a-zA-Z]*)[\s,](.*)')
 
