@@ -1,0 +1,21 @@
+http:
+    session:
+        rate_limit:
+            wikipedia_python:
+                persistence: !!python/name:docido_sdk.toolbox.rate_limits.IndexAPIRLPersistence
+                window_size_sec: 0.5
+                calls_per_window: 1
+                key:
+                    - "{application}"
+                    - !!python/object/apply:socket.getfqdn []
+                    - "{http_headers[user-agent]}"
+                    - "{http_params[service]}"
+                urls:
+                    - https://en.wikipedia.org/wiki/Python_(programming_language)
+                    - https://fr.wikipedia.org/wiki/Python_(langage)
+            ignored_because_no_mount_urls:
+                persistence: !!python/name:docido_sdk.toolbox.rate_limits.IndexAPIRLPersistence
+                window_size_sec: 0.5
+                calls_per_window: 1
+                key:
+                    - "{application}"
