@@ -2,16 +2,7 @@ import os
 from StringIO import StringIO
 import unittest
 
-
-import yaml
-try:
-    from yaml import CLoader as Loader
-except ImportError:  # pragma: no cover
-    from yaml import Loader
-
-from docido_sdk.toolbox.yaml_ext import load_all_yaml_constructors
-
-load_all_yaml_constructors()
+from docido_sdk.toolbox.collections_ext import yaml, Loader
 
 
 class TestYamlExt(unittest.TestCase):

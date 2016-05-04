@@ -5,12 +5,8 @@ import os
 import os.path as osp
 
 from peak.util.proxies import ObjectWrapper
-
 import yaml
-try:
-    from yaml import CLoader as Loader
-except ImportError:  # pragma: no cover
-    from yaml import Loader
+from yaml import Loader
 
 from . yaml_ext import load_all_yaml_constructors
 
