@@ -12,6 +12,10 @@ try:
 except ImportError:  # pragma: no cover
     from yaml import Loader
 
+from . yaml_ext import load_all_yaml_constructors
+
+load_all_yaml_constructors()
+
 
 class nameddict(dict):
     """ Provides dictionary whose keys are accessible via the property
