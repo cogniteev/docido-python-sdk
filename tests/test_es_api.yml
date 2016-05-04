@@ -1,4 +1,4 @@
-elasticsearch: &elasticsearch local.docker:9200
+elasticsearch: &elasticsearch !env ELASTICSEARCH_HOST:=localhost:9200
 
 elasticsearch:
     ES_CARD_TYPE: item
