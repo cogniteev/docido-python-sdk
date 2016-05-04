@@ -14,8 +14,6 @@ from docido_sdk.index import (
 )
 import docido_sdk.config as docido_config
 
-import os
-
 __all__ = ['Elasticsearch']
 
 ES_BULK_OPERATION = ['index', 'create', 'update', 'delete']
@@ -41,11 +39,11 @@ class ElasticsearchProcessor(IndexAPIProcessor):
         self.__store_type = es_config.ES_STORE_TYPE.format(**fmt)
         self.__routing = config.get('elasticsearch', {}).get('routing')
         self.__es = _Elasticsearch(
-            os.getenv('ELASTICSEARCH_HOST', es_config.ES_HOST),
+            es_config.ES_HOST,
             **es_config.get('connection_params', {})
         )
         self.__es_store = _Elasticsearch(
-            os.getenv('ELASTICSEARCH_HOST', es_config.ES_HOST),
+            es_config.ES_HOST,
             **es_config.get('connection_params', {})
         )
 
