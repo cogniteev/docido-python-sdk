@@ -1,4 +1,5 @@
 from collections import Mapping
+import copy
 
 from elasticsearch import Elasticsearch as _Elasticsearch
 from elasticsearch.helpers import scan
@@ -151,7 +152,7 @@ class ElasticsearchProcessor(IndexAPIProcessor):
                 if doc_id is None:
                     errors.append(doc)
                 else:
-                    new_action = action.copy()
+                    new_action = copy.deepcopy(action)
                     new_action.values()[0].update(_id=doc['id'])
                     body.append(new_action)
                     body.append(doc)
