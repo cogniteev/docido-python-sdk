@@ -109,6 +109,17 @@ class TestEsAPI(unittest.TestCase):
                     {'query': {'match_all': {}}})
                 ), []
             )
+            index.delete_cards({'query': {'match_all': {}}})
+
+    def test_push_several(self):
+        with self.index() as index:
+            try:
+                cards = [dict(id=42), dict(id=43)]
+                index.push_cards(cards)
+                cards_gen = index.search_cards({'query': {'match_all': {}}})
+                self.assertEqual(cards, list(cards_gen))
+            finally:
+                index.delete_cards({'query': {'match_all': {}}})
 
     def test_push_and_get_card(self):
         with self.index() as index:
