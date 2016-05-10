@@ -14,7 +14,7 @@ from docido_sdk.index import IndexAPI
 from docido_sdk.oauth import OAuthToken
 from docido_sdk.scripts import dcc_run
 from docido_sdk.toolbox.contextlib_ext import restore_dict_kv
-from docido_sdk.toolbox.collections_ext import Configuration
+from docido_sdk.toolbox.collections_ext import Configuration, nameddict
 import docido_sdk.config as docido_config
 
 
@@ -24,10 +24,11 @@ epilogue_result = None
 
 
 def _check_task_parameters(*args):
-    assert len(args) == 4
-    index, token, result, logger = args
+    assert len(args) == 5
+    index, token, result, config, logger = args
     assert isinstance(index, IndexAPI)
     assert isinstance(token, OAuthToken)
+    assert isinstance(config, nameddict)
     assert isinstance(logger, logging.Logger)
 
 
@@ -38,14 +39,14 @@ def _crawl_task(*args):
     return tasks_counter
 
 
-def _increment_task(index, token, prev_result, logger):
+def _increment_task(index, token, prev_result, config, logger):
     global tasks_counter
     tasks_counter += 1
     prev_result = prev_result or 0
     return prev_result + 1
 
 
-def _retry_crawl_task(index, token, prev_result, logger,
+def _retry_crawl_task(index, token, prev_result, config, logger,
                       attempt=1, max_retries=None):
     global tasks_counter
     if tasks_counter == 10:

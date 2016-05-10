@@ -16,7 +16,7 @@ class ICrawler(Interface):
         :rtype: string
         """
 
-    def iter_crawl_tasks(index, oauth_token, logger, full):
+    def iter_crawl_tasks(index, oauth_token, config, logger):
         """Split the crawl in smaller independant actions,
         and returns them for delayed execution.
 
@@ -26,12 +26,16 @@ class ICrawler(Interface):
         :param docido_sdk.oauth.OAuthToken oauth_token:
           OAuth credentials
 
+        :param docido_sdk.toolbox.collections_ext.nameddict config:
+          crawl configuration. Every crawler may expect the following
+          keys to be set:
+          - bool `full`:
+              whether the entire account must be pushed or only
+              changes that occured since previous crawl. Default
+              value is `False`.
+
         :param logging.Logger logger:
           to emit messages
-
-        :param bool full:
-          whether the entire account must be pushed or only
-          changes that occured since previous crawl.
 
         :return: a dictionary instance containing the following keys:
 
@@ -52,7 +56,6 @@ class ICrawler(Interface):
           `prev_result` parameter of a sub-task will be given what the
           previous sub-task of the same list returns. `None` is given to the
           first task of every sequence.
-
 
         - 'epilogue' (optional): a :py:func:`functools.partial` instance
           to execute when all sub-tasks have been executed. The partial

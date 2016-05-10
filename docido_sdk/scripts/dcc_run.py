@@ -29,7 +29,7 @@ from ..index.processor import (
 )
 from docido_sdk.index.pipeline import IndexPipelineProvider
 import docido_sdk.config as docido_config
-from ..toolbox.collections_ext import Configuration
+from ..toolbox.collections_ext import Configuration, nameddict
 from ..toolbox.date_ext import timestamp_ms
 from ..crawler.tasks import (
     reorg_crawl_tasks,
@@ -63,13 +63,11 @@ def oauth_tokens_from_file():
                                       Configuration())
     for crawler, runs in crawlers.iteritems():
         for run, run_config in runs.iteritems():
-            for k in 'config', 'token':
+            for k in 'environment', 'token':
                 if k not in run_config:
                     message = ("In file {}: missing config key '{}'"
                                " in '{}/{}' crawl description.")
                     raise Exception(message.format(path, k, crawler, run))
-            if 'config' not in run_config:
-                raise Exception("Missing 'config' key")
             run_config.token = OAuthToken(**run_config.token)
     return crawlers
 
@@ -91,9 +89,9 @@ class LocalRunner(Component):
         logger.info('pushed data will be stored in {}'.format(self.crawl_path))
         index_provider = env[IndexPipelineProvider]
         with docido_config:
-            if config.config is not None:
+            if config.environment is not None:
                 docido_config.clear()
-                new_config = Configuration.from_file(config.config)
+                new_config = Configuration.from_file(config.environment)
                 docido_config.update(new_config)
             index_api = index_provider.get_index_api(
                 self.service, None, None
@@ -101,9 +99,11 @@ class LocalRunner(Component):
             attempt = 1
             while True:
                 try:
+                    crawl_config = nameddict(config.get('config') or {})
+                    crawl_config.setdefault('full', False)
                     tasks = crawler.iter_crawl_tasks(
                         index_api, config.token,
-                        logger, config.get('full', False)
+                        crawl_config, logger,
                     )
                     break
                 except Retry as e:
@@ -131,8 +131,8 @@ class LocalRunner(Component):
                 kwargs = dict()
                 while True:
                     try:
-                        result = task(index_api, config.token,
-                                      prev_result, logger, **kwargs)
+                        result = task(index_api, config.token, prev_result,
+                                      crawl_config, logger, **kwargs)
                         break
                     except Retry as e:
                         try:
