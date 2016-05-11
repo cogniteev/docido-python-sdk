@@ -1,0 +1,18 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.10.0]
+    method: GET
+    uri: https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=access_token42
+  response:
+    body: {string: '{"aud": "aud42", "email_verified": "true", "expires_in": "3512",
+        "access_type": "offline", "exp": "1463043859", "azp": "azp42", "scope": "scope1
+        scope2 scope3", "email": "tech@cogniteev.com", "sub": "sub42"}'}
+    headers:
+      content-type: [application/json; charset=UTF-8]
+    status: {code: 200, message: OK}
+version: 1

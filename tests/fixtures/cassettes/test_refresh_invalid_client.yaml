@@ -1,0 +1,31 @@
+interactions:
+- request:
+    body: refresh_token=refresh_token41&client_secret=consumer_secret41&client_id=consumer_key41&grant_type=refresh_token
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['111']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [python-requests/2.10.0]
+    method: POST
+    uri: https://accounts.google.com/o/oauth2/token
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAKvmUlBQSi0qyi9SUrBSUMrMK0vMyUyJT87JTM0rUdKBy8anpBYnF2UWlGTm54FV
+        hmSkKvg7lpZkKEDUKpQnFivk5ZcopOWX5qXoKXHVAgCxd+a3WwAAAA==
+    headers:
+      alt-svc: ['quic=":443"; ma=2592000; v="33,32,31,30,29,28,27,26,25"']
+      alternate-protocol: ['443:quic']
+      cache-control: ['private, max-age=0']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 12 May 2016 07:41:04 GMT']
+      expires: ['Thu, 12 May 2016 07:41:04 GMT']
+      server: [GSE]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-xss-protection: [1; mode=block]
+    status: {code: 401, message: Unauthorized}
+version: 1

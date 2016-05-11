@@ -1,0 +1,19 @@
+interactions:
+- request:
+    body: grant_type=refresh_token&client_id=consumer_key42&client_secret=consumer_secret42&refresh_token=refresh_token42
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['208']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [python-requests/2.10.0]
+    method: POST
+    uri: https://accounts.google.com/o/oauth2/token
+  response:
+    body: {string: '{"access_token": "access_token42", "token_type": "Bearer", "expires_in":
+        3600, "id_token": "id_token42"}'}
+    headers:
+      content-type: [application/json; charset=utf-8]
+    status: {code: 200, message: OK}
+version: 1
