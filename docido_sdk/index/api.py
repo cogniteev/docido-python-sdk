@@ -235,8 +235,11 @@ class IndexPipelineConfig(Interface):  # pragma: no cover
     """ Provides list of :py:class:`docido_sdk.index.IndexAPIProvider`
     to link together in order to create the indexing pipeline.
     """
-    def get_pipeline(self):
+    def get_pipeline(service):
         """
+
+        :param: basestring service:
+
         :return:
           description of the index pipeline to create
         :rtype: :py:class:`docido_sdk.index.IndexAPIProvider`
