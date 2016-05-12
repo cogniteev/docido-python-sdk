@@ -1,6 +1,6 @@
 fake-crawler:
     launch:
-        config:
+        environment:
         token:
             access_token: the_access_token
             refresh_token: the_refresh_token
