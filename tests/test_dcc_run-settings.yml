@@ -1,5 +1,5 @@
 pull_crawlers:
     crawlers:
         fake-crawler:
-    indexing:
-        pipeline: []
+            indexing:
+                pipeline: []

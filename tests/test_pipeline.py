@@ -41,7 +41,7 @@ class Processor2Provider(Component):
 class IndexPipelineConfig(Component):
     implements(IndexPipelineConfig)
 
-    def get_pipeline(self):
+    def get_pipeline(self, *args, **kwargs):
         return [
             self.env[Processor1Provider],
             self.env[Processor2Provider],

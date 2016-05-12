@@ -96,7 +96,7 @@ class TestLocalIndex(unittest.TestCase):
         class ForcePipeline(Component):
             implements(IndexPipelineConfig)
 
-            def get_pipeline(self):
+            def get_pipeline(self, *args, **kwargs):
                 return [env[LocalDumbIndex]]
 
         class ForceConfig(Component):

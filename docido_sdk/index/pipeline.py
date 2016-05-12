@@ -47,7 +47,7 @@ class IndexPipelineProvider(Component):
         config = self.config.get_index_api_conf(
             service, docido_user_id, account_login
         )
-        index_providers = self.pipeline.get_pipeline()
+        index_providers = self.pipeline.get_pipeline(service)
         index_api = IndexAPI()
         for provider in reversed(index_providers):
             index_api = provider.get_index_api(parent=index_api, **config)
