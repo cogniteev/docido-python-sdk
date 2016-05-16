@@ -1,5 +1,4 @@
 import logging
-import requests
 
 from docido_sdk.crawler import (
     OAuthTokenExpiredError,
@@ -7,6 +6,7 @@ from docido_sdk.crawler import (
 )
 from docido_sdk.oauth import OAuthToken
 from docido_sdk.toolbox.collections_ext import nameddict
+from . http_ext import HTTP_SESSION
 
 
 __all__ = [
@@ -28,7 +28,7 @@ def refresh_token(token, session=None):
     :param requests.Session session:
       Optional `requests` session to use.
     """
-    session = session or requests.Session()
+    session = session or HTTP_SESSION
     refresh_data = dict(
         refresh_token=token.refresh_token,
         client_id=token.consumer_key,
@@ -83,7 +83,7 @@ def token_info(token, refresh=True, refresh_cb=None, session=None):
       - `refreshed`: boolean that will tell if the token has been refreshed
     :rtype: nameddict
     """
-    session = session or requests.Session()
+    session = session or HTTP_SESSION
     params = dict(access_token=token.access_token)
     resp = session.get(TOKEN_INFO_URL, params=params)
     if resp.status_code != 200:

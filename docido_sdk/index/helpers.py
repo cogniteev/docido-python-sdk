@@ -1,10 +1,11 @@
+from .. toolbox.http_ext import HTTP_SESSION
 
-import requests
 
+def push_thumbnails_from_links(index_api, thumbnails, session=None):
+    session = session or HTTP_SESSION
 
-def push_thumbnails_from_links(index_api, thumbnails):
     def dl_url(id_, url):
-        r = requests.get(url)
+        r = session.get(url)
         if r.status_code == 200:
             encoded_bytes = r.content.encode("base64")
             return id_, encoded_bytes, r.headers['content-type']
