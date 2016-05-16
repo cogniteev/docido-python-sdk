@@ -6,7 +6,9 @@ import json
 
 __all__ = [
     'activate_pyopenssl_for_urllib3',
+    'HTTP_SESSION',
 ]
+HTTP_SESSION = requests.Session()
 
 
 def activate_pyopenssl_for_urllib3():
