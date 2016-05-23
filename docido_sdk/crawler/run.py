@@ -14,6 +14,7 @@ from ..toolbox.date_ext import timestamp_ms
 
 
 def wait_or_raise(logger, retry_exc, attempt):
+    wait_time = None
     if attempt == retry_exc.max_retries:
         raise retry_exc
     if retry_exc.countdown is not None:
@@ -22,7 +23,7 @@ def wait_or_raise(logger, retry_exc, attempt):
         if wait_time < 0:
             raise (Exception("'countdown' is less than 0"), None,
                    sys.exc_info()[2])
-    else:
+    elif retry_exc.eta is not None:
         assert isinstance(retry_exc.eta, datetime.datetime)
         target_ts = timestamp_ms.feeling_lucky(retry_exc.eta)
         now_ts = timestamp_ms.now()
@@ -30,7 +31,8 @@ def wait_or_raise(logger, retry_exc, attempt):
         if wait_time < 0:
             raise Exception("'eta' is in the future"), None, sys.exc_info()[2]
     logger.warn("Retry raised, waiting {} seconds".format(wait_time))
-    time.sleep(wait_time)
+    if wait_time is not None:
+        time.sleep(wait_time)
 
 
 class TasksRunner(object):
