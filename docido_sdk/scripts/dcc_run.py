@@ -35,7 +35,7 @@ def oauth_tokens_from_file():
                                       Configuration())
     for crawler, runs in crawlers.iteritems():
         for run, run_config in runs.iteritems():
-            for k in 'environment', 'token':
+            for k in ['environment', 'token']:
                 if k not in run_config:
                     message = ("In file {}: missing config key '{}'"
                                " in '{}/{}' crawl description.")
