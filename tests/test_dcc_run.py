@@ -86,7 +86,7 @@ class TestDCCRun(unittest.TestCase):
             def get_service_name(self):
                 return 'fake-crawler'
 
-            def iter_crawl_tasks(self, index, token, logger, full):
+            def iter_crawl_tasks(self, index, token, config, logger):
                 return {
                     'tasks': [
                         list(repeat(_increment_task, 10)),
@@ -104,7 +104,7 @@ class TestDCCRun(unittest.TestCase):
             def get_service_name(self):
                 return 'fake-crawler'
 
-            def iter_crawl_tasks(self, index, token, logger, full):
+            def iter_crawl_tasks(self, index, token, config, logger):
                 return {
                     'tasks': [
                         _retry_crawl_task,
