@@ -1,0 +1,35 @@
+ut-multi:
+    -
+        persistence: !!python/name:docido_sdk.toolbox.rate_limits.IndexAPIRLPersistence
+        window_size_sec: 1
+        calls_per_window: 2
+        key:
+            - docido
+            - 192.168.0.1
+            - "{user}"
+            - "{service}"
+    -
+        window_size_sec: 5
+        calls_per_window: 5
+        key:
+            - docido
+            - "{service}"
+
+ut:
+    persistence: !!python/name:docido_sdk.toolbox.rate_limits.IndexAPIRLPersistence
+    window_size_sec: 1
+    calls_per_window: 5
+    key:
+        - docido
+        - "{user}"
+        - "{service}"
+
+wikipedia_python:
+    persistence: !!python/name:docido_sdk.toolbox.rate_limits.IndexAPIRLPersistence
+    window_size_sec: 3
+    calls_per_window: 2
+    key:
+        - "{application}"
+        - !!python/object/apply:socket.getfqdn []
+        - "{http_headers[user-agent]}"
+        - "{http_params[service]}"

@@ -1,9 +1,13 @@
 import os.path as osp
+import sys
 
 import vcr as _vcr
 
+from docido_sdk.toolbox.collections_ext import Configuration
+
 __all__ = [
-    'vcr'
+    'TestCaseMixin',
+    'vcr',
 ]
 
 
@@ -17,3 +21,16 @@ vcr = _vcr.VCR(
     path_transformer=_vcr.VCR.ensure_suffix('.yaml'),
     filter_headers=['authorization', 'Cookie'],
 )
+
+
+class TestCaseMixin(object):
+    """Unit tests utility mixin class
+    """
+    @classmethod
+    def _test_config(cls):
+        """Provides content of .yml file named after the Python module
+        where the class extending this class is defined.
+        """
+        module_path = sys.modules[cls.__module__].__file__
+        yaml_path = osp.splitext(module_path)[0] + '.yml'
+        return Configuration.from_file(yaml_path)

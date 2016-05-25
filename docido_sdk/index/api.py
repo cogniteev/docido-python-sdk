@@ -57,6 +57,10 @@ class IndexAPI(object):
         the target scope by providing a `query` in parameter.
         The `query` parameters follows the Elasticsearch Query DSL.
     """
+    def get_user_identifier(self):
+        """Retrieve unique resource identifier of the user that owns
+        the crawled data"""
+
     def push_cards(self, cards):
         """Send a synchronous bulk indexing request
 
@@ -171,6 +175,9 @@ class IndexAPIProcessor(IndexAPI):
         """
         self._parent = parent
         self._config = config
+
+    def get_user_identifier(self):
+        return self._parent.get_user_identifier()
 
     def push_cards(self, cards):
         return self._parent.push_cards(cards)

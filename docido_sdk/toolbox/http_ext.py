@@ -3,6 +3,11 @@ from contextlib import contextmanager
 import requests
 import json
 
+from . rate_limits import (
+    RateLimiter,
+    RLRequestAdapter,
+)
+
 
 __all__ = [
     'activate_pyopenssl_for_urllib3',
@@ -60,3 +65,41 @@ class delayed_request(object):
 
     def __repr__(self):
         return json.dumps(self.__kwargs)
+
+
+class HttpSessionPreparer(object):
+    """Provides utility class methods to tweak a
+    :py:class:`requests.Session`
+    """
+    @classmethod
+    def mount_rate_limit_adapters(cls, session=None,
+                                  rls_config=None, **kwargs):
+        """Mount rate-limits adapters on the specified `requests.Session`
+        object.
+
+        :param py:class:`requests.Session` session:
+          Session to mount. If not specified, then use the global
+          `HTTP_SESSION`.
+
+        :param dict rls_config:
+          Rate-limits configuration. If not specified, then
+          use the one defined at application level.
+
+        :param kwargs:
+          Additional keywords argument given to
+          py:class:`docido_sdk.toolbox.rate_limits.RLRequestAdapter`
+          constructor.
+        """
+        session = session or HTTP_SESSION
+        if rls_config is None:
+            rls_config = RateLimiter.get_configs()
+        for name, rl_conf in rls_config.items():
+            urls = rl_conf.get('urls', [])
+            if not urls:
+                continue
+            rl_adapter = RLRequestAdapter(name, config=rls_config, **kwargs)
+            for url in urls:
+                session.mount(url, rl_adapter)
+
+
+HttpSessionPreparer.mount_rate_limit_adapters(session=HTTP_SESSION)
