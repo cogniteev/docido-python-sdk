@@ -35,8 +35,8 @@ setup(
     install_requires=[
         'elasticsearch==2.3.0',
         'ProxyTypes==0.9',
-        'python-dateutil>=2.5.2',
-        'pytz>=2015.6',
+        'python-dateutil>=2.5.3',
+        'pytz>=2016.4',
         'requests>=2.8.1',
         'setuptools>=0.6',
         'six>=1.10.0',
