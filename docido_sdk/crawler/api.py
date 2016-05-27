@@ -41,12 +41,15 @@ class ICrawler(Interface):
 
         - 'tasks' (mandatory): generator of :py:func:`functools.partial` tasks
           to execute to perform the account synchronization.
-          partial objects may accept 4 arguments:
+          partial objects may accept the following arguments:
 
               - push_api (:py:class:`docido_sdk.push.IndexAPI`)
               - oauth_token (:py:class:`docido_sdk.oauth.OAuthToken`)
               - previous_result (:py:class:`object`) previous task result,
                 if any.
+              - config
+                (:py:class:`docido_sdk.toolbox.collections_ext.nameddict`)
+                crawler configuration
               - logger (:py:class:`logging.Logger`)
 
           If a list of tasks is returned, then they are executed concurrently,
@@ -64,12 +67,15 @@ class ICrawler(Interface):
               - push_api (:py:class:`docido_sdk.push.IndexAPI`)
               - oauth_token (:py:class:`docido_sdk.oauth.OAuthToken`)
               - results (a result or a list of results)
-              providing what the sub-tasks returned.
+                providing what the sub-tasks returned.
+              - config
+                (:py:class:`docido_sdk.toolbox.collections_ext.nameddict`)
+                crawler configuration
               - logger (:py:class:`logging.Logger`)
 
-        - 'max_concurrent_tasks' (optional): an integer greater than 0 and less
-        than 10 (the default value) used to limit number of tasks executed
-        concurrently.
+        - 'max_concurrent_tasks' (optional): an integer greater than 0 and
+          less than 10 (the default value) used to limit number of tasks
+          executed concurrently.
 
         A task cannot be instance, class, or static method
         of a :py:func:`docido_sdk.core.Component` object.
