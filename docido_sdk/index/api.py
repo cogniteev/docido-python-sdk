@@ -69,7 +69,7 @@ class IndexAPI(object):
         :return: collection of items whose insertion failed.
         """
 
-    def delete_cards(self, query):
+    def delete_cards(self, query=None):
         """Send a synchronous deletion by query
 
         :param list query: a search definition using the Elasticsearch
@@ -104,7 +104,7 @@ class IndexAPI(object):
         :return: collection of items whose insertion failed.
         """
 
-    def delete_thumbnails(self, query):
+    def delete_thumbnails(self, query=None):
         """Delete thumbnails from dedicated Docido index.
 
         :param query: a search definition using the Elasticsearch Query DSL to
@@ -182,7 +182,7 @@ class IndexAPIProcessor(IndexAPI):
     def push_cards(self, cards):
         return self._parent.push_cards(cards)
 
-    def delete_cards(self, query):
+    def delete_cards(self, query=None):
         return self._parent.delete_cards(query)
 
     def delete_cards_by_id(self, ids):
@@ -194,7 +194,7 @@ class IndexAPIProcessor(IndexAPI):
     def push_thumbnails(self, thumbnails):
         return self._parent.push_thumbnails(thumbnails)
 
-    def delete_thumbnails(self, query):
+    def delete_thumbnails(self, query=None):
         return self._parent.delete_thumbnails(query)
 
     def get_kv(self, key):
