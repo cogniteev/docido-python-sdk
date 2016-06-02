@@ -4,8 +4,9 @@ python:
 - '2.7'
 services:
 - elasticsearch
+- mongodb
 env:
-- ELASTICSEARCH_HOST=127.0.0.1:9200
+- ELASTICSEARCH_HOST=127.0.0.1:9200 MONGO_HOST=127.0.0.1
 install:
 - travis_retry pip install -r requirements-dev.txt
 - travis_retry pip install tox>=2.3.1 coveralls
