@@ -35,6 +35,7 @@ setup(
     install_requires=[
         'elasticsearch==2.3.0',
         'ProxyTypes==0.9',
+        'pymongo==2.9.3',
         'python-dateutil>=2.5.3',
         'pytz>=2016.4',
         'requests>=2.8.1',
