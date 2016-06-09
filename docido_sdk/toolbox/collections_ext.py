@@ -63,7 +63,7 @@ class Configuration(nameddict):
             if e.errno == errno.ENOENT:
                 config = default_config
             else:
-                raise e
+                raise
         return config
 
 
