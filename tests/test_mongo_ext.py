@@ -1,10 +1,13 @@
 import os
 import unittest
 
-from docido_sdk.toolbox.mongo_ext import MongoClientPool
+from docido_sdk.toolbox.mongo_ext import (
+    KwargsqlToMongo,
+    MongoClientPool,
+)
 
 
-class MongoExt(unittest.TestCase):
+class MongoPool(unittest.TestCase):
     MONGO_HOST = os.environ.get('MONGO_HOST', 'localhost')
 
     def test_connect_twice(self):
@@ -31,6 +34,54 @@ class MongoExt(unittest.TestCase):
         )
         self.assertEqual(con1.max_pool_size, 100)
         self.assertEqual(con2.max_pool_size, 42)
+
+
+class KwargsMongoConversion(unittest.TestCase):
+    def test_straight_operators(self):
+        self.assertEquals(
+            KwargsqlToMongo.convert(foo__bar__in=[41, 42]),
+            {
+                'foo.bar': {
+                    '$in': [41, 42],
+                },
+            },
+        )
+        self.assertEquals(
+            KwargsqlToMongo.convert(foo__bar__exists=42),
+            {
+                'foo.bar': {
+                    '$exists': True,
+                },
+            },
+        )
+
+    def test_compound_and_string_ops(self):
+        lhs = KwargsqlToMongo.convert(
+            foo__bar__exists=1,
+            foo__bar__iendswith='pika+',
+            foo='plop',
+        )
+        self.assertIsInstance(lhs, dict)
+        self.assertTrue(len(lhs) == 1)
+        self.assertItemsEqual(
+            lhs.get('$and'),
+            [
+                {'foo': 'plop'},
+                {'foo.bar': {
+                    '$exists': True,
+                }},
+                {'foo.bar': {
+                    '$regex': '^.*pika\+$',
+                    '$options': 'i',
+                }},
+            ],
+        )
+
+    def test_no_op(self):
+        self.assertEqual(
+            KwargsqlToMongo.convert(),
+            {}
+        )
 
 
 if __name__ == '__main__':
