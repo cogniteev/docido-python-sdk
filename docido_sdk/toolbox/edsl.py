@@ -106,7 +106,7 @@ class kwargsql(object):
         'in': lambda e, c: e in c,
         'nin': lambda e, c: e not in c,
         'size': lambda c, e: len(c) == e,
-        'exists': lambda e, _: e is not None,
+        'exists': lambda e, cond: e is not None if cond else e is None,
         'iexact': lambda s, e: s.lower() == e.lower(),
         'contains': lambda s, e: e in s,
         'icontains': lambda s, e: e.lower() in s.lower(),

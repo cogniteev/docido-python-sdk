@@ -117,6 +117,8 @@ class TestKwargSQL(unittest.TestCase):
     def test_exist_operation(self):
         self.assertFalse(and_(self.d, nested__unknown__exists=1))
         self.assertFalse(and_(self.d, exc__unknown__exists=1))
+        self.assertTrue(and_(self.d, nested__unknown__exists=False))
+        self.assertTrue(and_(self.d, exc__unknown__exists=False))
 
     def test_get(self):
         self.assertEqual(kwargsql.get(self.d, 'nested__val'), 'nested-value')
