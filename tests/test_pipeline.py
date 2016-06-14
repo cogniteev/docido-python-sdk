@@ -52,7 +52,8 @@ class IndexPipelineConfig(Component):
 class IndexAPIConfigurationProvider(Component):
     implements(IndexAPIConfigurationProvider)
 
-    def get_index_api_conf(self, service, docido_user_id, account_login):
+    def get_index_api_conf(self, service, docido_user_id,
+                           account_login, config):
         return {
             'service': service,
             'docido_user_id': docido_user_id,
@@ -68,7 +69,7 @@ class TestPipeline(unittest.TestCase):
         env[IndexPipelineConfig]
         pipeline_provider = env[IndexPipelineProvider]
         index_api = pipeline_provider.get_index_api(
-            'service1', 'user1', 'account1'
+            'service1', 'user1', 'account1', None
         )
         config = {
             'service': 'service1',

@@ -80,7 +80,7 @@ class TestLocalIndex(unittest.TestCase):
             pipeline = env[IndexPipelineProvider]
             try:
                 # build and provide an IndexAPI
-                yield pipeline.get_index_api(None, None, None)
+                yield pipeline.get_index_api(None, None, None, None)
             finally:
                 # Hide from Environment the Component classes defined
                 # for this test only.
@@ -103,7 +103,7 @@ class TestLocalIndex(unittest.TestCase):
             implements(IndexAPIConfigurationProvider)
 
             def get_index_api_conf(self, service, docido_user_id,
-                                   account_login):
+                                   account_login, config):
                 return {
                     'local_storage': {
                         'documents': {

@@ -35,7 +35,7 @@ class TestCheckProcessor(unittest.TestCase):
             implements(IndexAPIConfigurationProvider)
 
             def get_index_api_conf(self, service, docido_user_id,
-                                   account_login):
+                                   account_login, config):
                 return {
                     'service': service,
                     'docido_user_id': docido_user_id,
@@ -59,7 +59,7 @@ class TestCheckProcessor(unittest.TestCase):
                 env[YamlPullCrawlersIndexingConfig]
                 index_builder = env[IndexPipelineProvider]
                 yield index_builder.get_index_api(
-                    'check-processor-test', 'user2', 'account3'
+                    'check-processor-test', 'user2', 'account3', None
                 )
             finally:
                 for test_component in test_components:

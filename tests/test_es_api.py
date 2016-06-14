@@ -38,7 +38,7 @@ class TestEsAPI(unittest.TestCase):
             try:
                 # build and provide an IndexAPI
                 env[YamlPullCrawlersIndexingConfig]
-                yield pipeline.get_index_api(None, None, None)
+                yield pipeline.get_index_api(None, None, None, None)
             finally:
                 # Hide from Environment the Component classes defined
                 # for this test only.
@@ -54,7 +54,7 @@ class TestEsAPI(unittest.TestCase):
             implements(IndexAPIConfigurationProvider)
 
             def get_index_api_conf(self, service, docido_user_id,
-                                   account_login):
+                                   account_login, config):
                 return {
                     'service': service,
                     'docido_user_id': docido_user_id,

@@ -21,7 +21,7 @@ class IndexPipelineProvider(Component):
         unique=True
     )
 
-    def get_index_api(self, service, docido_user_id, account_login):
+    def get_index_api(self, service, docido_user_id, account_login, config):
         """ Create a pipeline of :py:class:`docido_sdk.index.IndexAPIProcessor`
         based on:
 
@@ -41,11 +41,13 @@ class IndexPipelineProvider(Component):
         :param basestring: account_login
           the user account login for which the IndexAPI is meant for
 
+        :param :py:class:`docido_sdk.toolbox.collections_ext.nameddict`
+
         :return: new pipeline of processors
         :rtype: :py:class:`docido_sdk.index.IndexAPI`
         """
         config = self.config.get_index_api_conf(
-            service, docido_user_id, account_login
+            service, docido_user_id, account_login, config
         )
         index_providers = self.pipeline.get_pipeline(service)
         index_api = IndexAPI()

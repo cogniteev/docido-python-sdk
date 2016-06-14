@@ -220,7 +220,7 @@ class IndexAPIConfigurationProvider(Interface):  # pragma: no cover
     """ An interface to provide a configuration consumed by
     :py:class:`docido_sdk.index.IndexAPIProcessor`
     """
-    def get_index_api_conf(service, docido_user_id, account_login):
+    def get_index_api_conf(service, docido_user_id, account_login, config):
         """ Provides a configuration object given to every index processors
 
         :param: basestring: service:
@@ -231,6 +231,9 @@ class IndexAPIConfigurationProvider(Interface):  # pragma: no cover
 
         :param: basestring: account_login
           the user account login for which the IndexAPI is meant for
+
+        :param nameddict: config
+          optional crawl configuration
 
         :return: IndexAPI Configuration
         :rtype: dict

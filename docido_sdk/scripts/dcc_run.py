@@ -26,7 +26,7 @@ from ..index.processor import (
 )
 from docido_sdk.index.pipeline import IndexPipelineProvider
 import docido_sdk.config as docido_config
-from ..toolbox.collections_ext import Configuration
+from ..toolbox.collections_ext import Configuration, nameddict
 
 
 def oauth_tokens_from_file():
@@ -66,7 +66,7 @@ class LocalRunner(Component):
                 new_config = Configuration.from_file(config.environment)
                 docido_config.update(new_config)
             index_api = index_provider.get_index_api(
-                self.service, None, None
+                self.service, None, None, config.get('config') or {}
             )
             runner = TasksRunner(crawler, index_api, config, logger)
             self._check_pickle(runner.tasks)
@@ -181,12 +181,14 @@ def get_crawls_runner(environment, crawls_root_path, incremental_path):
     class YamlAPIConfigurationProvider(Component):
         implements(IndexAPIConfigurationProvider)
 
-        def get_index_api_conf(self, service, docido_user_id, account_login):
-            return {
-                'service': service,
-                'docido_user_id': docido_user_id,
-                'account_login': account_login,
-                'local_storage': {
+        def get_index_api_conf(self, service, docido_user_id,
+                               account_login, config):
+            return nameddict(
+                service=service,
+                docido_user_id=docido_user_id,
+                account_login=account_login,
+                crawl=config,
+                local_storage={
                     'kv': {
                         'path': local_runner.crawl_path,
                     },
@@ -194,7 +196,7 @@ def get_crawls_runner(environment, crawls_root_path, incremental_path):
                         'path': local_runner.crawl_path,
                     }
                 }
-            }
+            )
     environment = _prepare_environment(environment)
     try:
         local_runner = env[LocalRunner]

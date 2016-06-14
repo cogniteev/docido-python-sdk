@@ -49,7 +49,7 @@ class TestLocalKV(unittest.TestCase):
                 implements(IndexAPIConfigurationProvider)
 
                 def get_index_api_conf(self, service,
-                                       docido_user_id, account_login):
+                                       docido_user_id, account_login, config):
                     return {
                         'local_storage': {
                             'documents': {
@@ -64,7 +64,7 @@ class TestLocalKV(unittest.TestCase):
             env[ForceConfig]
             pipeline = env[IndexPipelineProvider]
             try:
-                yield pipeline.get_index_api(None, None, None)
+                yield pipeline.get_index_api(None, None, None, None)
             finally:
                 ForcePipeline.unregister()
                 ForceConfig.unregister()
