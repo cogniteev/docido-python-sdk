@@ -111,5 +111,5 @@ class TasksRunner(object):
                 result = e
                 break
             finally:
-                self.index_api.task_terminated
+                self.index_api.task_terminated()
         return result
