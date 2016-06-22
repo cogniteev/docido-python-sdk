@@ -27,6 +27,7 @@ from ..index.processor import (
 from docido_sdk.index.pipeline import IndexPipelineProvider
 import docido_sdk.config as docido_config
 from ..toolbox.collections_ext import Configuration, nameddict
+from ..toolbox.logger_ext import set_root_logger_from_verbosity
 
 
 def oauth_tokens_from_file():
@@ -139,22 +140,6 @@ def parse_options(args=None):
     return parser.parse_args(args)
 
 
-def configure_loggers(verbose):  # pragma: no cover
-    logging_level = logging.WARN
-    if verbose == 1:
-        logging_level = logging.INFO
-    elif verbose > 1:
-        logging_level = logging.DEBUG
-    logging.basicConfig(level=logging_level)
-    # shut up a bunch of loggers
-    for l in [
-        'elasticsearch',
-        'requests.packages.urllib3.connectionpool',
-        'urllib3.connectionpool',
-    ]:
-        logging.getLogger(l).setLevel(logging.WARNING)
-
-
 def _prepare_environment(environment):
     environment = environment or env
     loader.load_components(environment)
@@ -209,7 +194,7 @@ def get_crawls_runner(environment, crawls_root_path, incremental_path):
 
 def run(args=None, environment=None):
     args = parse_options(args)
-    configure_loggers(args.verbose)
+    set_root_logger_from_verbosity(args.verbose)
     with get_crawls_runner(environment, args.output,
                            args.incremental) as runner:
         return list(runner.run_all(set(args.crawls)))
