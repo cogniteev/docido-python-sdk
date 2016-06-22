@@ -52,13 +52,16 @@ class TasksRunner(object):
         )
         tasks = split_crawl_tasks(tasks, concurrency)
         results = []
-        for seq in tasks:
-            previous_result = None
-            for task in seq:
-                previous_result = self._run_task(task, previous_result)
-            results.append(previous_result)
-        if epilogue is not None:
-            self._run_task(epilogue, results)
+        try:
+            for seq in tasks:
+                previous_result = None
+                for task in seq:
+                    previous_result = self._run_task(task, previous_result)
+                results.append(previous_result)
+            if epilogue is not None:
+                self._run_task(epilogue, results)
+        finally:
+            self.index_api.crawl_terminated()
 
     def _iter_crawl_tasks(self):
         attempt = 1
@@ -80,6 +83,8 @@ class TasksRunner(object):
             except Exception:
                 self.logger.exception('Unexpected exception was raised')
                 raise
+            finally:
+                self.index_api.task_terminated()
         return tasks
 
     def _run_task(self, task, prev_result):
@@ -105,4 +110,6 @@ class TasksRunner(object):
                 self.logger.exception('Unexpected exception was raised')
                 result = e
                 break
+            finally:
+                self.index_api.task_terminated
         return result

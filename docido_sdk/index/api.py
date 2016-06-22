@@ -161,6 +161,18 @@ class IndexAPI(object):
         :raises SystemError: if Docido index is unreachable
         """
 
+    def crawl_terminated(self):
+        """Called by framework when crawl is over
+
+        Helpful to flush buffers
+        """
+
+    def task_terminated(self):
+        """Called by the framework when a crawl task terminates
+
+        Helpful to flush buffers
+        """
+
 
 class IndexAPIProcessor(IndexAPI):
     """ Allows creation of :py:class:`docido_sdk.index.IndexAPI` pipelines
@@ -214,6 +226,12 @@ class IndexAPIProcessor(IndexAPI):
 
     def ping(self):
         return self._parent.ping()
+
+    def crawl_terminated(self):
+        return self._parent.crawl_terminated()
+
+    def task_terminated(self):
+        return self._parent.task_terminated()
 
 
 class IndexAPIConfigurationProvider(Interface):  # pragma: no cover
