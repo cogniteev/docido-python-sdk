@@ -59,7 +59,9 @@ class TasksRunner(object):
                     previous_result = self._run_task(task, previous_result)
                 results.append(previous_result)
             if epilogue is not None:
-                self._run_task(epilogue, results)
+                return self._run_task(epilogue, results)
+            else:
+                return results
         finally:
             self.index_api.crawl_terminated()
 
