@@ -1,4 +1,3 @@
-
 import pkg_resources
 from pkg_resources import (
     working_set,

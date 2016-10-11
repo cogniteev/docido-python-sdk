@@ -60,7 +60,7 @@ class Configuration(nameddict):
         try:
             config = Configuration.from_file(os.getenv(envvar, default))
         except IOError as e:
-            if e.errno == errno.ENOENT:
+            if e.errno in [errno.ENOENT, errno.ENOTDIR]:
                 config = default_config
             else:
                 raise
