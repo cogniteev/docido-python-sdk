@@ -24,7 +24,7 @@ class MongoPool(unittest.TestCase):
 
     def test_connect_change_parameters(self):
         con1 = MongoClientPool.get(host=self.MONGO_HOST)
-        con2 = MongoClientPool.get(host=self.MONGO_HOST, max_pool_size=42)
+        con2 = MongoClientPool.get(host=self.MONGO_HOST, maxpoolsize=42)
         con3 = MongoClientPool.get(host=self.MONGO_HOST)
         self.assertNotEqual(hash(con1), hash(con2))
         self.assertEqual(hash(con1), hash(con3))
