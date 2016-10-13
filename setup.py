@@ -33,7 +33,7 @@ setup(
     test_suite='docido.sdk.test.suite',
     zip_safe=True,
     install_requires=[
-        'elasticsearch==2.3.0',
+        'elasticsearch>=2.3.0',
         'ProxyTypes==0.9',
         'pymongo>=2.9.4',
         'python-dateutil>=2.5.3',
