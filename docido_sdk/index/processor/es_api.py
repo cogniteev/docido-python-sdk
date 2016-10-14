@@ -52,6 +52,7 @@ class ElasticsearchProcessor(IndexAPIProcessor):
         return self.__es.ping() and self.__es_store.ping()
 
     def search_cards(self, query):
+        # pylint: disable=unexpected-keyword-arg
         generated_results = 0
         batch_size = 10
         offset = 0
@@ -112,6 +113,7 @@ class ElasticsearchProcessor(IndexAPIProcessor):
                                    self.__store_type)
 
     def __delete_by_id(self, ids, index, _type):
+        # pylint: disable=unexpected-keyword-arg
         error_docs = []
         body = [{
             'delete': {

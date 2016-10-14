@@ -1,3 +1,3 @@
 
-from api import *
-from errors import *
+from api import *  # noqa
+from errors import *  # noqa

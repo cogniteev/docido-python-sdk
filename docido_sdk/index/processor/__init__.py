@@ -1,2 +1,2 @@
-from check import *
-from es_api import *
+from check import *  # noqa
+from es_api import *  # noqa

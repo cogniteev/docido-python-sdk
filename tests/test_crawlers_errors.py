@@ -1,6 +1,6 @@
 import unittest
 
-from docido_sdk.crawler import *
+from docido_sdk.crawler import *  # noqa
 
 
 class TestCrawlersErrors(unittest.TestCase):
