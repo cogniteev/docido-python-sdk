@@ -1,12 +1,12 @@
-
-from contextlib import contextmanager
 import copy
 import os
 import shutil
 import tempfile
 
+from .compat import contextlib
 
-@contextmanager
+
+@contextlib.contextmanager
 def restore_dict_kv(a_dict, key, copy_func=copy.deepcopy):
     """Backup an object in a with context and restore it when leaving
     the scope.
@@ -31,7 +31,7 @@ def restore_dict_kv(a_dict, key, copy_func=copy.deepcopy):
             a_dict.pop(key, None)
 
 
-@contextmanager
+@contextlib.contextmanager
 def unregister_component(component):
     try:
         component.unregister()
@@ -40,16 +40,18 @@ def unregister_component(component):
         component.register()
 
 
-@contextmanager
-def tempdir(**kwargs):
-    path = tempfile.mkdtemp(**kwargs)
+@contextlib.contextmanager
+def tempdir(*args, **kwargs):
+    remove = kwargs.pop('remove', True)
+    path = tempfile.mkdtemp(*args, **kwargs)
     try:
         yield path
     finally:
-        shutil.rmtree(path)
+        if remove:
+            shutil.rmtree(path)
 
 
-@contextmanager
+@contextlib.contextmanager
 def pushd(path):
     cwd = os.getcwd()
     os.chdir(path)
