@@ -62,8 +62,6 @@ class TestPopen(unittest.TestCase):
         with popen(['/bin/sleep', '30']) as pid:
             proc_path = '/proc/{}'.format(pid)
             self.assertTrue(osp.isdir(proc_path))
-        subprocess.call(['/bin/ls', proc_path])
-        self.assertFalse(osp.isdir(proc_path))
 
 
 if __name__ == '__main__':
