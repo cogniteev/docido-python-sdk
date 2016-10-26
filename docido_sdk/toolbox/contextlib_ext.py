@@ -1,6 +1,9 @@
 import copy
 import os
+import os.path as osp
 import shutil
+import signal
+import subprocess
 import tempfile
 
 from .compat import contextlib
@@ -59,3 +62,28 @@ def pushd(path):
         yield path
     finally:
         os.chdir(cwd)
+
+
+@contextlib.contextmanager
+def mkstemp(*args, **kwargs):
+    remove = kwargs.pop('remove', True)
+    fd, path = tempfile.mkstemp(*args, **kwargs)
+    os.close(fd)
+    try:
+        yield path
+    finally:
+        if remove and osp.exists(path):
+            os.remove(path)
+
+
+@contextlib.contextmanager
+def popen(*args, **kwargs):
+    """Run a process in background in a `with` context. Parameters given
+    to this function are passed to `subprocess.Popen`. Process is kill
+    when exiting the context.
+    """
+    process = subprocess.Popen(*args, **kwargs)
+    try:
+        yield process.pid
+    finally:
+        os.kill(process.pid, signal.SIGKILL)

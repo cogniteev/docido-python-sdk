@@ -1,11 +1,14 @@
 import os
 import os.path as osp
+import subprocess
 import unittest
 
 from docido_sdk.toolbox.contextlib_ext import (
+    mkstemp,
+    popen,
+    pushd,
     restore_dict_kv,
     tempdir,
-    pushd,
 )
 
 
@@ -25,7 +28,7 @@ class TestRestoreDictKV(unittest.TestCase):
         self.assertEqual(d, {'a': 'b'})
 
 
-class TestPushd(unittest.TestCase):
+class TestTempfile(unittest.TestCase):
     def test_pushd(self):
         cwd = osp.realpath(os.getcwd())
         with tempdir() as path, pushd(path) as ppath:
@@ -37,6 +40,30 @@ class TestPushd(unittest.TestCase):
             self.assertEqual(path, cwd_in_context)
         self.assertEqual(cwd, osp.realpath(os.getcwd()))
         self.assertFalse(osp.isdir(path))
+
+    def test_pushd_keep_dir(self):
+        with tempdir(remove=False) as path:
+            self.assertTrue(osp.isdir(path))
+        self.assertTrue(osp.isdir(path))
+
+    def test_mkstemp(self):
+        with mkstemp() as path:
+            self.assertTrue(osp.isfile(path))
+        self.assertFalse(osp.isfile(path))
+
+    def test_mkstemp_keep_file(self):
+        with mkstemp(remove=False) as path:
+            self.assertTrue(osp.isfile(path))
+        self.assertTrue(osp.isfile(path))
+
+
+class TestPopen(unittest.TestCase):
+    def test_already_dead(self):
+        with popen(['/bin/sleep', '30']) as pid:
+            proc_path = '/proc/{}'.format(pid)
+            self.assertTrue(osp.isdir(proc_path))
+        subprocess.call(['/bin/ls', proc_path])
+        self.assertFalse(osp.isdir(proc_path))
 
 
 if __name__ == '__main__':
