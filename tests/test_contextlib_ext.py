@@ -1,6 +1,5 @@
 import os
 import os.path as osp
-import subprocess
 import unittest
 
 from docido_sdk.toolbox.contextlib_ext import (
