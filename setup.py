@@ -9,7 +9,7 @@ with open('docido_sdk/__init__.py') as istr:
         exec(l)
 
 install_requires = [
-    'elasticsearch>=2.3.0,<5',
+    'elasticsearch==2.3.0',
     'ProxyTypes==0.9',
     'pymongo>=2.9.4',
     'python-dateutil>=2.5.3',
