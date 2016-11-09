@@ -86,4 +86,5 @@ def popen(*args, **kwargs):
     try:
         yield process.pid
     finally:
-        os.kill(process.pid, signal.SIGKILL)
+        os.kill(process.pid, signal.SIGTERM)
+        os.waitpid(process.pid, 0)
