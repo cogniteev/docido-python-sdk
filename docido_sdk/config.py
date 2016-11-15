@@ -3,7 +3,7 @@ import sys
 from . toolbox.collections_ext import Configuration, contextobj
 
 sys.modules[__name__] = contextobj(Configuration.from_env(
-    'DOCIDO_CONFIG',
+    ['DOCIDO_CONFIG', 'APP_CONFIG'],
     'settings.yml',
     Configuration()
 ))

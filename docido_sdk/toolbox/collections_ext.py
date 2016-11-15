@@ -5,6 +5,7 @@ import os
 import os.path as osp
 
 from peak.util.proxies import ObjectWrapper
+import six
 import yaml
 from yaml import Loader
 
@@ -56,9 +57,17 @@ class Configuration(nameddict):
             return Configuration(yaml.load(istr, Loader=Loader))
 
     @classmethod
-    def from_env(cls, envvar, default, default_config):
+    def from_env(cls, envvars, default, default_config):
         try:
-            config = Configuration.from_file(os.getenv(envvar, default))
+            if isinstance(envvars, six.string_types):
+                envvars = [envvars]
+            config_file = default
+            for envvar in envvars:
+                envvalue = os.getenv(envvar)
+                if envvalue is not None:
+                    config_file = envvalue
+                    break
+            config = Configuration.from_file(config_file)
         except IOError as e:
             if e.errno in [errno.ENOENT, errno.ENOTDIR]:
                 config = default_config
