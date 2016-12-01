@@ -7,12 +7,13 @@ def set_root_logger_from_verbosity(verbosity=0):
     """Configure root logger according to both application settings
     and verbosity level.
     """
-    level = logging.WARN
+    kwargs = {}
     if verbosity == 1:
-        level = logging.INFO
+        kwargs.update(level=logging.INFO)
     elif verbosity > 1:
-        level = logging.DEBUG
-    set_root_logger(level=level)
+        kwargs.update(level=logging.DEBUG)
+
+    set_root_logger(**kwargs)
 
 
 def set_root_logger(config=None, **kwargs):
