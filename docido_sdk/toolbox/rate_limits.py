@@ -11,6 +11,8 @@ import urlparse
 from requests.adapters import BaseAdapter, HTTPAdapter
 from requests.exceptions import RequestException
 
+import operator
+
 from docido_sdk.crawler import Retry
 from docido_sdk.toolbox.date_ext import timestamp_ms
 from docido_sdk.toolbox.edsl import kwargsql
@@ -20,14 +22,14 @@ DEFAULT_RETRY = 60
 LOGGER = logging.getLogger(__name__)
 
 
-def truncated_exponential_backoff(slot_delay, collision=0, max_collisions=5):
+def truncated_exponential_backoff(
+    slot_delay, collision=0, max_collisions=5,
+    op=operator.mul):
     """Truncated Exponential Backoff
     see https://en.wikipedia.org/wiki/Exponential_backoff
     """
-    if collision == max_collisions:
-        collision = 0
-    slots = random.randint(0, collision)
-    return slots * slot_delay
+    slots = random.randint(0, collision % max_collisions)
+    return op(slot_delay, slots)
 
 
 def teb_retry(exc=RequestException,
