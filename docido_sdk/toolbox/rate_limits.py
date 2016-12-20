@@ -24,11 +24,15 @@ LOGGER = logging.getLogger(__name__)
 
 def truncated_exponential_backoff(
     slot_delay, collision=0, max_collisions=5,
-    op=operator.mul):
+    op=operator.mul, in_range=True):
     """Truncated Exponential Backoff
     see https://en.wikipedia.org/wiki/Exponential_backoff
     """
-    slots = random.randint(0, collision % max_collisions)
+    truncated_collision = collision % max_collisions
+    if in_range:
+        slots = random.randint(0, truncated_collision)
+    else:
+        slots = truncated_collision
     return op(slot_delay, slots)
 
 
