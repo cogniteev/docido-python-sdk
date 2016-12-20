@@ -30,7 +30,7 @@ class RetryDelaySeries(object):
     def truncated_exponential_backoff(cls, **kwargs):
         delay = kwargs.pop('delay')
         kwargs.setdefault('collision', 0)
-        op = kwargs.pop('op', None)
+        op = kwargs.get('op', None)
         if isinstance(op, six.string_types):
             kwargs.update(op=getattr(operator, op))
         while True:
