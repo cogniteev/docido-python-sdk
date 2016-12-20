@@ -6,6 +6,8 @@ import unittest
 from docido_sdk.toolbox.collections_ext import (
     Configuration,
     contextobj,
+    hashabledict,
+    flatten_dict,
     nameddict,
 )
 
@@ -143,6 +145,89 @@ class TestConfiguration(unittest.TestCase):
                 Configuration.from_env(envvar, None, {})
         finally:
             shutil.rmtree(tmpdir)
+
+
+class TestFlattenDict(unittest.TestCase):
+    def test_empty(self):
+        self.assertEqual(flatten_dict({}), {})
+
+    def test_nested_dict(self):
+        self.assertEqual(
+            flatten_dict({
+                'foo': 42,
+                'bar': {
+                    'foo': 43
+                }
+            }),
+            {
+                'foo': 42,
+                'bar.foo': 43
+            }
+        )
+
+    def test_conflict(self):
+        self.assertEqual(
+            flatten_dict({
+                'bar.foo': 42,
+                'bar': {
+                    'foo': 43
+                }
+            }),
+            {
+                'bar.foo': 42,
+                'bar.foo.2': 43,
+            }
+        )
+
+    def test_list(self):
+        self.assertEqual(
+            flatten_dict({
+                'foo': [
+                    dict(bar=42),
+                    dict(pika='plop'),
+                    dict(bar=43),
+                ]
+            }),
+            {
+                'foo.0.bar': 42,
+                'foo.1.pika': 'plop',
+                'foo.2.bar': 43,
+            }
+        )
+
+
+class TestHashableDict(unittest.TestCase):
+    def test_empty_dict(self):
+        the_hash = hash(hashabledict())
+        self.assertIsNotNone(the_hash)
+        self.assertEqual(the_hash, hash(hashabledict()))
+
+    def test_single_key_dict(self):
+        self.assertEqual(
+            hash(hashabledict(foo=42)),
+            hash(hashabledict(foo=42))
+        )
+        self.assertNotEqual(
+            hash(hashabledict(foo=42)),
+            hash(hashabledict(foo=43))
+        )
+
+    def test_dict_with_lists(self):
+        self.assertIsNotNone(hash(hashabledict({
+            'foo': [
+                dict(bar=42),
+                dict(pika='plop'),
+                dict(bar=43),
+            ]
+        })))
+
+    def test_nested_dict(self):
+        self.assertIsNotNone(hash(hashabledict({
+            'foo': 42,
+            'bar': {
+                'foo': 43
+            }
+        })))
 
 if __name__ == '__main__':
     unittest.main()
