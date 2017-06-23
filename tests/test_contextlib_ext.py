@@ -1,6 +1,7 @@
 import os
 import os.path as osp
 import unittest
+import platform
 
 from docido_sdk.toolbox.contextlib_ext import (
     mkstemp,
@@ -58,6 +59,8 @@ class TestTempfile(unittest.TestCase):
 
 class TestPopen(unittest.TestCase):
     def test_already_dead(self):
+        if platform.system() != 'Linux':
+            raise unittest.SkipTest('This test is for linux only')
         with popen(['/bin/sleep', '30']) as pid:
             proc_path = '/proc/{}'.format(pid)
             self.assertTrue(osp.isdir(proc_path))

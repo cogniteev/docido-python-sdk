@@ -53,8 +53,9 @@ class TestHA(unittest.TestCase):
                     raise RuntimeError()
                 return 0
 
-            def ha_on_error(self, method, exc, counter):
+            def ha_on_error(self, method, exc, args, kwargs):
                 test_instance.assertIsInstance(exc, RuntimeError)
+                counter = args[0]
                 test_instance.assertIsInstance(counter, int)
                 call_count[0] += 1
                 return (counter - 1,), {}

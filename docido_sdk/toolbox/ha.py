@@ -88,7 +88,7 @@ class HA(object):
                     try:
                         return method(self, *args, **kwargs)
                     except catch_exception as e:
-                        res = self.ha_on_error(method, e, *args, **kwargs)
+                        res = self.ha_on_error(method, e, args, kwargs)
                         if res is not None:
                             args, kwargs = res
                         if max_retries and retries >= max_retries:
@@ -115,7 +115,7 @@ class HA(object):
             **delay_policy_conf
         )
 
-    def ha_on_error(self, method, exc, *args, **kwargs):
+    def ha_on_error(self, method, exc, my_args, my_kwargs):
         """Callback when exception is caught by the Ha.catch decorator.
         This method is meant to be overloaded.
 
